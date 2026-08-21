@@ -26,6 +26,28 @@ services:
     depends_on:
       - db
       - redis
+  celery_worker:
+    build: .
+    restart: unless-stopped
+    command: celery -A config worker --loglevel=info
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis
 
+  celery_beat:
+    build: .
+    restart: unless-stopped
+    command: celery -A config beat --loglevel=info
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - redis
 volumes:
   pgdata:
