@@ -1,35 +1,49 @@
-from django.db import transaction
 from django.utils import timezone
 
-from inventory.models import MovementType, StockMovement
+from .models import Product
 
-from .models import Order
+# SKT'ye/tazelik son tarihine kac gun veya daha az kaldiginda "acele sat" uyarisi versin
+PRIORITY_SALE_THRESHOLD_DAYS = 3
 
 
-def fulfill_order(order):
+def get_freshness_status(lot):
     """
-    Bir siparisi karsilar: her kalem icin stoktan duser (StockMovement
-    OUT_SALE olarak), siparisi FULFILLED isaretler. Hepsi tek transaction --
-    production/services.py'deki create_roast_batch ile ayni desen.
+    Bir lot'un tazelik durumunu hesaplar. Hicbir veritabani kaydi OLUSTURMAZ,
+    sadece durumu doner: 'NORMAL', 'PRIORITY_SALE', ya da 'WASTE'.
     """
-    if order.status != Order.Status.PENDING:
-        raise ValueError(
-            f'Order is not pending (current status: {order.status}).'
-        )
+    days_left = (lot.expiry_date - timezone.localdate()).days
 
-    with transaction.atomic():
-        for item in order.items.select_related('lot'):
-            if item.lot.remaining_quantity < item.quantity:
-                raise ValueError(
-                    f'Not enough stock in lot {item.lot.lot_code}: '
-                    f'need {item.quantity}, have {item.lot.remaining_quantity}.'
-                )
-                    StockMovement.objects.create(
-            lot=output_lot,
-            movement_type=MovementType.IN,
-            quantity=output_quantity,
-        )
-        order.status = Order.Status.FULFILLED
-        order.fulfilled_at = timezone.now()
-        order.save(update_fields=['status', 'fulfilled_at'])
-    return order
+    if days_left < 0:
+        return 'WASTE'
+    if days_left <= PRIORITY_SALE_THRESHOLD_DAYS:
+        return 'PRIORITY_SALE'
+    return 'NORMAL'
+
+
+def get_stock_summary(product_name):
+    """
+    Verilen urun adina (kismi eslesme ile) en yakin Product icin stok ozeti
+    doner -- toplam kalan miktar ve her lot'un tazelik durumu dahil.
+    AI katmaninin function calling ile cagiracagi ilk gercek 'arac' bu.
+    """
+    product = Product.objects.filter(name__icontains=product_name).first()
+    if product is None:
+        return {'error': f'"{product_name}" adinda bir urun bulunamadi.'}
+
+    lots = product.lots.all()
+    total_remaining = sum(lot.remaining_quantity for lot in lots)
+    lot_details = [
+        {
+            'lot_code': lot.lot_code,
+            'remaining': float(lot.remaining_quantity),
+            'expiry_date': str(lot.expiry_date),
+            'freshness_status': get_freshness_status(lot),
+        }
+        for lot in lots
+    ]
+    return {
+        'product': product.name,
+        'total_remaining': float(total_remaining),
+        'unit': product.unit,
+        'lots': lot_details,
+    }
