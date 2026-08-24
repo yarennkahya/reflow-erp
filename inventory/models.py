@@ -7,12 +7,11 @@ from django.db import models
 
 class Business(models.Model):
     class BusinessType(models.TextChoices):
-        MARKET = 'market', 'Market'
-        RESTAURANT = 'restaurant', 'Restaurant'
-        PRODUCER = 'producer', 'Producer'
+        SUPPLIER = 'supplier', 'Green coffee supplier'
+        WHOLESALE_CUSTOMER = 'wholesale_customer', 'Wholesale customer (cafe)'
 
     name = models.CharField(max_length=255)
-    business_type = models.CharField(max_length=20, choices=BusinessType.choices)
+    business_type = models.CharField(max_length=30, choices=BusinessType.choices)
     contact_email = models.EmailField()
     contact_phone = models.CharField(max_length=32)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -72,16 +71,20 @@ class Lot(models.Model):
             )
         ]
 
+    @property
+    def remaining_quantity(self):
+        from django.db.models import Sum
+        moved = self.stock_movements.aggregate(total=Sum('quantity'))['total'] or 0
+        return self.quantity_received + moved
+
     def __str__(self):
         return f'{self.product} ({self.lot_code})'
 
 
-# NOT: Bilerek MODUL seviyesinde. Nested class'lar (Meta gibi) kardes nested
-# class'lara bare isimle erisemez, sadece modul seviyesi isimler otomatik
-# gorulur. Bu satirlarin StockMovement'in ICINE tasinmasi eski hataya doner.
+# NOT: Bilerek MODUL seviyesinde (nested class scoping sorununu hatirla).
 class MovementType(models.TextChoices):
     IN = 'IN', 'Stock in'
-    OUT_DONATION = 'OUT_DONATION', 'Donation out'
+    OUT_PRODUCTION = 'OUT_PRODUCTION', 'Used in production'
     OUT_SALE = 'OUT_SALE', 'Sale out'
     WASTE = 'WASTE', 'Waste'
 
@@ -110,7 +113,7 @@ class StockMovement(models.Model):
                     models.Q(movement_type=MovementType.IN, quantity__gt=0)
                     | models.Q(
                         movement_type__in=[
-                            MovementType.OUT_DONATION,
+                            MovementType.OUT_PRODUCTION,
                             MovementType.OUT_SALE,
                             MovementType.WASTE,
                         ],
@@ -133,81 +136,3 @@ class StockMovement(models.Model):
 
     def __str__(self):
         return f'{self.lot} - {self.get_movement_type_display()} ({self.quantity})'
-
-
-class Partner(models.Model):
-    name = models.CharField(max_length=255)
-    capacity_kg = models.DecimalField(
-        max_digits=12,
-        decimal_places=3,
-        validators=[MinValueValidator(Decimal('0'))],
-    )
-    contact_email = models.EmailField()
-    is_active = models.BooleanField(default=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ['-capacity_kg', 'name']
-
-    def __str__(self):
-        return self.name
-
-
-# Ayni sebep: MODUL seviyesinde, Distribution'in disinda.
-class Channel(models.TextChoices):
-    DONATION = 'DONATION', 'Donation'
-    DISCOUNT_SALE = 'DISCOUNT_SALE', 'Discount sale'
-    WASTE = 'WASTE', 'Waste'
-
-
-class Distribution(models.Model):
-    # Geriye donuk uyumluluk: Distribution.Channel hala calisir.
-    Channel = Channel
-
-    lot = models.ForeignKey(
-        Lot,
-        on_delete=models.PROTECT,
-        related_name='distributions',
-    )
-    channel = models.CharField(max_length=20, choices=Channel.choices)
-    partner = models.ForeignKey(
-        Partner,
-        on_delete=models.PROTECT,
-        related_name='distributions',
-        null=True,
-        blank=True,
-    )
-    quantity = models.DecimalField(
-        max_digits=12,
-        decimal_places=3,
-        validators=[MinValueValidator(Decimal('0.001'))],
-    )
-    decided_at = models.DateTimeField(auto_now_add=True)
-    note = models.TextField(blank=True)
-
-    class Meta:
-        ordering = ['-decided_at', '-pk']
-        constraints = [
-            models.CheckConstraint(
-                condition=models.Q(channel=Channel.DONATION, partner__isnull=False)
-                | models.Q(
-                    channel__in=[Channel.DISCOUNT_SALE, Channel.WASTE],
-                    partner__isnull=True,
-                ),
-                name='inventory_distribution_partner_matches_channel',
-            ),
-            models.CheckConstraint(
-                condition=models.Q(quantity__gt=0),
-                name='inventory_distribution_quantity_positive',
-            ),
-        ]
-
-    def clean(self):
-        super().clean()
-        if self.channel == self.Channel.DONATION and self.partner is None:
-            raise ValidationError({'partner': 'A donation requires a partner.'})
-        if self.channel != self.Channel.DONATION and self.partner is not None:
-            raise ValidationError({'partner': 'Only donations can have a partner.'})
-
-    def __str__(self):
-        return f'{self.lot} - {self.get_channel_display()} ({self.quantity})'

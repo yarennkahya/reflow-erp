@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Business, Distribution, Lot, Partner, Product, StockMovement
+from .models import Business, Lot, Product, StockMovement
 
 
 @admin.register(Business)
@@ -31,18 +31,3 @@ class StockMovementAdmin(admin.ModelAdmin):
     list_filter = ('movement_type', 'created_at')
     search_fields = ('lot__lot_code', 'lot__product__name')
     ordering = ('-created_at',)
-
-
-@admin.register(Partner)
-class PartnerAdmin(admin.ModelAdmin):
-    list_display = ('name', 'capacity_kg', 'contact_email', 'is_active', 'updated_at')
-    list_filter = ('is_active',)
-    search_fields = ('name', 'contact_email')
-
-
-@admin.register(Distribution)
-class DistributionAdmin(admin.ModelAdmin):
-    list_display = ('lot', 'channel', 'partner', 'quantity', 'decided_at')
-    list_filter = ('channel', 'decided_at')
-    search_fields = ('lot__lot_code', 'lot__product__name', 'partner__name')
-    ordering = ('-decided_at',)

@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'inventory',
+    'production',
 ]
 
 MIDDLEWARE = [
@@ -135,7 +136,7 @@ CELERY_TIMEZONE = 'Europe/Istanbul'
 
 CELERY_BEAT_SCHEDULE = {
     'nightly-expiry-scan': {
-        'task': 'inventory.tasks.scan_and_distribute_lots',
+        'task': 'inventory.tasks.scan_lot_freshness',
         'schedule': crontab(hour=2, minute=0),
     },
 }

@@ -1,21 +1,23 @@
 from celery import shared_task
-from django.db.models import Sum
 
 from .models import Lot
-from .services import apply_distribution
+from .services import get_freshness_status
 
 
 @shared_task
-def scan_and_distribute_lots():
-    """Her gece çalışır: hâlâ dağıtılmamış miktarı olan her lot için
-    kanal kararını verir ve StockMovement + Distribution kaydını oluşturur."""
-    created_ids = []
+def scan_lot_freshness():
+    """
+    Her gece calisir: tum lotlarin tazelik durumunu degerlendirir,
+    acil ilgi gerektirenleri raporlar. Otomatik satis/iskarta islemi YAPMAZ --
+    bu bilgi ileride AI katmani ve satis modulu tarafindan kullanilacak.
+    """
+    report = {'NORMAL': 0, 'PRIORITY_SALE': [], 'WASTE': []}
     for lot in Lot.objects.all():
-        already_distributed = (
-            lot.distributions.aggregate(total=Sum('quantity'))['total'] or 0
-        )
-        remaining = lot.quantity_received - already_distributed
-        if remaining > 0:
-            distribution = apply_distribution(lot, remaining)
-            created_ids.append(distribution.pk)
-    return {'distributions_created': len(created_ids), 'ids': created_ids}
+        status = get_freshness_status(lot)
+        if status == 'NORMAL':
+            report['NORMAL'] += 1
+        elif status == 'PRIORITY_SALE':
+            report['PRIORITY_SALE'].append(lot.pk)
+        else:
+            report['WASTE'].append(lot.pk)
+    return report
