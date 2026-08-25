@@ -47,3 +47,5 @@ def get_profitability_report(start_date=None, end_date=None):
         'margin_percent': float(margin_percent),
         'line_items': line_items,
     }
+
+

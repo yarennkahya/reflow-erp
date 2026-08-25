@@ -1,18 +1,19 @@
-from openai import OpenAI
 import json
+
+from openai import OpenAI
+from pgvector.django import CosineDistance
 
 from inventory.services import get_stock_summary
 
 from .models import Document
-from pgvector.django import CosineDistance
 
 EMBEDDING_MODEL = 'text-embedding-3-small'
 
-client = OpenAI()  # OPENAI_API_KEY'i ortam değişkeninden otomatik okur
+client = OpenAI()  # OPENAI_API_KEY'i ortam degiskeninden otomatik okur
 
 
 def generate_embedding(text):
-    """Verilen metni OpenAI'ye gönderip embedding vektörünü döner."""
+    """Verilen metni OpenAI'ye gonderip embedding vektorunu doner."""
     response = client.embeddings.create(
         model=EMBEDDING_MODEL,
         input=text,
@@ -21,10 +22,11 @@ def generate_embedding(text):
 
 
 def embed_document(document):
-    """Bir Document kaydının content'ini embedding'e çevirir ve kaydeder."""
+    """Bir Document kaydinin content'ini embedding'e cevirir ve kaydeder."""
     document.embedding = generate_embedding(document.content)
     document.save(update_fields=['embedding'])
     return document
+
 
 def search_similar_documents(query_embedding, top_k=3):
     """
@@ -78,6 +80,20 @@ def answer_question(question, top_k=3):
     }
 
 
+def _search_documents_tool(query):
+    """
+    search_documents aracinin gercek calisan tarafi -- RAG'in arama kismini
+    (embedding uret + benzer belge bul) bir fonksiyon olarak sarmalar.
+    """
+    query_embedding = generate_embedding(query)
+    docs = search_similar_documents(query_embedding, top_k=3)
+    return {
+        'results': [
+            {'title': doc.title, 'content': doc.content} for doc in docs
+        ]
+    }
+
+
 TOOLS = [
     {
         'type': 'function',
@@ -99,10 +115,31 @@ TOOLS = [
             },
         },
     },
+    {
+        'type': 'function',
+        'function': {
+            'name': 'search_documents',
+            'description': (
+                'Kurumsal dokumanlarda (prosedurler, tedarikci notlari, '
+                'politikalar) arama yapar, en alakali belgeleri dondurur.'
+            ),
+            'parameters': {
+                'type': 'object',
+                'properties': {
+                    'query': {
+                        'type': 'string',
+                        'description': 'Aranacak konu veya soru',
+                    },
+                },
+                'required': ['query'],
+            },
+        },
+    },
 ]
 
 AVAILABLE_FUNCTIONS = {
     'get_stock_summary': get_stock_summary,
+    'search_documents': _search_documents_tool,
 }
 
 
@@ -117,10 +154,7 @@ def ask_with_tools(question):
             'role': 'system',
             'content': (
                 'Sen bir kahve kavurma isletmesinin ic bilgi asistanisin. '
-                'Stok sorularinda elindeki araclari kullan, tahmin yurutme. '
-                'Urun adlari veritabaninda Ingilizce kayitlidir (orn. Ethiopia, '
-                'Brazil, Colombia). Turkce soru sorulsa bile, arac cagirirken '
-                'urun adini Ingilizceye cevirerek kullan.'
+                'Stok sorularinda elindeki araclari kullan, tahmin yurutme.'
             ),
         },
         {'role': 'user', 'content': question},
@@ -159,3 +193,71 @@ def ask_with_tools(question):
         'answer': second_response.choices[0].message.content,
         'tool_used': function_name,
     }
+
+
+def ask_assistant(message, conversation_history=None):
+    """
+    Frontend'in cagiracagi tek giris noktasi. Konusma gecmisini destekler
+    (JSON'a cevrilebilir duz sozlukler olarak saklanir), LLM'in ayni
+    yanitta birden fazla arac cagirmasina izin verir.
+    """
+    if conversation_history is None:
+        conversation_history = [
+            {
+                'role': 'system',
+                'content': (
+                    'Sen bir kahve kavurma isletmesinin ic bilgi asistanisin. '
+                    'Stok sorularinda ve dokuman aramalarinda elindeki '
+                    'araclari kullan, tahmin yurutme. Urun adlari '
+                    'veritabaninda Ingilizce kayitlidir (orn. Ethiopia, '
+                    'Brazil, Colombia). Turkce soru sorulsa bile, arac '
+                    'cagirirken urun adini Ingilizceye cevirerek kullan.'
+                ),
+            }
+        ]
+
+    messages = conversation_history + [{'role': 'user', 'content': message}]
+
+    response = client.chat.completions.create(
+        model='gpt-4o-mini',
+        messages=messages,
+        tools=TOOLS,
+    )
+    response_message = response.choices[0].message
+
+    if not response_message.tool_calls:
+        messages.append({'role': 'assistant', 'content': response_message.content})
+        return {'answer': response_message.content, 'conversation_history': messages}
+
+    messages.append({
+        'role': 'assistant',
+        'content': response_message.content,
+        'tool_calls': [
+            {
+                'id': tc.id,
+                'type': 'function',
+                'function': {'name': tc.function.name, 'arguments': tc.function.arguments},
+            }
+            for tc in response_message.tool_calls
+        ],
+    })
+
+    for tool_call in response_message.tool_calls:
+        function_name = tool_call.function.name
+        function_args = json.loads(tool_call.function.arguments)
+        function_to_call = AVAILABLE_FUNCTIONS[function_name]
+        function_result = function_to_call(**function_args)
+        messages.append({
+            'role': 'tool',
+            'tool_call_id': tool_call.id,
+            'content': json.dumps(function_result),
+        })
+
+    second_response = client.chat.completions.create(
+        model='gpt-4o-mini',
+        messages=messages,
+    )
+    final_answer = second_response.choices[0].message.content
+    messages.append({'role': 'assistant', 'content': final_answer})
+
+    return {'answer': final_answer, 'conversation_history': messages}
