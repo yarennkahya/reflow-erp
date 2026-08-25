@@ -24,6 +24,7 @@ def create_roast_batch(*, recipe, input_lots, output_quantity,
         raise ValueError(f'Recipe ratios must sum to 100, got {total_ratio}.')
 
     with transaction.atomic():
+        total_input_cost = Decimal('0')
         for component in components:
             lot = input_lots.get(component.input_product_id)
             if lot is None:
@@ -41,17 +42,16 @@ def create_roast_batch(*, recipe, input_lots, output_quantity,
                 movement_type=MovementType.OUT_PRODUCTION,
                 quantity=-needed,
             )
+            total_input_cost += needed * (lot.unit_cost or Decimal('0'))
+
+        output_unit_cost = (total_input_cost / output_quantity).quantize(Decimal('0.01'))
 
         output_lot = Lot.objects.create(
             product=recipe.output_product,
             lot_code=output_lot_code,
             expiry_date=output_expiry_date,
             quantity_received=output_quantity,
-        )
-        StockMovement.objects.create(
-            lot=output_lot,
-            movement_type=MovementType.IN,
-            quantity=output_quantity,
+            unit_cost=output_unit_cost,
         )
         batch = RoastBatch.objects.create(
             recipe=recipe,
