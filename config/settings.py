@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'sales',
     'ai_layer',
     'purchasing',
+    'finance',
 ]
 
 MIDDLEWARE = [
