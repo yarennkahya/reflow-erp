@@ -117,7 +117,10 @@ def ask_with_tools(question):
             'role': 'system',
             'content': (
                 'Sen bir kahve kavurma isletmesinin ic bilgi asistanisin. '
-                'Stok sorularinda elindeki araclari kullan, tahmin yurutme.'
+                'Stok sorularinda elindeki araclari kullan, tahmin yurutme. '
+                'Urun adlari veritabaninda Ingilizce kayitlidir (orn. Ethiopia, '
+                'Brazil, Colombia). Turkce soru sorulsa bile, arac cagirirken '
+                'urun adini Ingilizceye cevirerek kullan.'
             ),
         },
         {'role': 'user', 'content': question},
