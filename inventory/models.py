@@ -60,6 +60,10 @@ class Lot(models.Model):
         decimal_places=3,
         validators=[MinValueValidator(Decimal('0.001'))],
     )
+    unit_cost = models.DecimalField(
+    max_digits=10, decimal_places=2, null=True, blank=True,
+    help_text='Bu lotun birim başına maliyeti (opsiyonel).',
+    )
     received_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
