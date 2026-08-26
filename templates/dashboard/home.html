@@ -1,107 +1,233 @@
 {% extends 'base.html' %}
-{% block title %}Ana Panel - Reflow Coffee ERP{% endblock %}
+{% block title %}Dashboard — Reflow Coffee ERP{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block extra_head %}
+<style>
+  .module-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 20px;
+    height: 100%;
+    transition: box-shadow 0.18s, transform 0.18s;
+    cursor: default;
+  }
+  .module-card:hover {
+    box-shadow: 0 8px 28px rgba(15,23,42,0.08);
+    transform: translateY(-2px);
+  }
+  .card-icon {
+    width: 42px; height: 42px;
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .card-module-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    color: #64748b;
+    margin-bottom: 4px;
+  }
+  .metric-value {
+    font-size: 26px;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1;
+  }
+  .metric-sub {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-top: 2px;
+  }
+  .stat-list {
+    border-top: 1px solid #f1f5f9;
+    margin-top: 14px;
+    padding-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 13px;
+    color: #475569;
+  }
+  .stat-row strong {
+    color: #1e293b;
+    font-weight: 600;
+  }
+  .accent-left-blue  { border-left: 3px solid #3b82f6; }
+  .accent-left-green { border-left: 3px solid #22c55e; }
+</style>
+{% endblock %}
+
 {% block content %}
-<h1 class="mb-4">ERP Modülleri</h1>
-<div class="row g-4">
+<div class="d-flex align-items-baseline gap-3 mb-4">
+  <h4 class="fw-bold mb-0 text-dark">ERP Modülleri</h4>
+  <span class="text-muted" style="font-size:13px;">Operasyonel metriklere genel bakış</span>
+</div>
 
-  <div class="col-md-4">
-    <div class="card h-100">
-      <div class="card-body">
-        <h5 class="card-title">Stok Yönetimi</h5>
-        <p class="card-text text-muted">Ürünleri, depoları ve stok hareketlerini izleyin.</p>
-        <ul class="list-unstyled">
-          <li>Toplam parti: <strong>{{ inventory.total_lots }}</strong></li>
-          <li>Depo: <strong>{{ inventory.warehouses }}</strong></li>
-          <li>Kritik stok: <strong>{{ inventory.critical_lots }}</strong></li>
-        </ul>
+<div class="row g-3">
+
+  <!-- Stok Yönetimi -->
+  <div class="col-xl-4 col-md-6">
+    <div class="module-card">
+      <div class="d-flex align-items-start justify-content-between mb-3">
+        <div>
+          <div class="card-module-label">Stok Yönetimi</div>
+          <div class="metric-value">{{ inventory.total_lots }}</div>
+          <div class="metric-sub">Aktif Lot</div>
+        </div>
+        <div class="card-icon" style="background:#eff6ff; color:#3b82f6;">
+          <i class="bi bi-boxes"></i>
+        </div>
+      </div>
+      <div class="stat-list">
+        <div class="stat-row"><span>Depo sayısı</span><strong>{{ inventory.warehouses }}</strong></div>
+        <div class="stat-row"><span>Kritik stok</span><strong class="text-danger">{{ inventory.critical_lots }}</strong></div>
       </div>
     </div>
   </div>
 
-  <div class="col-md-4">
-    <div class="card h-100">
-      <div class="card-body">
-        <h5 class="card-title">Satın Alma</h5>
-        <p class="card-text text-muted">Tedarikçileri ve satın alma siparişlerini yönetin.</p>
-        <ul class="list-unstyled">
-          <li>Toplam sipariş: <strong>{{ purchasing.total_orders }}</strong></li>
-          <li>Açık sipariş: <strong>{{ purchasing.open_orders }}</strong></li>
-        </ul>
+  <!-- Satın Alma -->
+  <div class="col-xl-4 col-md-6">
+    <div class="module-card">
+      <div class="d-flex align-items-start justify-content-between mb-3">
+        <div>
+          <div class="card-module-label">Satın Alma</div>
+          <div class="metric-value">{{ purchasing.total_orders }}</div>
+          <div class="metric-sub">Toplam Sipariş</div>
+        </div>
+        <div class="card-icon" style="background:#fff7ed; color:#f97316;">
+          <i class="bi bi-basket3"></i>
+        </div>
+      </div>
+      <div class="stat-list">
+        <div class="stat-row"><span>Açık sipariş</span><strong class="text-warning">{{ purchasing.open_orders }}</strong></div>
       </div>
     </div>
   </div>
 
-  <div class="col-md-4">
-    <div class="card h-100">
-      <div class="card-body">
-        <h5 class="card-title">Üretim</h5>
-        <p class="card-text text-muted">Kavurma partilerini ve reçeteleri yönetin.</p>
-        <ul class="list-unstyled">
-          <li>Toplam parti: <strong>{{ production.total_batches }}</strong></li>
-        </ul>
+  <!-- Üretim -->
+  <div class="col-xl-4 col-md-6">
+    <div class="module-card">
+      <div class="d-flex align-items-start justify-content-between mb-3">
+        <div>
+          <div class="card-module-label">Üretim</div>
+          <div class="metric-value">{{ production.total_batches }}</div>
+          <div class="metric-sub">Kavurma Partisi</div>
+        </div>
+        <div class="card-icon" style="background:#fefce8; color:#ca8a04;">
+          <i class="bi bi-fire"></i>
+        </div>
+      </div>
+      <div class="stat-list">
+        <div class="stat-row"><span>Reçete (BOM)</span><strong>—</strong></div>
       </div>
     </div>
   </div>
 
-  <div class="col-md-4">
-    <div class="card h-100">
-      <div class="card-body">
-        <h5 class="card-title">Satış</h5>
-        <p class="card-text text-muted">Müşterileri ve siparişleri takip edin.</p>
-        <ul class="list-unstyled">
-          <li>Müşteri: <strong>{{ sales.total_customers }}</strong></li>
-          <li>Tamamlanan sipariş: <strong>{{ sales.fulfilled_orders }}</strong></li>
-          <li>Toplam gelir: <strong>₺{{ sales.total_revenue }}</strong></li>
-        </ul>
+  <!-- Satış -->
+  <div class="col-xl-4 col-md-6">
+    <div class="module-card accent-left-blue">
+      <div class="d-flex align-items-start justify-content-between mb-3">
+        <div>
+          <div class="card-module-label">Satış</div>
+          <div class="metric-value">₺{{ sales.total_revenue }}</div>
+          <div class="metric-sub">Toplam Gelir</div>
+        </div>
+        <div class="card-icon" style="background:#eff6ff; color:#2563eb;">
+          <i class="bi bi-cart3"></i>
+        </div>
+      </div>
+      <div class="stat-list">
+        <div class="stat-row"><span>Müşteri sayısı</span><strong>{{ sales.total_customers }}</strong></div>
+        <div class="stat-row"><span>Tamamlanan sipariş</span><strong>{{ sales.fulfilled_orders }}</strong></div>
       </div>
     </div>
   </div>
 
-  <div class="col-md-4">
-    <div class="card h-100">
-      <div class="card-body">
-        <h5 class="card-title">CRM</h5>
-        <p class="card-text text-muted">Satış fırsatlarını yönetin.</p>
-        <ul class="list-unstyled">
-          <li>Açık fırsat: <strong>{{ crm.open_opportunities }}</strong></li>
-          <li>Kazanılan: <strong>{{ crm.won_opportunities }}</strong></li>
-        </ul>
+  <!-- CRM -->
+  <div class="col-xl-4 col-md-6">
+    <div class="module-card">
+      <div class="d-flex align-items-start justify-content-between mb-3">
+        <div>
+          <div class="card-module-label">CRM</div>
+          <div class="metric-value">{{ crm.open_opportunities }}</div>
+          <div class="metric-sub">Açık Fırsat</div>
+        </div>
+        <div class="card-icon" style="background:#f0fdf4; color:#16a34a;">
+          <i class="bi bi-building"></i>
+        </div>
+      </div>
+      <div class="stat-list">
+        <div class="stat-row"><span>Kazanılan</span><strong class="text-success">{{ crm.won_opportunities }}</strong></div>
       </div>
     </div>
   </div>
 
-  <div class="col-md-4">
-    <div class="card h-100">
-      <div class="card-body">
-        <h5 class="card-title">İnsan Kaynakları</h5>
-        <p class="card-text text-muted">Personel ve izin süreçlerini yönetin.</p>
-        <ul class="list-unstyled">
-          <li>Toplam personel: <strong>{{ hr.total_employees }}</strong></li>
-          <li>Bekleyen izin: <strong>{{ hr.pending_leaves }}</strong></li>
-        </ul>
+  <!-- İnsan Kaynakları -->
+  <div class="col-xl-4 col-md-6">
+    <div class="module-card">
+      <div class="d-flex align-items-start justify-content-between mb-3">
+        <div>
+          <div class="card-module-label">İnsan Kaynakları</div>
+          <div class="metric-value">{{ hr.total_employees }}</div>
+          <div class="metric-sub">Toplam Personel</div>
+        </div>
+        <div class="card-icon" style="background:#fdf4ff; color:#9333ea;">
+          <i class="bi bi-people"></i>
+        </div>
+      </div>
+      <div class="stat-list">
+        <div class="stat-row"><span>Bekleyen izin</span><strong>{{ hr.pending_leaves }}</strong></div>
       </div>
     </div>
   </div>
 
-  <div class="col-md-4">
-    <div class="card h-100 border-success">
-      <div class="card-body">
-        <h5 class="card-title">Finans</h5>
-        <p class="card-text text-muted">Kârlılık özeti.</p>
-        <ul class="list-unstyled">
-          <li>Toplam kâr: <strong>₺{{ finance.total_profit }}</strong></li>
-          <li>Kâr marjı: <strong>%{{ finance.margin_percent }}</strong></li>
-        </ul>
+  <!-- Finans -->
+  <div class="col-xl-4 col-md-6">
+    <div class="module-card accent-left-green">
+      <div class="d-flex align-items-start justify-content-between mb-3">
+        <div>
+          <div class="card-module-label">Finans</div>
+          <div class="metric-value text-success">₺{{ finance.total_profit }}</div>
+          <div class="metric-sub">Net Kâr</div>
+        </div>
+        <div class="card-icon" style="background:#f0fdf4; color:#22c55e;">
+          <i class="bi bi-graph-up-arrow"></i>
+        </div>
+      </div>
+      <div class="stat-list">
+        <div class="stat-row"><span>Kâr marjı</span><strong class="text-success">%{{ finance.margin_percent }}</strong></div>
       </div>
     </div>
   </div>
 
-  <div class="col-md-4">
-    <div class="card h-100 border-primary">
-      <div class="card-body">
-        <h5 class="card-title">🤖 AI Asistan</h5>
-        <p class="card-text text-muted">Stok ve doküman sorularınızı yanıtlar.</p>
+  <!-- AI Asistan -->
+  <div class="col-xl-4 col-md-6">
+    <div class="module-card" style="background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%); border-color:transparent;">
+      <div class="d-flex align-items-start justify-content-between mb-3">
+        <div>
+          <div class="card-module-label" style="color:#475569;">AI Asistan</div>
+          <div class="metric-value" style="color:#f8fafc;">RAG + GPT</div>
+          <div class="metric-sub" style="color:#334155;">Function Calling Aktif</div>
+        </div>
+        <div class="card-icon" style="background:rgba(59,130,246,0.15); color:#60a5fa;">
+          <i class="bi bi-robot"></i>
+        </div>
       </div>
+      <a href="/chat/" class="btn btn-sm mt-1"
+         style="background:#3b82f6;color:#fff;border:none;border-radius:6px;font-size:13px;padding:6px 14px;">
+        <i class="bi bi-chat-dots me-1"></i> Sohbet Başlat
+      </a>
     </div>
   </div>
 

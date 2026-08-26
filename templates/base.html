@@ -2,17 +2,256 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Reflow Coffee ERP{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --sidebar-w: 232px;
+            --sidebar-bg: #111827;
+            --sidebar-accent: #3b82f6;
+            --sidebar-text: #9ca3af;
+            --sidebar-text-hover: #f9fafb;
+            --topbar-h: 56px;
+            --main-bg: #f1f5f9;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: var(--main-bg);
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+        }
+
+        /* ── Sidebar ── */
+        #sidebar {
+            position: fixed;
+            top: 0; left: 0;
+            width: var(--sidebar-w);
+            height: 100vh;
+            background: var(--sidebar-bg);
+            display: flex;
+            flex-direction: column;
+            z-index: 200;
+            overflow-y: auto;
+        }
+
+        .sb-brand {
+            padding: 18px 16px 14px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .sb-brand a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .sb-brand-icon {
+            width: 36px; height: 36px;
+            background: var(--sidebar-accent);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 17px;
+            flex-shrink: 0;
+        }
+
+        .sb-brand-name {
+            color: #f9fafb;
+            font-weight: 700;
+            font-size: 14px;
+            line-height: 1.2;
+            letter-spacing: -0.2px;
+        }
+
+        .sb-brand-sub {
+            color: var(--sidebar-text);
+            font-size: 10.5px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        .sb-section {
+            padding: 18px 10px 6px;
+        }
+
+        .sb-label {
+            color: var(--sidebar-text);
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 8px;
+            margin-bottom: 4px;
+        }
+
+        .sb-nav a {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            padding: 8px 10px;
+            border-radius: 6px;
+            font-size: 13.5px;
+            font-weight: 500;
+            margin-bottom: 1px;
+            transition: color 0.12s, background 0.12s;
+        }
+
+        .sb-nav a i {
+            font-size: 15px;
+            width: 16px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .sb-nav a:hover {
+            color: var(--sidebar-text-hover);
+            background: rgba(255,255,255,0.06);
+        }
+
+        .sb-nav a.active {
+            color: #fff;
+            background: var(--sidebar-accent);
+        }
+
+        .sb-nav a.dim {
+            opacity: 0.38;
+            pointer-events: none;
+        }
+
+        .sb-divider {
+            margin: 6px 10px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .sb-footer {
+            margin-top: auto;
+            padding: 14px 16px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            font-size: 11px;
+            color: #4b5563;
+        }
+
+        /* ── Main ── */
+        #main {
+            margin-left: var(--sidebar-w);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #topbar {
+            height: var(--topbar-h);
+            background: #fff;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        #topbar .page-title {
+            font-size: 14.5px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        #topbar .topbar-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .status-pill {
+            font-size: 11.5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: #f0fdf4;
+            color: #16a34a;
+            border: 1px solid #bbf7d0;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-pill i { font-size: 7px; }
+
+        #page-content {
+            flex: 1;
+            padding: 24px 28px 32px;
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
 </head>
-<body class="bg-light">
-    <nav class="navbar navbar-dark bg-dark mb-4">
-        <div class="container">
-            <span class="navbar-brand mb-0 h1">☕ Reflow Coffee ERP</span>
+<body>
+
+<!-- Sidebar -->
+<aside id="sidebar">
+    <div class="sb-brand">
+        <a href="/">
+            <div class="sb-brand-icon">☕</div>
+            <div>
+                <div class="sb-brand-name">Reflow</div>
+                <div class="sb-brand-sub">Coffee ERP</div>
+            </div>
+        </a>
+    </div>
+
+    <div class="sb-section">
+        <div class="sb-label">Genel</div>
+        <nav class="sb-nav">
+            <a href="/" class="{% block nav_dashboard %}{% endblock %}">
+                <i class="bi bi-grid-1x2-fill"></i> Dashboard
+            </a>
+            <a href="/chat/" class="{% block nav_chat %}{% endblock %}">
+                <i class="bi bi-robot"></i> AI Asistan
+            </a>
+        </nav>
+    </div>
+
+    <div class="sb-divider"></div>
+
+    <div class="sb-section">
+        <div class="sb-label">Modüller</div>
+        <nav class="sb-nav">
+            <a class="dim"><i class="bi bi-boxes"></i> Stok</a>
+            <a class="dim"><i class="bi bi-fire"></i> Üretim</a>
+            <a class="dim"><i class="bi bi-cart3"></i> Satış</a>
+            <a class="dim"><i class="bi bi-graph-up-arrow"></i> Finans</a>
+            <a class="dim"><i class="bi bi-building"></i> CRM</a>
+            <a class="dim"><i class="bi bi-people"></i> İnsan Kaynakları</a>
+        </nav>
+    </div>
+
+    <div class="sb-footer">v0.1.0 &mdash; MVP</div>
+</aside>
+
+<!-- Main content -->
+<div id="main">
+    <header id="topbar">
+        <span class="page-title">{% block page_title %}Reflow Coffee ERP{% endblock %}</span>
+        <div class="topbar-right">
+            <div class="status-pill">
+                <i class="bi bi-circle-fill"></i> Sistem Aktif
+            </div>
         </div>
-    </nav>
-    <div class="container pb-5">
+    </header>
+
+    <div id="page-content">
         {% block content %}{% endblock %}
     </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_scripts %}{% endblock %}
 </body>
 </html>

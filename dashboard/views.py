@@ -10,6 +10,10 @@ from hr.models import Employee, LeaveRequest
 from finance.services import get_profitability_report
 
 
+def chat_page_view(request):
+    return render(request, 'ai_layer/chat.html')
+
+
 def dashboard_view(request):
     profitability = get_profitability_report()
 
