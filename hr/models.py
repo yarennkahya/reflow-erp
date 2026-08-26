@@ -56,3 +56,43 @@ class Employee(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class LeaveType(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    annual_allowance_days = models.PositiveIntegerField(
+        help_text='Bu izin turunden yillik kac gun hakki var.'
+    )
+
+    def __str__(self):
+        return self.name
+
+
+class LeaveRequest(models.Model):
+    class Status(models.TextChoices):
+        PENDING = 'pending', 'Beklemede'
+        APPROVED = 'approved', 'Onaylandı'
+        REJECTED = 'rejected', 'Reddedildi'
+
+    employee = models.ForeignKey(
+        Employee, on_delete=models.PROTECT, related_name='leave_requests'
+    )
+    leave_type = models.ForeignKey(
+        LeaveType, on_delete=models.PROTECT, related_name='leave_requests'
+    )
+    start_date = models.DateField()
+    end_date = models.DateField()
+    status = models.CharField(
+        max_length=20, choices=Status.choices, default=Status.PENDING
+    )
+    approved_by = models.ForeignKey(
+        Employee, on_delete=models.SET_NULL, related_name='approved_leaves',
+        null=True, blank=True,
+    )
+    requested_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-requested_at']
+
+    def __str__(self):
+        return f'{self.employee} - {self.leave_type} ({self.get_status_display()})'
