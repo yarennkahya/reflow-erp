@@ -6,3 +6,4 @@ redis>=5.0
 pgvector>=0.2
 openai>=1.0
 gunicorn>=21.2
+sentry-sdk>=2.0

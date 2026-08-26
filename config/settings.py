@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 import os
 from celery.schedules import crontab
+import sentry_sdk
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -151,3 +152,10 @@ CELERY_BEAT_SCHEDULE = {
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+
+sentry_sdk.init(
+    dsn=os.environ.get('SENTRY_DSN'),
+    send_default_pii=False,
+    environment='development' if DEBUG else 'production',
+)
