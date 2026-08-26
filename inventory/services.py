@@ -38,6 +38,7 @@ def get_stock_summary(product_name):
             'remaining': float(lot.remaining_quantity),
             'expiry_date': str(lot.expiry_date),
             'freshness_status': get_freshness_status(lot),
+            'warehouse': lot.warehouse.name if lot.warehouse else 'Belirtilmemiş',
         }
         for lot in lots
     ]

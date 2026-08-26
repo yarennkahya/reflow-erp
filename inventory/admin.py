@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from .models import Business, Lot, Product, StockMovement
+from .models import Business, Lot, Product, StockMovement , Warehouse
+
 
 
 @admin.register(Business)
@@ -31,3 +32,9 @@ class StockMovementAdmin(admin.ModelAdmin):
     list_filter = ('movement_type', 'created_at')
     search_fields = ('lot__lot_code', 'lot__product__name')
     ordering = ('-created_at',)
+
+
+@admin.register(Warehouse)
+class WarehouseAdmin(admin.ModelAdmin):
+    list_display = ('name', 'city', 'is_active')
+    list_filter = ('is_active', 'city')

@@ -4,7 +4,16 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
 
+class Warehouse(models.Model):
+    name = models.CharField(max_length=255)
+    city = models.CharField(max_length=100)
+    is_active = models.BooleanField(default=True)
 
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
 class Business(models.Model):
     class BusinessType(models.TextChoices):
         SUPPLIER = 'supplier', 'Green coffee supplier'
@@ -52,6 +61,10 @@ class Lot(models.Model):
         Product,
         on_delete=models.PROTECT,
         related_name='lots',
+    )
+    warehouse = models.ForeignKey(
+        Warehouse, on_delete=models.PROTECT, related_name='lots',
+        null=True, blank=True,
     )
     lot_code = models.CharField(max_length=100)
     expiry_date = models.DateField(db_index=True)

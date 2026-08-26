@@ -7,7 +7,7 @@ from inventory.models import Lot
 from .models import GoodsReceipt, PurchaseOrder
 
 
-def receive_goods(purchase_order_item, quantity_received, lot_code, expiry_date):
+def receive_goods(purchase_order_item, quantity_received, lot_code, expiry_date, warehouse=None):
     """
     Bir satin alma kalemi icin mal teslim alma islemini gerceklestirir.
     Kismi teslimat destekler -- ayni kalem icin birden fazla kez cagrilabilir.
@@ -31,6 +31,7 @@ def receive_goods(purchase_order_item, quantity_received, lot_code, expiry_date)
             expiry_date=expiry_date,
             quantity_received=quantity_received,
             unit_cost=purchase_order_item.unit_price,
+            warehouse=warehouse,
         )
         receipt = GoodsReceipt.objects.create(
             purchase_order_item=purchase_order_item,
