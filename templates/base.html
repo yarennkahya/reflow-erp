@@ -223,12 +223,13 @@
     <div class="sb-section">
         <div class="sb-label">Modüller</div>
         <nav class="sb-nav">
-            <a class="dim"><i class="bi bi-boxes"></i> Stok</a>
-            <a class="dim"><i class="bi bi-fire"></i> Üretim</a>
-            <a class="dim"><i class="bi bi-cart3"></i> Satış</a>
-            <a class="dim"><i class="bi bi-graph-up-arrow"></i> Finans</a>
-            <a class="dim"><i class="bi bi-building"></i> CRM</a>
-            <a class="dim"><i class="bi bi-people"></i> İnsan Kaynakları</a>
+            <a href="/inventory/"  class="{% block nav_inventory %}{% endblock %}"><i class="bi bi-boxes"></i> Stok</a>
+            <a href="/purchasing/" class="{% block nav_purchasing %}{% endblock %}"><i class="bi bi-basket3"></i> Satın Alma</a>
+            <a href="/production/" class="{% block nav_production %}{% endblock %}"><i class="bi bi-fire"></i> Üretim</a>
+            <a href="/sales/"      class="{% block nav_sales %}{% endblock %}"><i class="bi bi-cart3"></i> Satış</a>
+            <a href="/finance/"    class="{% block nav_finance %}{% endblock %}"><i class="bi bi-graph-up-arrow"></i> Finans</a>
+            <a href="/crm/"        class="{% block nav_crm %}{% endblock %}"><i class="bi bi-building"></i> CRM</a>
+            <a href="/hr/"         class="{% block nav_hr %}{% endblock %}"><i class="bi bi-people"></i> İnsan Kaynakları</a>
         </nav>
     </div>
 

@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% block title %}İnsan Kaynakları — Reflow Coffee ERP{% endblock %}
+{% block nav_hr %}active{% endblock %}
+{% block page_title %}İnsan Kaynakları{% endblock %}
+
+{% block extra_head %}
+<style>
+  .data-card { background:#fff; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden; }
+  .data-card .table { margin-bottom:0; font-size:13.5px; }
+  .data-card .table thead th { background:#f8fafc; color:#64748b; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.7px; border-bottom:1px solid #e2e8f0; padding:10px 16px; white-space:nowrap; }
+  .data-card .table tbody td { padding:11px 16px; vertical-align:middle; color:#334155; border-color:#f1f5f9; }
+  .data-card .table tbody tr:last-child td { border-bottom:none; }
+  .data-card .table tbody tr:hover { background:#f8fafc; }
+  .empty-state { padding:48px 24px; text-align:center; color:#94a3b8; }
+  .empty-state i { font-size:36px; display:block; margin-bottom:8px; }
+  .section-head { font-size:13px; font-weight:600; color:#475569; padding:12px 16px; background:#f8fafc; border-bottom:1px solid #e2e8f0; display:flex; align-items:center; gap:8px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-baseline gap-3 mb-4">
+  <h4 class="fw-bold mb-0 text-dark"><i class="bi bi-people me-2" style="color:#9333ea;"></i>İnsan Kaynakları</h4>
+</div>
+
+<!-- Personel tablosu -->
+<div class="data-card mb-4">
+  <div class="section-head">
+    <i class="bi bi-person-badge" style="color:#9333ea;"></i>
+    Personel — {{ employees|length }} kayıt
+  </div>
+  <table class="table table-borderless">
+    <thead>
+      <tr>
+        <th>İsim</th>
+        <th>Departman</th>
+        <th>Pozisyon</th>
+        <th>Yönetici</th>
+        <th>İşe Giriş</th>
+        <th>Durum</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in employees %}
+      <tr>
+        <td class="fw-medium">{{ row.emp.name }}</td>
+        <td>{{ row.emp.department.name }}</td>
+        <td>{{ row.emp.position.title }}</td>
+        <td>{{ row.emp.manager.name|default:"—" }}</td>
+        <td style="font-size:12.5px; color:#64748b;">{{ row.emp.hire_date }}</td>
+        <td>
+          <span class="badge {{ row.badge_cls }} fw-medium" style="font-size:11.5px; padding:4px 9px;">
+            {{ row.emp.get_employment_status_display }}
+          </span>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="6" class="empty-state">
+          <i class="bi bi-inbox"></i>
+          Henüz hiç personel kaydı yok.
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Bekleyen izin talepleri -->
+<div class="data-card">
+  <div class="section-head">
+    <i class="bi bi-calendar-check" style="color:#f97316;"></i>
+    Bekleyen İzin Talepleri — {{ leaves|length }} kayıt
+  </div>
+  <table class="table table-borderless">
+    <thead>
+      <tr>
+        <th>Personel</th>
+        <th>İzin Türü</th>
+        <th>Başlangıç</th>
+        <th>Bitiş</th>
+        <th>Talep Tarihi</th>
+        <th>Durum</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in leaves %}
+      <tr>
+        <td class="fw-medium">{{ row.leave.employee.name }}</td>
+        <td>{{ row.leave.leave_type.name }}</td>
+        <td>{{ row.leave.start_date }}</td>
+        <td>{{ row.leave.end_date }}</td>
+        <td style="font-size:12.5px; color:#64748b;">{{ row.leave.requested_at|date:"d M Y" }}</td>
+        <td>
+          <span class="badge {{ row.badge_cls }} fw-medium" style="font-size:11.5px; padding:4px 9px;">
+            {{ row.leave.get_status_display }}
+          </span>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="6" class="empty-state">
+          <i class="bi bi-check-circle"></i>
+          Bekleyen izin talebi yok.
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

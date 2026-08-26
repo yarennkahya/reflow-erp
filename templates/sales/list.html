@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}Satış — Reflow Coffee ERP{% endblock %}
+{% block nav_sales %}active{% endblock %}
+{% block page_title %}Satış{% endblock %}
+
+{% block extra_head %}
+<style>
+  .data-card { background:#fff; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden; }
+  .data-card .table { margin-bottom:0; font-size:13.5px; }
+  .data-card .table thead th { background:#f8fafc; color:#64748b; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.7px; border-bottom:1px solid #e2e8f0; padding:10px 16px; white-space:nowrap; }
+  .data-card .table tbody td { padding:11px 16px; vertical-align:middle; color:#334155; border-color:#f1f5f9; }
+  .data-card .table tbody tr:last-child td { border-bottom:none; }
+  .data-card .table tbody tr:hover { background:#f8fafc; }
+  .empty-state { padding:48px 24px; text-align:center; color:#94a3b8; }
+  .empty-state i { font-size:36px; display:block; margin-bottom:8px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-baseline gap-3 mb-4">
+  <h4 class="fw-bold mb-0 text-dark"><i class="bi bi-cart3 me-2" style="color:#2563eb;"></i>Siparişler</h4>
+  <span class="text-muted" style="font-size:13px;">{{ orders|length }} kayıt</span>
+</div>
+
+<div class="data-card">
+  <table class="table table-borderless">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Müşteri</th>
+        <th>Durum</th>
+        <th>Oluşturulma</th>
+        <th>Karşılanma</th>
+        <th class="text-end">Toplam Tutar</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in orders %}
+      <tr>
+        <td class="text-muted" style="font-size:12.5px;">#{{ row.order.pk }}</td>
+        <td class="fw-medium">{{ row.order.customer.name }}</td>
+        <td>
+          <span class="badge {{ row.badge_cls }} fw-medium" style="font-size:11.5px; padding:4px 9px;">
+            {{ row.order.get_status_display }}
+          </span>
+        </td>
+        <td style="font-size:12.5px; color:#64748b;">{{ row.order.created_at|date:"d M Y" }}</td>
+        <td style="font-size:12.5px; color:#64748b;">{{ row.order.fulfilled_at|date:"d M Y"|default:"—" }}</td>
+        <td class="text-end fw-semibold">₺{{ row.total|floatformat:2 }}</td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="6" class="empty-state">
+          <i class="bi bi-inbox"></i>
+          Henüz hiç sipariş yok.
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

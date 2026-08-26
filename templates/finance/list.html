@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block title %}Finans — Reflow Coffee ERP{% endblock %}
+{% block nav_finance %}active{% endblock %}
+{% block page_title %}Finans{% endblock %}
+
+{% block extra_head %}
+<style>
+  .summary-card { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:20px; }
+  .summary-card .label { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.7px; color:#64748b; margin-bottom:4px; }
+  .summary-card .value { font-size:26px; font-weight:700; color:#0f172a; line-height:1; }
+  .summary-card .sub { font-size:12px; color:#94a3b8; margin-top:2px; }
+  .summary-card .icon-wrap { width:42px; height:42px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+  .data-card { background:#fff; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden; }
+  .data-card .table { margin-bottom:0; font-size:13.5px; }
+  .data-card .table thead th { background:#f8fafc; color:#64748b; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.7px; border-bottom:1px solid #e2e8f0; padding:10px 16px; white-space:nowrap; }
+  .data-card .table tbody td { padding:11px 16px; vertical-align:middle; color:#334155; border-color:#f1f5f9; }
+  .data-card .table tbody tr:last-child td { border-bottom:none; }
+  .data-card .table tbody tr:hover { background:#f8fafc; }
+  .empty-state { padding:48px 24px; text-align:center; color:#94a3b8; }
+  .empty-state i { font-size:36px; display:block; margin-bottom:8px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-baseline gap-3 mb-4">
+  <h4 class="fw-bold mb-0 text-dark"><i class="bi bi-graph-up-arrow me-2" style="color:#22c55e;"></i>Kârlılık Raporu</h4>
+  <span class="text-muted" style="font-size:13px;">Tamamlanan siparişler</span>
+</div>
+
+<!-- Özet kartlar -->
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="summary-card d-flex align-items-start justify-content-between">
+      <div>
+        <div class="label">Toplam Gelir</div>
+        <div class="value">₺{{ report.total_revenue|floatformat:2 }}</div>
+      </div>
+      <div class="icon-wrap" style="background:#eff6ff; color:#3b82f6;"><i class="bi bi-arrow-up-right-circle"></i></div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="summary-card d-flex align-items-start justify-content-between">
+      <div>
+        <div class="label">Toplam Maliyet</div>
+        <div class="value text-danger">₺{{ report.total_cost|floatformat:2 }}</div>
+      </div>
+      <div class="icon-wrap" style="background:#fef2f2; color:#ef4444;"><i class="bi bi-arrow-down-right-circle"></i></div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="summary-card d-flex align-items-start justify-content-between" style="border-left:3px solid #22c55e;">
+      <div>
+        <div class="label">Net Kâr</div>
+        <div class="value text-success">₺{{ report.total_profit|floatformat:2 }}</div>
+      </div>
+      <div class="icon-wrap" style="background:#f0fdf4; color:#22c55e;"><i class="bi bi-graph-up-arrow"></i></div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="summary-card d-flex align-items-start justify-content-between">
+      <div>
+        <div class="label">Kâr Marjı</div>
+        <div class="value">%{{ report.margin_percent|floatformat:2 }}</div>
+      </div>
+      <div class="icon-wrap" style="background:#f0fdf4; color:#16a34a;"><i class="bi bi-percent"></i></div>
+    </div>
+  </div>
+</div>
+
+<!-- Kalem bazlı tablo -->
+<div class="data-card">
+  <table class="table table-borderless">
+    <thead>
+      <tr>
+        <th>Sipariş #</th>
+        <th>Ürün</th>
+        <th class="text-end">Miktar</th>
+        <th class="text-end">Gelir</th>
+        <th class="text-end">Maliyet</th>
+        <th class="text-end">Kâr</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in report.line_items %}
+      <tr>
+        <td class="text-muted" style="font-size:12.5px;">#{{ item.order_id }}</td>
+        <td class="fw-medium">{{ item.product }}</td>
+        <td class="text-end">{{ item.quantity|floatformat:3 }}</td>
+        <td class="text-end">₺{{ item.revenue|floatformat:2 }}</td>
+        <td class="text-end text-danger">₺{{ item.cost|floatformat:2 }}</td>
+        <td class="text-end fw-semibold {% if item.profit >= 0 %}text-success{% else %}text-danger{% endif %}">
+          ₺{{ item.profit|floatformat:2 }}
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="6" class="empty-state">
+          <i class="bi bi-inbox"></i>
+          Henüz tamamlanmış sipariş yok.
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
