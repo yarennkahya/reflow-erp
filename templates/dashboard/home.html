@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% block title %}Ana Panel - Reflow Coffee ERP{% endblock %}
+{% block content %}
+<h1 class="mb-4">ERP Modülleri</h1>
+<div class="row g-4">
+
+  <div class="col-md-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title">Stok Yönetimi</h5>
+        <p class="card-text text-muted">Ürünleri, depoları ve stok hareketlerini izleyin.</p>
+        <ul class="list-unstyled">
+          <li>Toplam parti: <strong>{{ inventory.total_lots }}</strong></li>
+          <li>Depo: <strong>{{ inventory.warehouses }}</strong></li>
+          <li>Kritik stok: <strong>{{ inventory.critical_lots }}</strong></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title">Satın Alma</h5>
+        <p class="card-text text-muted">Tedarikçileri ve satın alma siparişlerini yönetin.</p>
+        <ul class="list-unstyled">
+          <li>Toplam sipariş: <strong>{{ purchasing.total_orders }}</strong></li>
+          <li>Açık sipariş: <strong>{{ purchasing.open_orders }}</strong></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title">Üretim</h5>
+        <p class="card-text text-muted">Kavurma partilerini ve reçeteleri yönetin.</p>
+        <ul class="list-unstyled">
+          <li>Toplam parti: <strong>{{ production.total_batches }}</strong></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title">Satış</h5>
+        <p class="card-text text-muted">Müşterileri ve siparişleri takip edin.</p>
+        <ul class="list-unstyled">
+          <li>Müşteri: <strong>{{ sales.total_customers }}</strong></li>
+          <li>Tamamlanan sipariş: <strong>{{ sales.fulfilled_orders }}</strong></li>
+          <li>Toplam gelir: <strong>₺{{ sales.total_revenue }}</strong></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title">CRM</h5>
+        <p class="card-text text-muted">Satış fırsatlarını yönetin.</p>
+        <ul class="list-unstyled">
+          <li>Açık fırsat: <strong>{{ crm.open_opportunities }}</strong></li>
+          <li>Kazanılan: <strong>{{ crm.won_opportunities }}</strong></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card h-100">
+      <div class="card-body">
+        <h5 class="card-title">İnsan Kaynakları</h5>
+        <p class="card-text text-muted">Personel ve izin süreçlerini yönetin.</p>
+        <ul class="list-unstyled">
+          <li>Toplam personel: <strong>{{ hr.total_employees }}</strong></li>
+          <li>Bekleyen izin: <strong>{{ hr.pending_leaves }}</strong></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card h-100 border-success">
+      <div class="card-body">
+        <h5 class="card-title">Finans</h5>
+        <p class="card-text text-muted">Kârlılık özeti.</p>
+        <ul class="list-unstyled">
+          <li>Toplam kâr: <strong>₺{{ finance.total_profit }}</strong></li>
+          <li>Kâr marjı: <strong>%{{ finance.margin_percent }}</strong></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card h-100 border-primary">
+      <div class="card-body">
+        <h5 class="card-title">🤖 AI Asistan</h5>
+        <p class="card-text text-muted">Stok ve doküman sorularınızı yanıtlar.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
