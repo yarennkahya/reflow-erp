@@ -96,3 +96,67 @@ class LeaveRequest(models.Model):
 
     def __str__(self):
         return f'{self.employee} - {self.leave_type} ({self.get_status_display()})'
+
+
+
+class JobOpening(models.Model):
+    class Status(models.TextChoices):
+        OPEN = 'open', 'Açık'
+        CLOSED = 'closed', 'Kapatıldı'
+        FILLED = 'filled', 'Dolduruldu'
+
+    title = models.CharField(max_length=255)
+    department = models.ForeignKey(
+        Department, on_delete=models.PROTECT, related_name='job_openings'
+    )
+    position = models.ForeignKey(
+        Position, on_delete=models.PROTECT, related_name='job_openings'
+    )
+    status = models.CharField(
+        max_length=20, choices=Status.choices, default=Status.OPEN
+    )
+    opened_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-opened_at']
+
+    def __str__(self):
+        return f'{self.title} ({self.get_status_display()})'
+
+
+class Candidate(models.Model):
+    name = models.CharField(max_length=255)
+    email = models.EmailField()
+    phone = models.CharField(max_length=32, blank=True)
+    resume_note = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.name
+
+
+class Application(models.Model):
+    class Stage(models.TextChoices):
+        APPLIED = 'applied', 'Başvurdu'
+        SCREENING = 'screening', 'İnceleniyor'
+        INTERVIEW = 'interview', 'Mülakat'
+        OFFER = 'offer', 'Teklif'
+        HIRED = 'hired', 'İşe Alındı'
+        REJECTED = 'rejected', 'Reddedildi'
+
+    candidate = models.ForeignKey(
+        Candidate, on_delete=models.PROTECT, related_name='applications'
+    )
+    job_opening = models.ForeignKey(
+        JobOpening, on_delete=models.PROTECT, related_name='applications'
+    )
+    stage = models.CharField(
+        max_length=20, choices=Stage.choices, default=Stage.APPLIED
+    )
+    applied_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-updated_at']
+
+    def __str__(self):
+        return f'{self.candidate} -> {self.job_opening} ({self.get_stage_display()})'
