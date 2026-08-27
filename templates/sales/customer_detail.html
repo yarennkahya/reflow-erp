@@ -29,12 +29,12 @@
 
   <div class="col-md-6">
     <div class="card">
-      <div class="card-header">Satış Fırsatları (crm.Opportunity)</div>
+      <div class="card-header d-flex align-items-center justify-content-between"><span>CRM Satış Kayıtları</span><a href="{% url 'crm-customer-detail' customer.pk %}" class="btn btn-sm btn-outline-primary">CRM kartını aç</a></div>
       <div class="card-body">
         {% for opp in customer.opportunities.all %}
           <div class="d-flex justify-content-between border-bottom py-2">
             <span>{{ opp.title }}</span>
-            <span class="badge bg-info">{{ opp.get_stage_display }}</span>
+            <span class="badge {% if opp.status == 'active' %}bg-success{% elif opp.status == 'passive' %}bg-secondary{% elif opp.status == 'won' %}bg-success{% else %}bg-danger{% endif %}">{{ opp.get_status_display }} · {{ opp.get_stage_display }}</span>
           </div>
         {% empty %}
           <p class="text-muted">Henüz fırsat yok.</p>

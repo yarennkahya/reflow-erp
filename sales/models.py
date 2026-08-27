@@ -8,13 +8,14 @@ from inventory.models import Lot, Product
 
 class Customer(models.Model):
     class CustomerType(models.TextChoices):
-        WHOLESALE = 'wholesale', 'Wholesale (cafe)'
-        RETAIL = 'retail', 'Retail (individual)'
+        WHOLESALE = 'wholesale', 'Toptan (kafe)'
+        RETAIL = 'retail', 'Perakende (bireysel)'
 
     name = models.CharField(max_length=255)
     customer_type = models.CharField(max_length=20, choices=CustomerType.choices)
     contact_email = models.EmailField(blank=True)
     contact_phone = models.CharField(max_length=32, blank=True)
+    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

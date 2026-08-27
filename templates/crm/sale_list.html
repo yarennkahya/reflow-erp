@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}Satış Takibi — Reflow Coffee ERP{% endblock %}
+{% block nav_crm %}active{% endblock %}
+{% block page_title %}CRM / Satış Takibi{% endblock %}
+
+{% block extra_head %}
+<style>
+  .crm-stat, .data-card { background:#fff; border:1px solid #e2e8f0; border-radius:12px; }
+  .crm-stat { padding:16px; display:flex; align-items:center; gap:12px; height:100%; }
+  .crm-stat-icon { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; }
+  .crm-stat-value { color:#0f172a; font-size:22px; font-weight:700; line-height:1.1; }
+  .crm-stat-label { color:#64748b; font-size:11px; font-weight:600; letter-spacing:.6px; text-transform:uppercase; margin-top:3px; }
+  .data-card { overflow:hidden; }.data-card .table { margin:0; font-size:13px; }.data-card .table thead th { background:#f8fafc; border-bottom:1px solid #e2e8f0; color:#64748b; font-size:11px; font-weight:700; letter-spacing:.65px; padding:11px 16px; text-transform:uppercase; white-space:nowrap; }.data-card .table tbody td { border-color:#f1f5f9; color:#334155; padding:12px 16px; vertical-align:middle; }.data-card .table tbody tr:hover { background:#f8fafc; }
+  .customer-link, .sale-link { color:#0f172a; font-weight:600; text-decoration:none; }.customer-link:hover, .sale-link:hover { color:#2563eb; }
+  .sale-sub { color:#64748b; font-size:12px; margin-top:2px; }
+  .stage-pill, .sale-status-pill { border-radius:20px; display:inline-block; font-size:11.5px; font-weight:600; padding:4px 8px; white-space:nowrap; }
+  .stage-new { background:#f1f5f9; color:#475569; } .stage-in_discussion { background:#e0f2fe; color:#0369a1; } .stage-proposal_sent { background:#eff6ff; color:#1d4ed8; } .stage-negotiation { background:#fdf4ff; color:#a21caf; } .stage-won { background:#f0fdf4; color:#15803d; } .stage-lost { background:#fef2f2; color:#b91c1c; }
+  .sale-status-active { background:#dcfce7; color:#166534; } .sale-status-passive { background:#f1f5f9; color:#475569; } .sale-status-won { background:#d1fae5; color:#047857; } .sale-status-lost { background:#fee2e2; color:#b91c1c; }
+  .empty-state { color:#94a3b8; padding:52px 24px; text-align:center; }.empty-state i { display:block; font-size:34px; margin-bottom:8px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+  <div><h4 class="fw-bold mb-1 text-dark"><i class="bi bi-bar-chart-steps me-2" style="color:#2563eb;"></i>Satış Takibi</h4><p class="mb-0 text-muted" style="font-size:13px;">Her satışın durumunu, aşamasını ve tahmini değerini takip edin.</p></div>
+  <div class="d-flex gap-2"><a href="{% url 'crm-list' %}" class="btn btn-outline-primary"><i class="bi bi-people me-1"></i>Müşteriler</a><a href="{% url 'crm-sale-create' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Yeni Satış</a></div>
+</div>
+
+<div class="row g-3 mb-4"><div class="col-md-4"><div class="crm-stat"><div class="crm-stat-icon" style="background:#dcfce7;color:#16a34a;"><i class="bi bi-play-circle"></i></div><div><div class="crm-stat-value">{{ active_sales }}</div><div class="crm-stat-label">Aktif Satış</div></div></div></div><div class="col-md-4"><div class="crm-stat"><div class="crm-stat-icon" style="background:#f1f5f9;color:#64748b;"><i class="bi bi-pause-circle"></i></div><div><div class="crm-stat-value">{{ passive_sales }}</div><div class="crm-stat-label">Pasif Satış</div></div></div></div><div class="col-md-4"><div class="crm-stat"><div class="crm-stat-icon" style="background:#ecfdf5;color:#047857;"><i class="bi bi-trophy"></i></div><div><div class="crm-stat-value">{{ won_sales }}</div><div class="crm-stat-label">Kazanılan Satış</div></div></div></div></div>
+
+<div class="data-card">
+  <div class="p-3 border-bottom"><form method="get" class="row g-2 align-items-center"><div class="col-lg-4"><div class="input-group"><span class="input-group-text bg-white"><i class="bi bi-search"></i></span><input type="search" name="q" value="{{ query }}" class="form-control" placeholder="Satış veya müşteri ara"></div></div><div class="col-sm-4 col-lg-3"><select name="status" class="form-select"><option value="all">Tüm durumlar</option>{% for value, label in status_choices %}<option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div><div class="col-sm-4 col-lg-3"><select name="stage" class="form-select"><option value="all">Tüm aşamalar</option>{% for value, label in stage_choices %}<option value="{{ value }}" {% if selected_stage == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div><div class="col-auto"><button type="submit" class="btn btn-outline-secondary"><i class="bi bi-funnel me-1"></i>Filtrele</button></div></form></div>
+  <div class="table-responsive"><table class="table table-borderless align-middle"><thead><tr><th>Satış</th><th>Müşteri</th><th>Aşama</th><th>Durum</th><th class="text-end">Tahmini tutar</th><th>Son güncelleme</th><th class="text-end">İşlemler</th></tr></thead><tbody>
+    {% for sale in sales %}
+    <tr>
+      <td><a class="sale-link" href="{% url 'crm-sale-edit' sale.pk %}">{{ sale.title }}</a>{% if sale.notes %}<div class="sale-sub">{{ sale.notes|truncatechars:54 }}</div>{% endif %}</td>
+      <td><a class="customer-link" href="{% url 'crm-customer-detail' sale.customer_id %}">{{ sale.customer.name }}</a></td>
+      <td><span class="stage-pill stage-{{ sale.stage }}">{{ sale.get_stage_display }}</span></td><td><span class="sale-status-pill sale-status-{{ sale.status }}">{{ sale.get_status_display }}</span></td><td class="text-end fw-semibold">{% if sale.estimated_value %}₺{{ sale.estimated_value|floatformat:0 }}{% else %}—{% endif %}</td><td class="text-muted" style="font-size:12px;">{{ sale.updated_at|date:"d M Y, H:i" }}</td>
+      <td class="text-end"><div class="d-inline-flex gap-1">{% if sale.status == 'active' %}<form method="post" action="{% url 'opportunity-advance' sale.pk %}">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-primary" title="Bir sonraki aşamaya ilerlet"><i class="bi bi-arrow-right"></i></button></form><form method="post" action="{% url 'crm-sale-activity' sale.pk %}">{% csrf_token %}<input type="hidden" name="status" value="passive"><button type="submit" class="btn btn-sm btn-outline-secondary" title="Pasife al"><i class="bi bi-pause"></i></button></form>{% elif sale.status == 'passive' %}<form method="post" action="{% url 'crm-sale-activity' sale.pk %}">{% csrf_token %}<input type="hidden" name="status" value="active"><button type="submit" class="btn btn-sm btn-outline-success" title="Aktifleştir"><i class="bi bi-play"></i></button></form>{% endif %}{% if sale.is_open %}<form method="post" action="{% url 'opportunity-lose' sale.pk %}" onsubmit="return confirm('Bu satışı kaybedildi olarak kapatmak istiyor musunuz?');">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-danger" title="Kaybedildi"><i class="bi bi-x-lg"></i></button></form>{% endif %}<a class="btn btn-sm btn-light" href="{% url 'crm-sale-edit' sale.pk %}" title="Düzenle"><i class="bi bi-pencil"></i></a></div></td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="7" class="empty-state"><i class="bi bi-graph-up"></i><div class="fw-medium">Gösterilecek satış kaydı bulunamadı.</div><a href="{% url 'crm-sale-create' %}" class="btn btn-primary btn-sm mt-3">İlk satış kaydını oluştur</a></td></tr>
+    {% endfor %}
+  </tbody></table></div>
+</div>
+{% endblock %}

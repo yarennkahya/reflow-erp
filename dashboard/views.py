@@ -39,8 +39,8 @@ def dashboard_view(request):
             'total_revenue': profitability['total_revenue'],
         },
         'crm': {
-            'open_opportunities': Opportunity.objects.exclude(stage__in=['won', 'lost']).count(),
-            'won_opportunities': Opportunity.objects.filter(stage='won').count(),
+            'active_sales': Opportunity.objects.filter(status='active').count(),
+            'won_sales': Opportunity.objects.filter(status='won').count(),
         },
         'hr': {
             'total_employees': Employee.objects.count(),

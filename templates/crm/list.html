@@ -1,62 +1,75 @@
 {% extends 'base.html' %}
-{% block title %}CRM — Reflow Coffee ERP{% endblock %}
+{% block title %}Müşteriler — Reflow Coffee ERP{% endblock %}
 {% block nav_crm %}active{% endblock %}
-{% block page_title %}CRM{% endblock %}
+{% block page_title %}CRM / Müşteriler{% endblock %}
 
 {% block extra_head %}
 <style>
-  .data-card { background:#fff; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden; }
-  .data-card .table { margin-bottom:0; font-size:13.5px; }
-  .data-card .table thead th { background:#f8fafc; color:#64748b; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.7px; border-bottom:1px solid #e2e8f0; padding:10px 16px; white-space:nowrap; }
-  .data-card .table tbody td { padding:11px 16px; vertical-align:middle; color:#334155; border-color:#f1f5f9; }
-  .data-card .table tbody tr:last-child td { border-bottom:none; }
+  .crm-stat, .data-card { background:#fff; border:1px solid #e2e8f0; border-radius:12px; }
+  .crm-stat { padding:16px; display:flex; align-items:center; gap:12px; height:100%; }
+  .crm-stat-icon { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; }
+  .crm-stat-value { color:#0f172a; font-size:22px; font-weight:700; line-height:1.1; }
+  .crm-stat-label { color:#64748b; font-size:11px; font-weight:600; letter-spacing:.6px; text-transform:uppercase; margin-top:3px; }
+  .data-card { overflow:hidden; }
+  .data-card .table { margin:0; font-size:13px; }
+  .data-card .table thead th { background:#f8fafc; border-bottom:1px solid #e2e8f0; color:#64748b; font-size:11px; font-weight:700; letter-spacing:.65px; padding:11px 16px; text-transform:uppercase; white-space:nowrap; }
+  .data-card .table tbody td { border-color:#f1f5f9; color:#334155; padding:13px 16px; vertical-align:middle; }
   .data-card .table tbody tr:hover { background:#f8fafc; }
-  .empty-state { padding:48px 24px; text-align:center; color:#94a3b8; }
-  .empty-state i { font-size:36px; display:block; margin-bottom:8px; }
+  .customer-avatar { width:36px; height:36px; border-radius:50%; background:#ede9fe; color:#6d28d9; display:inline-flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; flex:0 0 auto; }
+  .customer-name { color:#0f172a; font-weight:600; text-decoration:none; }
+  .customer-name:hover { color:#6d28d9; }
+  .customer-contact { color:#64748b; font-size:12px; margin-top:2px; }
+  .status-dot { width:7px; height:7px; display:inline-block; border-radius:50%; margin-right:5px; }
+  .empty-state { color:#94a3b8; padding:52px 24px; text-align:center; }
+  .empty-state i { display:block; font-size:34px; margin-bottom:8px; }
+  @media (max-width: 767.98px) { .customer-contact { display:none; } }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="d-flex align-items-baseline gap-3 mb-4">
-  <h4 class="fw-bold mb-0 text-dark"><i class="bi bi-building me-2" style="color:#16a34a;"></i>Satış Fırsatları</h4>
-  <span class="text-muted" style="font-size:13px;">{{ opportunities|length }} kayıt</span>
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+  <div>
+    <h4 class="fw-bold mb-1 text-dark"><i class="bi bi-people-fill me-2" style="color:#7c3aed;"></i>Müşteri Yönetimi</h4>
+    <p class="mb-0 text-muted" style="font-size:13px;">Müşteri kartlarını, iletişim bilgilerini ve satış ilişkilerini yönetin.</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'crm-sale-list' %}" class="btn btn-outline-primary"><i class="bi bi-bar-chart-steps me-1"></i>Satışları Görüntüle</a>
+    <a href="{% url 'crm-customer-create' %}" class="btn btn-primary"><i class="bi bi-person-plus me-1"></i>Yeni Müşteri</a>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4"><div class="crm-stat"><div class="crm-stat-icon" style="background:#f5f3ff;color:#7c3aed;"><i class="bi bi-people"></i></div><div><div class="crm-stat-value">{{ total_customers }}</div><div class="crm-stat-label">Toplam Müşteri</div></div></div></div>
+  <div class="col-md-4"><div class="crm-stat"><div class="crm-stat-icon" style="background:#f0fdf4;color:#16a34a;"><i class="bi bi-person-check"></i></div><div><div class="crm-stat-value">{{ active_customers }}</div><div class="crm-stat-label">Aktif Müşteri</div></div></div></div>
+  <div class="col-md-4"><div class="crm-stat"><div class="crm-stat-icon" style="background:#eff6ff;color:#2563eb;"><i class="bi bi-graph-up-arrow"></i></div><div><div class="crm-stat-value">{{ active_sales }}</div><div class="crm-stat-label">Aktif Satış</div></div></div></div>
 </div>
 
 <div class="data-card">
-  <table class="table table-borderless">
-    <thead>
-      <tr>
-        <th>Başlık</th>
-        <th>Müşteri</th>
-        <th>Aşama</th>
-        <th class="text-end">Tahmini Değer</th>
-        <th>Son Güncelleme</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for row in opportunities %}
-      <tr>
-        <td class="fw-medium">{{ row.opp.title }}</td>
-        <td>{{ row.opp.customer.name }}</td>
-        <td>
-          <span class="badge {{ row.badge_cls }} fw-medium" style="font-size:11.5px; padding:4px 9px;">
-            {{ row.opp.get_stage_display }}
-          </span>
-        </td>
-        <td class="text-end">
-          {% if row.opp.estimated_value %}₺{{ row.opp.estimated_value|floatformat:2 }}{% else %}—{% endif %}
-        </td>
-        <td style="font-size:12.5px; color:#64748b;">{{ row.opp.updated_at|date:"d M Y" }}</td>
-      </tr>
-      {% empty %}
-      <tr>
-        <td colspan="5" class="empty-state">
-          <i class="bi bi-inbox"></i>
-          Henüz hiç fırsat kaydı yok.
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  <div class="p-3 border-bottom bg-white">
+    <form method="get" class="row g-2 align-items-center">
+      <div class="col-md-5"><div class="input-group"><span class="input-group-text bg-white"><i class="bi bi-search"></i></span><input type="search" name="q" value="{{ query }}" class="form-control" placeholder="Müşteri, e-posta veya telefon ara"></div></div>
+      <div class="col-sm-4 col-md-3"><select name="status" class="form-select" onchange="this.form.submit()"><option value="active" {% if selected_status == 'active' %}selected{% endif %}>Aktif müşteriler</option><option value="inactive" {% if selected_status == 'inactive' %}selected{% endif %}>Pasif müşteriler</option><option value="all" {% if selected_status == 'all' %}selected{% endif %}>Tüm müşteriler</option></select></div>
+      <div class="col-auto"><button type="submit" class="btn btn-outline-secondary"><i class="bi bi-funnel me-1"></i>Filtrele</button></div>
+    </form>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-borderless align-middle">
+      <thead><tr><th>Müşteri</th><th>Tür</th><th>Kayıt tarihi</th><th class="text-center">Satışlar</th><th>Durum</th><th class="text-end">İşlemler</th></tr></thead>
+      <tbody>
+        {% for customer in customers %}
+        <tr>
+          <td><div class="d-flex align-items-center gap-2"><div class="customer-avatar">{{ customer.name|first|upper }}</div><div><a class="customer-name" href="{% url 'crm-customer-detail' customer.pk %}">{{ customer.name }}</a><div class="customer-contact">{% if customer.contact_email %}{{ customer.contact_email }}{% elif customer.contact_phone %}{{ customer.contact_phone }}{% else %}İletişim bilgisi eklenmemiş{% endif %}</div></div></div></td>
+          <td>{{ customer.get_customer_type_display }}</td>
+          <td class="text-muted" style="font-size:12px;">{{ customer.created_at|date:"d M Y" }}</td>
+          <td class="text-center"><span class="fw-semibold">{{ customer.sale_count }}</span>{% if customer.active_sale_count %}<span class="text-success ms-1" style="font-size:11px;">({{ customer.active_sale_count }} aktif)</span>{% endif %}</td>
+          <td>{% if customer.is_active %}<span class="badge bg-success-subtle text-success-emphasis fw-medium"><span class="status-dot bg-success"></span>Aktif</span>{% else %}<span class="badge bg-secondary-subtle text-secondary-emphasis fw-medium"><span class="status-dot bg-secondary"></span>Pasif</span>{% endif %}</td>
+          <td class="text-end"><a class="btn btn-sm btn-outline-primary" href="{% url 'crm-customer-detail' customer.pk %}">Müşteri kartı <i class="bi bi-arrow-right ms-1"></i></a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6" class="empty-state"><i class="bi bi-person-x"></i><div class="fw-medium">Gösterilecek müşteri bulunamadı.</div><a href="{% url 'crm-customer-create' %}" class="btn btn-primary btn-sm mt-3">İlk müşteriyi ekle</a></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </div>
 {% endblock %}
