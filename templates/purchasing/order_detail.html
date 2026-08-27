@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Satın Alma #{{ order.pk }} - Reflow Coffee ERP{% endblock %}
+{% block content %}
+<div class="mb-4">
+  <div class="btn-group btn-group-sm" role="group">
+    <a href="/purchasing/" class="btn btn-primary">Siparişler</a>
+    <a href="/purchasing/suppliers/" class="btn btn-outline-primary">Tedarikçiler</a>
+  </div>
+</div>
+
+<h1 class="mb-1">Satın Alma #{{ order.pk }}</h1>
+<p class="text-muted mb-4">
+  {{ order.supplier.name }} · <span class="badge bg-secondary">{{ order.get_status_display }}</span>
+</p>
+
+<table class="table bg-white">
+  <thead>
+    <tr>
+      <th>Ürün</th>
+      <th>Sipariş Edilen</th>
+      <th>Teslim Alınan</th>
+      <th>Kalan</th>
+      <th>Birim Fiyat</th>
+      <th>İlerleme</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in order.items.all %}
+    <tr>
+      <td>{{ item.product.name }}</td>
+      <td>{{ item.quantity_ordered }}</td>
+      <td>{{ item.quantity_received }}</td>
+      <td>
+        {% if item.quantity_remaining > 0 %}
+          <span class="text-warning fw-bold">{{ item.quantity_remaining }}</span>
+        {% else %}
+          <span class="text-success">0</span>
+        {% endif %}
+      </td>
+      <td>₺{{ item.unit_price }}</td>
+      <td style="width: 160px;">
+        <div class="progress" style="height: 8px;">
+          <div class="progress-bar bg-success" style="width: {% widthratio item.quantity_received item.quantity_ordered 100 %}%"></div>
+        </div>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

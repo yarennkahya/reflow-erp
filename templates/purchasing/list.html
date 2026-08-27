@@ -21,7 +21,12 @@
   <h4 class="fw-bold mb-0 text-dark"><i class="bi bi-basket3 me-2" style="color:#f97316;"></i>Satın Alma Siparişleri</h4>
   <span class="text-muted" style="font-size:13px;">{{ orders|length }} kayıt</span>
 </div>
-
+<div class="mb-4">
+  <div class="btn-group btn-group-sm" role="group">
+    <a href="/purchasing/" class="btn btn-primary">Siparişler</a>
+    <a href="/purchasing/suppliers/" class="btn btn-outline-primary">Tedarikçiler</a>
+  </div>
+</div>
 <div class="data-card">
   <table class="table table-borderless">
     <thead>
@@ -37,7 +42,9 @@
     <tbody>
       {% for row in orders %}
       <tr>
-        <td class="text-muted" style="font-size:12.5px;">PO #{{ row.po.pk }}</td>
+       <td class="text-muted" style="font-size:12.5px;">
+                   <a href="{% url 'purchase-order-detail' row.po.pk %}" class="fw-semibold">PO #{{ row.po.pk }}</a>
+        </td>
         <td class="fw-medium">{{ row.po.supplier.name }}</td>
         <td>
           <span class="badge {{ row.badge_cls }} fw-medium" style="font-size:11.5px; padding:4px 9px;">

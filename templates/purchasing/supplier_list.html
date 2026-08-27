@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Tedarikçiler - Reflow Coffee ERP{% endblock %}
+{% block content %}
+<div class="mb-4">
+  <div class="btn-group btn-group-sm" role="group">
+    <a href="/purchasing/" class="btn btn-outline-primary">Siparişler</a>
+    <a href="/purchasing/suppliers/" class="btn btn-primary">Tedarikçiler</a>
+  </div>
+</div>
+
+<h1 class="mb-4">Tedarikçiler</h1>
+<table class="table bg-white">
+  <thead>
+    <tr><th>İsim</th><th>E-posta</th><th>Telefon</th></tr>
+  </thead>
+  <tbody>
+    {% for supplier in suppliers %}
+    <tr>
+      <td>{{ supplier.name }}</td>
+      <td>{{ supplier.contact_email }}</td>
+      <td>{{ supplier.contact_phone }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
