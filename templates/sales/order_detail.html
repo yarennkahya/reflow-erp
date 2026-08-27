@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Sipariş #{{ order.pk }} - Reflow Coffee ERP{% endblock %}
+{% block content %}
+<div class="mb-4">
+  <div class="btn-group btn-group-sm" role="group">
+    <a href="/sales/" class="btn btn-primary">Siparişler</a>
+    <a href="/sales/customers/" class="btn btn-outline-primary">Müşteriler</a>
+  </div>
+</div>
+<h1 class="mb-1">Sipariş #{{ order.pk }}</h1>
+<p class="text-muted mb-4">
+  <a href="{% url 'customer-detail' order.customer.pk %}">{{ order.customer.name }}</a>
+  · <span class="badge bg-secondary">{{ order.get_status_display }}</span>
+</p>
+
+<table class="table bg-white">
+  <thead>
+    <tr>
+      <th>Ürün</th>
+      <th>Lot</th>
+      <th>Miktar</th>
+      <th>Birim Fiyat</th>
+      <th>Toplam</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in order.items.all %}
+    <tr>
+      <td>{{ item.product.name }}</td>
+      <td>{{ item.lot.lot_code }}</td>
+      <td>{{ item.quantity }}</td>
+      <td>₺{{ item.unit_price }}</td>
+      <td>₺{{ item.line_total }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

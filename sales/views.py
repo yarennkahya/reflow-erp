@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
+from django.shortcuts import render , get_object_or_404
 
-from .models import Order
+from .models import Order , Customer
 
 _STATUS = {
     'pending':   'bg-warning-subtle text-warning',
@@ -21,3 +21,23 @@ def order_list(request):
             'badge_cls': _STATUS.get(order.status, 'bg-secondary-subtle text-secondary'),
         })
     return render(request, 'sales/list.html', {'orders': orders_data})
+
+@login_required
+def order_detail_view(request, pk):
+    order = get_object_or_404(Order, pk=pk)
+    return render(request, 'sales/order_detail.html', {'order': order})
+
+
+@login_required
+def customer_list_view(request):
+    customers = Customer.objects.all()
+    customer_type = request.GET.get('customer_type')
+    if customer_type:
+        customers = customers.filter(customer_type=customer_type)
+    return render(request, 'sales/customer_list.html', {'customers': customers})
+
+
+@login_required
+def customer_detail_view(request, pk):
+    customer = get_object_or_404(Customer, pk=pk)
+    return render(request, 'sales/customer_detail.html', {'customer': customer})

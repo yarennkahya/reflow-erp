@@ -55,6 +55,10 @@ class OrderItem(models.Model):
         validators=[MinValueValidator(Decimal('0.001'))],
     )
     unit_price = models.DecimalField(max_digits=10, decimal_places=2)
-
+    
+    @property
+    def line_total(self):
+        return self.quantity * self.unit_price
+        
     def __str__(self):
         return f'{self.product} x {self.quantity}'

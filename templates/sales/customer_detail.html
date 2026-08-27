@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}{{ customer.name }} - Reflow Coffee ERP{% endblock %}
+{% block content %}
+<div class="mb-4">
+  <div class="btn-group btn-group-sm" role="group">
+    <a href="/sales/" class="btn btn-outline-primary">Siparişler</a>
+    <a href="/sales/customers/" class="btn btn-primary">Müşteriler</a>
+  </div>
+</div>
+<h1 class="mb-1">{{ customer.name }}</h1>
+<p class="text-muted mb-4">{{ customer.get_customer_type_display }} · {{ customer.contact_email }}</p>
+
+<div class="row g-4">
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">Sipariş Geçmişi (sales.Order)</div>
+      <div class="card-body">
+        {% for order in customer.orders.all %}
+          <div class="d-flex justify-content-between border-bottom py-2">
+            <a href="{% url 'order-detail' order.pk %}">Sipariş #{{ order.pk }}</a>
+            <span class="badge bg-secondary">{{ order.get_status_display }}</span>
+          </div>
+        {% empty %}
+          <p class="text-muted">Henüz sipariş yok.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header">Satış Fırsatları (crm.Opportunity)</div>
+      <div class="card-body">
+        {% for opp in customer.opportunities.all %}
+          <div class="d-flex justify-content-between border-bottom py-2">
+            <span>{{ opp.title }}</span>
+            <span class="badge bg-info">{{ opp.get_stage_display }}</span>
+          </div>
+        {% empty %}
+          <p class="text-muted">Henüz fırsat yok.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
