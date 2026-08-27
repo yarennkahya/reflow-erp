@@ -28,6 +28,14 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
 DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',')
 
+CSRF_TRUSTED_ORIGINS = [
+    'http://185.22.187.18',
+    'http://185.22.187.18:8001',
+    'http://185.22.187.18:8000',
+    'http://localhost',
+    'http://localhost:8001',
+]
+
 
 # Application definition
 
@@ -151,6 +159,9 @@ CELERY_BEAT_SCHEDULE = {
 
 
 
+LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = '/accounts/login/'
+
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
@@ -160,3 +171,5 @@ sentry_sdk.init(
     send_default_pii=False,
     environment='development' if DEBUG else 'production',
 )
+
+

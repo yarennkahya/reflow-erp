@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% block title %}{{ emp.name }} — Reflow Coffee ERP{% endblock %}
+{% block nav_hr %}active{% endblock %}
+{% block page_title %}İnsan Kaynakları{% endblock %}
+
+{% block extra_head %}
+<style>
+  .hr-subnav { display:flex; gap:4px; margin-bottom:20px; border-bottom:1px solid #e2e8f0; padding-bottom:0; }
+  .hr-subnav a { padding:8px 14px; font-size:13px; font-weight:500; color:#64748b; text-decoration:none; border-bottom:2px solid transparent; margin-bottom:-1px; white-space:nowrap; }
+  .hr-subnav a:hover { color:#0f172a; }
+  .hr-subnav a.active { color:#9333ea; border-bottom-color:#9333ea; font-weight:600; }
+  .data-card { background:#fff; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden; }
+  .data-card .table { margin-bottom:0; font-size:13.5px; }
+  .data-card .table thead th { background:#f8fafc; color:#64748b; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.7px; border-bottom:1px solid #e2e8f0; padding:10px 16px; white-space:nowrap; }
+  .data-card .table tbody td { padding:11px 16px; vertical-align:middle; color:#334155; border-color:#f1f5f9; }
+  .data-card .table tbody tr:last-child td { border-bottom:none; }
+  .data-card .table tbody tr:hover { background:#f8fafc; }
+  .empty-state { padding:32px 24px; text-align:center; color:#94a3b8; }
+  .empty-state i { font-size:28px; display:block; margin-bottom:6px; }
+  .info-card { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:20px 24px; }
+  .info-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f1f5f9; font-size:13.5px; }
+  .info-row:last-child { border-bottom:none; }
+  .info-label { color:#64748b; font-weight:500; }
+  .info-value { color:#1e293b; font-weight:600; }
+  .section-head { font-size:13px; font-weight:600; color:#475569; padding:10px 16px; background:#f8fafc; border-bottom:1px solid #e2e8f0; display:flex; align-items:center; gap:8px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hr-subnav">
+  <a href="{% url 'hr-list' %}">Genel Bakış</a>
+  <a href="{% url 'hr-employees' %}" class="active">Çalışanlar</a>
+  <a href="{% url 'hr-leave' %}">İzin & Devamsızlık</a>
+  <a href="{% url 'hr-recruitment' %}">İşe Alım</a>
+</div>
+
+<div class="d-flex align-items-center gap-3 mb-3">
+  <a href="{% url 'hr-employees' %}" class="text-muted" style="font-size:13px; text-decoration:none;"><i class="bi bi-arrow-left me-1"></i>Çalışanlar</a>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-5">
+    <div class="info-card">
+      <div class="d-flex align-items-center gap-3 mb-4">
+        <div style="width:52px; height:52px; border-radius:12px; background:#fdf4ff; color:#9333ea; display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0;">
+          <i class="bi bi-person"></i>
+        </div>
+        <div>
+          <div style="font-size:18px; font-weight:700; color:#0f172a;">{{ emp.name }}</div>
+          <div style="font-size:13px; color:#64748b;">{{ emp.position.title }}</div>
+        </div>
+        <span class="badge {{ badge_cls }} fw-medium ms-auto" style="font-size:12px; padding:5px 10px;">{{ emp.get_employment_status_display }}</span>
+      </div>
+      <div class="info-row"><span class="info-label">Departman</span><span class="info-value">{{ emp.department.name }}</span></div>
+      <div class="info-row"><span class="info-label">Yönetici</span><span class="info-value">{{ emp.manager.name|default:"—" }}</span></div>
+      <div class="info-row"><span class="info-label">İşe Giriş</span><span class="info-value">{{ emp.hire_date }}</span></div>
+      <div class="info-row"><span class="info-label">E-posta</span><span class="info-value">{{ emp.email|default:"—" }}</span></div>
+      <div class="info-row"><span class="info-label">Telefon</span><span class="info-value">{{ emp.phone|default:"—" }}</span></div>
+      <div class="info-row"><span class="info-label">Maaş</span><span class="info-value">{% if emp.salary %}₺{{ emp.salary|floatformat:2 }}{% else %}—{% endif %}</span></div>
+    </div>
+  </div>
+
+  {% if reports %}
+  <div class="col-md-7">
+    <div class="data-card">
+      <div class="section-head"><i class="bi bi-diagram-3" style="color:#9333ea;"></i>Altındaki Çalışanlar — {{ reports|length }}</div>
+      <table class="table table-borderless">
+        <thead>
+          <tr><th>İsim</th><th>Departman</th><th>Pozisyon</th></tr>
+        </thead>
+        <tbody>
+          {% for r in reports %}
+          <tr>
+            <td class="fw-medium"><a href="{% url 'hr-employee-detail' r.pk %}" style="color:#0f172a; text-decoration:none;">{{ r.name }}</a></td>
+            <td>{{ r.department.name }}</td>
+            <td>{{ r.position.title }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<!-- İzin Geçmişi -->
+<div class="data-card">
+  <div class="section-head"><i class="bi bi-calendar-check" style="color:#f97316;"></i>İzin Geçmişi — {{ leaves|length }} kayıt</div>
+  <table class="table table-borderless">
+    <thead>
+      <tr><th>İzin Türü</th><th>Başlangıç</th><th>Bitiş</th><th>Talep Tarihi</th><th>Durum</th></tr>
+    </thead>
+    <tbody>
+      {% for row in leaves %}
+      <tr>
+        <td class="fw-medium">{{ row.leave.leave_type.name }}</td>
+        <td>{{ row.leave.start_date }}</td>
+        <td>{{ row.leave.end_date }}</td>
+        <td style="font-size:12.5px; color:#64748b;">{{ row.leave.requested_at|date:"d M Y" }}</td>
+        <td><span class="badge {{ row.badge_cls }} fw-medium" style="font-size:11.5px; padding:4px 9px;">{{ row.leave.get_status_display }}</span></td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="5" class="empty-state"><i class="bi bi-check-circle"></i>İzin kaydı yok.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

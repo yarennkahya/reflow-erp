@@ -14,10 +14,19 @@
   .empty-state { padding:48px 24px; text-align:center; color:#94a3b8; }
   .empty-state i { font-size:36px; display:block; margin-bottom:8px; }
   .lot-code { font-family: monospace; font-size:12.5px; color:#475569; }
+  .prod-subnav { display:flex; gap:4px; margin-bottom:20px; border-bottom:1px solid #e2e8f0; padding-bottom:0; }
+  .prod-subnav a { padding:8px 14px; font-size:13px; font-weight:500; color:#64748b; text-decoration:none; border-bottom:2px solid transparent; margin-bottom:-1px; white-space:nowrap; }
+  .prod-subnav a:hover { color:#0f172a; }
+  .prod-subnav a.active { color:#ca8a04; border-bottom-color:#ca8a04; font-weight:600; }
 </style>
 {% endblock %}
 
 {% block content %}
+<div class="prod-subnav">
+  <a href="{% url 'production-list' %}" class="active">Kavurma Partileri</a>
+  <a href="{% url 'production-recipes' %}">Reçeteler (BOM)</a>
+</div>
+
 <div class="d-flex align-items-baseline gap-3 mb-4">
   <h4 class="fw-bold mb-0 text-dark"><i class="bi bi-fire me-2" style="color:#ca8a04;"></i>Kavurma Partileri</h4>
   <span class="text-muted" style="font-size:13px;">{{ batches|length }} kayıt</span>
@@ -38,7 +47,9 @@
     <tbody>
       {% for batch in batches %}
       <tr>
-        <td class="text-muted" style="font-size:12.5px;">#{{ batch.pk }}</td>
+        <td class="text-muted" style="font-size:12.5px;">
+          <a href="{% url 'production-batch-detail' batch.pk %}" style="color:#64748b; text-decoration:none;">#{{ batch.pk }}</a>
+        </td>
         <td class="fw-medium">{{ batch.recipe.name }}</td>
         <td>{{ batch.output_lot.product.name }}</td>
         <td><span class="lot-code">{{ batch.output_lot.lot_code }}</span></td>

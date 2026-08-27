@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block title %}Reçeteler — Reflow Coffee ERP{% endblock %}
+{% block nav_production %}active{% endblock %}
+{% block page_title %}Üretim{% endblock %}
+
+{% block extra_head %}
+<style>
+  .prod-subnav { display:flex; gap:4px; margin-bottom:20px; border-bottom:1px solid #e2e8f0; padding-bottom:0; }
+  .prod-subnav a { padding:8px 14px; font-size:13px; font-weight:500; color:#64748b; text-decoration:none; border-bottom:2px solid transparent; margin-bottom:-1px; white-space:nowrap; }
+  .prod-subnav a:hover { color:#0f172a; }
+  .prod-subnav a.active { color:#ca8a04; border-bottom-color:#ca8a04; font-weight:600; }
+  .data-card { background:#fff; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden; margin-bottom:16px; }
+  .data-card .table { margin-bottom:0; font-size:13.5px; }
+  .data-card .table thead th { background:#f8fafc; color:#64748b; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.7px; border-bottom:1px solid #e2e8f0; padding:10px 16px; white-space:nowrap; }
+  .data-card .table tbody td { padding:11px 16px; vertical-align:middle; color:#334155; border-color:#f1f5f9; }
+  .data-card .table tbody tr:last-child td { border-bottom:none; }
+  .data-card .table tbody tr:hover { background:#f8fafc; }
+  .empty-state { padding:32px 24px; text-align:center; color:#94a3b8; }
+  .empty-state i { font-size:28px; display:block; margin-bottom:6px; }
+  .recipe-head { padding:14px 16px; background:#fefce8; border-bottom:1px solid #fef08a; display:flex; align-items:center; gap:10px; }
+  .recipe-title { font-size:14px; font-weight:700; color:#713f12; }
+  .recipe-output { font-size:12px; color:#92400e; }
+  .ratio-bar { display:inline-block; height:6px; border-radius:3px; background:#ca8a04; margin-right:6px; vertical-align:middle; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="prod-subnav">
+  <a href="{% url 'production-list' %}">Kavurma Partileri</a>
+  <a href="{% url 'production-recipes' %}" class="active">Reçeteler (BOM)</a>
+</div>
+
+<div class="d-flex align-items-baseline gap-3 mb-3">
+  <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-journal-text me-2" style="color:#ca8a04;"></i>Reçeteler (BOM)</h5>
+  <span class="text-muted" style="font-size:13px;">{{ recipes|length }} reçete</span>
+</div>
+
+{% for recipe in recipes %}
+<div class="data-card">
+  <div class="recipe-head">
+    <i class="bi bi-journal-bookmark" style="color:#ca8a04;"></i>
+    <div>
+      <div class="recipe-title">{{ recipe.name }}</div>
+      <div class="recipe-output">Çıktı: {{ recipe.output_product.name }}{% if recipe.description %} · {{ recipe.description }}{% endif %}</div>
+    </div>
+    <span class="text-muted ms-auto" style="font-size:12px;">{{ recipe.components.all|length }} bileşen</span>
+  </div>
+  {% with components=recipe.components.all %}
+  {% if components %}
+  <table class="table table-borderless">
+    <thead>
+      <tr><th>Girdi Ürün</th><th>Oran (%)</th><th style="width:200px;">Görsel Oran</th></tr>
+    </thead>
+    <tbody>
+      {% for comp in components %}
+      <tr>
+        <td class="fw-medium">{{ comp.input_product.name }}</td>
+        <td>%{{ comp.ratio_percent|floatformat:2 }}</td>
+        <td>
+          <span class="ratio-bar" style="width:{{ comp.ratio_percent }}px; max-width:180px;"></span>
+          <span style="font-size:12px; color:#64748b;">{{ comp.ratio_percent|floatformat:1 }}</span>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state"><i class="bi bi-exclamation-circle"></i>Bileşen tanımlanmamış.</div>
+  {% endif %}
+  {% endwith %}
+</div>
+{% empty %}
+<div class="data-card">
+  <div class="empty-state" style="padding:48px 24px;">
+    <i class="bi bi-inbox" style="font-size:36px; display:block; margin-bottom:8px;"></i>
+    Henüz hiç reçete yok.
+  </div>
+</div>
+{% endfor %}
+{% endblock %}
