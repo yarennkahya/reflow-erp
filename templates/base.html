@@ -120,6 +120,66 @@
             background: var(--sidebar-accent);
         }
 
+        .sb-module-group {
+            margin-bottom: 3px;
+        }
+
+        .sb-module-heading {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: var(--sidebar-text);
+            padding: 8px 10px 5px;
+            font-size: 13.5px;
+            font-weight: 500;
+        }
+
+        .sb-module-heading i {
+            font-size: 15px;
+            width: 16px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .sb-module-group.active .sb-module-heading {
+            color: #f9fafb;
+        }
+
+        .sb-subnav {
+            border-left: 1px solid rgba(255,255,255,0.12);
+            margin: 0 0 4px 18px;
+            padding-left: 8px;
+        }
+
+        .sb-nav .sb-subnav a {
+            border-radius: 5px;
+            color: #7f8ba0;
+            font-size: 12px;
+            margin-bottom: 1px;
+            padding: 6px 9px;
+        }
+
+        .sb-nav .sb-subnav a::before {
+            content: '';
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: currentColor;
+            margin-right: 7px;
+            opacity: .65;
+        }
+
+        .sb-nav .sb-subnav a:hover {
+            color: #f9fafb;
+            background: rgba(255,255,255,0.06);
+        }
+
+        .sb-nav .sb-subnav a.active {
+            background: rgba(59,130,246,.22);
+            color: #fff;
+            font-weight: 600;
+        }
+
         .sb-nav a.dim {
             opacity: 0.38;
             pointer-events: none;
@@ -223,12 +283,30 @@
     <div class="sb-section">
         <div class="sb-label">Modüller</div>
         <nav class="sb-nav">
-            <a href="/inventory/"  class="{% block nav_inventory %}{% endblock %}"><i class="bi bi-boxes"></i> Stok</a>
-            <a href="/purchasing/" class="{% block nav_purchasing %}{% endblock %}"><i class="bi bi-basket3"></i> Satın Alma</a>
+            <div class="sb-module-group {% block nav_inventory %}{% endblock %}">
+                <div class="sb-module-heading"><i class="bi bi-boxes"></i> Stok</div>
+                <div class="sb-subnav">
+                    <a href="/inventory/" class="{% block nav_inventory_lots %}{% endblock %}">Stoklar</a>
+                    <a href="/inventory/warehouses/" class="{% block nav_inventory_warehouses %}{% endblock %}">Depolar</a>
+                </div>
+            </div>
+            <div class="sb-module-group {% block nav_purchasing %}{% endblock %}">
+                <div class="sb-module-heading"><i class="bi bi-basket3"></i> Satın Alma</div>
+                <div class="sb-subnav">
+                    <a href="/purchasing/" class="{% block nav_purchasing_orders %}{% endblock %}">Siparişler</a>
+                    <a href="/purchasing/suppliers/" class="{% block nav_purchasing_suppliers %}{% endblock %}">Tedarikçiler</a>
+                </div>
+            </div>
             <a href="/production/" class="{% block nav_production %}{% endblock %}"><i class="bi bi-fire"></i> Üretim</a>
             <a href="/sales/"      class="{% block nav_sales %}{% endblock %}"><i class="bi bi-cart3"></i> Satış</a>
             <a href="/finance/"    class="{% block nav_finance %}{% endblock %}"><i class="bi bi-graph-up-arrow"></i> Finans</a>
-            <a href="/crm/"        class="{% block nav_crm %}{% endblock %}"><i class="bi bi-building"></i> CRM</a>
+            <div class="sb-module-group {% block nav_crm %}{% endblock %}">
+                <div class="sb-module-heading"><i class="bi bi-building"></i> CRM</div>
+                <div class="sb-subnav">
+                    <a href="/crm/" class="{% block nav_crm_customers %}{% endblock %}">Müşteriler</a>
+                    <a href="/crm/sales/" class="{% block nav_crm_sales %}{% endblock %}">Satış Takibi</a>
+                </div>
+            </div>
             <a href="/hr/"         class="{% block nav_hr %}{% endblock %}"><i class="bi bi-people"></i> İnsan Kaynakları</a>
         </nav>
     </div>

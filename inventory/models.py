@@ -16,13 +16,16 @@ class Warehouse(models.Model):
         return self.name
 class Business(models.Model):
     class BusinessType(models.TextChoices):
-        SUPPLIER = 'supplier', 'Green coffee supplier'
-        WHOLESALE_CUSTOMER = 'wholesale_customer', 'Wholesale customer (cafe)'
+        SUPPLIER = 'supplier', 'Tedarikçi'
+        WHOLESALE_CUSTOMER = 'wholesale_customer', 'Toptan müşteri (kafe)'
+        INTERNAL = 'internal', 'İç işletme'
 
     name = models.CharField(max_length=255)
     business_type = models.CharField(max_length=30, choices=BusinessType.choices)
     contact_email = models.EmailField()
     contact_phone = models.CharField(max_length=32)
+    is_active = models.BooleanField(default=True)
+    notes = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

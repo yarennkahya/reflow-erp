@@ -4,6 +4,7 @@ from openai import OpenAI
 from pgvector.django import CosineDistance
 
 from inventory.services import get_stock_summary
+from sales.services import get_demand_forecast
 
 from .models import Document
 
@@ -135,11 +136,36 @@ TOOLS = [
             },
         },
     },
+    {
+        'type': 'function',
+        'function': {
+            'name': 'get_demand_forecast',
+            'description': (
+                'Bir urunun son 90 gunluk satis hizina gore basit bir talep '
+                'tahmini uretir ve mevcut stogun yetip yetmeyecegini soyler.'
+            ),
+            'parameters': {
+                'type': 'object',
+                'properties': {
+                    'product_name': {
+                        'type': 'string',
+                        'description': 'Aranacak urunun adi (tam olmasi gerekmez)',
+                    },
+                    'days_ahead': {
+                        'type': 'integer',
+                        'description': 'Kac gunluk tahmin yapilsin, varsayilan 30',
+                    },
+                },
+                'required': ['product_name'],
+            },
+        },
+    },
 ]
 
 AVAILABLE_FUNCTIONS = {
     'get_stock_summary': get_stock_summary,
     'search_documents': _search_documents_tool,
+    'get_demand_forecast': get_demand_forecast,
 }
 
 

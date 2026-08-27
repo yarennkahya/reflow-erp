@@ -1,7 +1,9 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render , get_object_or_404
+from django.shortcuts import render, get_object_or_404
 
-from .models import Order , Customer
+from inventory.models import Product
+from .models import Order, Customer
+from .services import get_demand_forecast
 
 _STATUS = {
     'pending':   'bg-warning-subtle text-warning',
@@ -41,3 +43,12 @@ def customer_list_view(request):
 def customer_detail_view(request, pk):
     customer = get_object_or_404(Customer, pk=pk)
     return render(request, 'sales/customer_detail.html', {'customer': customer})
+
+
+@login_required
+def forecast_view(request):
+    products_with_sales = Product.objects.filter(
+        order_items__order__status='fulfilled'
+    ).distinct()
+    forecasts = [get_demand_forecast(p.name) for p in products_with_sales]
+    return render(request, 'sales/forecast.html', {'forecasts': forecasts})

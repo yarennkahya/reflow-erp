@@ -28,7 +28,9 @@ def dashboard_view(request):
         },
         'purchasing': {
             'total_orders': PurchaseOrder.objects.count(),
-            'open_orders': PurchaseOrder.objects.exclude(status='received').count(),
+            'open_orders': PurchaseOrder.objects.filter(
+                status__in=['draft', 'sent', 'confirmed', 'partially_received']
+            ).count(),
         },
         'production': {
             'total_batches': RoastBatch.objects.count(),

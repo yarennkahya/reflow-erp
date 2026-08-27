@@ -1,69 +1,51 @@
 {% extends 'base.html' %}
 {% block title %}Satın Alma — Reflow Coffee ERP{% endblock %}
 {% block nav_purchasing %}active{% endblock %}
+{% block nav_purchasing_orders %}active{% endblock %}
 {% block page_title %}Satın Alma{% endblock %}
 
 {% block extra_head %}
 <style>
-  .data-card { background:#fff; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden; }
-  .data-card .table { margin-bottom:0; font-size:13.5px; }
-  .data-card .table thead th { background:#f8fafc; color:#64748b; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.7px; border-bottom:1px solid #e2e8f0; padding:10px 16px; white-space:nowrap; }
-  .data-card .table tbody td { padding:11px 16px; vertical-align:middle; color:#334155; border-color:#f1f5f9; }
-  .data-card .table tbody tr:last-child td { border-bottom:none; }
-  .data-card .table tbody tr:hover { background:#f8fafc; }
-  .empty-state { padding:48px 24px; text-align:center; color:#94a3b8; }
-  .empty-state i { font-size:36px; display:block; margin-bottom:8px; }
+  .purchase-stat, .data-card { background:#fff; border:1px solid #e2e8f0; border-radius:12px; }
+  .purchase-stat { height:100%; padding:16px; display:flex; align-items:center; gap:12px; }
+  .purchase-stat-icon { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto; }
+  .purchase-stat-value { color:#0f172a; font-size:22px; font-weight:700; line-height:1.1; }
+  .purchase-stat-label { color:#64748b; font-size:11px; font-weight:600; letter-spacing:.6px; margin-top:3px; text-transform:uppercase; }
+  .data-card { overflow:hidden; }.data-card .table { margin:0; font-size:13px; }.data-card .table thead th { background:#f8fafc; border-bottom:1px solid #e2e8f0; color:#64748b; font-size:11px; font-weight:700; letter-spacing:.65px; padding:11px 16px; text-transform:uppercase; white-space:nowrap; }.data-card .table tbody td { border-color:#f1f5f9; color:#334155; padding:13px 16px; vertical-align:middle; }.data-card .table tbody tr:hover { background:#f8fafc; }
+  .po-link, .supplier-link { color:#0f172a; font-weight:600; text-decoration:none; }.po-link:hover, .supplier-link:hover { color:#ea580c; }
+  .po-sub { color:#64748b; font-size:12px; margin-top:2px; }
+  .status-pill { border-radius:20px; display:inline-block; font-size:11.5px; font-weight:600; padding:4px 8px; white-space:nowrap; }
+  .status-draft { background:#f1f5f9; color:#475569; }.status-sent { background:#e0f2fe; color:#0369a1; }.status-confirmed { background:#eff6ff; color:#1d4ed8; }.status-partially_received { background:#fff7ed; color:#c2410c; }.status-received { background:#f0fdf4; color:#15803d; }.status-cancelled { background:#fef2f2; color:#b91c1c; }
+  .empty-state { color:#94a3b8; padding:52px 24px; text-align:center; }.empty-state i { display:block; font-size:34px; margin-bottom:8px; }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="d-flex align-items-baseline gap-3 mb-4">
-  <h4 class="fw-bold mb-0 text-dark"><i class="bi bi-basket3 me-2" style="color:#f97316;"></i>Satın Alma Siparişleri</h4>
-  <span class="text-muted" style="font-size:13px;">{{ orders|length }} kayıt</span>
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+  <div><h4 class="fw-bold mb-1 text-dark"><i class="bi bi-basket3 me-2" style="color:#ea580c;"></i>Satın Alma Siparişleri</h4><p class="mb-0 text-muted" style="font-size:13px;">Taslak oluşturmadan teslim almaya kadar satın alma sürecinizi takip edin.</p></div>
+  <div class="d-flex gap-2"><a href="{% url 'supplier-list' %}" class="btn btn-outline-primary"><i class="bi bi-truck me-1"></i>Tedarikçiler</a><a href="{% url 'purchase-order-create' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Yeni Sipariş</a></div>
 </div>
-<div class="mb-4">
-  <div class="btn-group btn-group-sm" role="group">
-    <a href="/purchasing/" class="btn btn-primary">Siparişler</a>
-    <a href="/purchasing/suppliers/" class="btn btn-outline-primary">Tedarikçiler</a>
-  </div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4"><div class="purchase-stat"><div class="purchase-stat-icon" style="background:#fff7ed;color:#ea580c;"><i class="bi bi-cart-check"></i></div><div><div class="purchase-stat-value">{{ open_order_count }}</div><div class="purchase-stat-label">Açık Sipariş</div></div></div></div>
+  <div class="col-md-4"><div class="purchase-stat"><div class="purchase-stat-icon" style="background:#eff6ff;color:#2563eb;"><i class="bi bi-box-seam"></i></div><div><div class="purchase-stat-value">{{ awaiting_delivery_count }}</div><div class="purchase-stat-label">Teslimat Bekleyen</div></div></div></div>
+  <div class="col-md-4"><div class="purchase-stat"><div class="purchase-stat-icon" style="background:#fef2f2;color:#dc2626;"><i class="bi bi-exclamation-triangle"></i></div><div><div class="purchase-stat-value">{{ overdue_count }}</div><div class="purchase-stat-label">Geciken Teslimat</div></div></div></div>
 </div>
+
 <div class="data-card">
-  <table class="table table-borderless">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Tedarikçi</th>
-        <th>Durum</th>
-        <th>Beklenen Teslimat</th>
-        <th>Kalem Sayısı</th>
-        <th>Oluşturulma</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for row in orders %}
-      <tr>
-       <td class="text-muted" style="font-size:12.5px;">
-                   <a href="{% url 'purchase-order-detail' row.po.pk %}" class="fw-semibold">PO #{{ row.po.pk }}</a>
-        </td>
-        <td class="fw-medium">{{ row.po.supplier.name }}</td>
-        <td>
-          <span class="badge {{ row.badge_cls }} fw-medium" style="font-size:11.5px; padding:4px 9px;">
-            {{ row.po.get_status_display }}
-          </span>
-        </td>
-        <td>{{ row.po.expected_delivery_date|default:"—" }}</td>
-        <td>{{ row.item_count }}</td>
-        <td style="font-size:12.5px; color:#64748b;">{{ row.po.created_at|date:"d M Y" }}</td>
-      </tr>
-      {% empty %}
-      <tr>
-        <td colspan="6" class="empty-state">
-          <i class="bi bi-inbox"></i>
-          Henüz hiç satın alma siparişi yok.
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+  <div class="p-3 border-bottom"><form method="get" class="row g-2 align-items-center"><div class="col-md-5"><div class="input-group"><span class="input-group-text bg-white"><i class="bi bi-search"></i></span><input type="search" name="q" value="{{ query }}" class="form-control" placeholder="Sipariş no, tedarikçi veya not ara"></div></div><div class="col-sm-5 col-md-3"><select name="status" class="form-select"><option value="all">Tüm durumlar</option>{% for value, label in status_choices %}<option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div><div class="col-auto"><button type="submit" class="btn btn-outline-secondary"><i class="bi bi-funnel me-1"></i>Filtrele</button></div></form></div>
+  <div class="table-responsive"><table class="table table-borderless align-middle"><thead><tr><th>Sipariş</th><th>Tedarikçi</th><th>Durum</th><th>Beklenen teslimat</th><th class="text-center">Kalem</th><th class="text-end">Toplam</th><th>Oluşturulma</th><th class="text-end"></th></tr></thead><tbody>
+    {% for row in orders %}
+    <tr>
+      <td><a href="{% url 'purchase-order-detail' row.order.pk %}" class="po-link">PO #{{ row.order.pk }}</a>{% if row.order.notes %}<div class="po-sub">{{ row.order.notes|truncatechars:42 }}</div>{% endif %}</td>
+      <td><a href="{% url 'supplier-detail' row.order.supplier_id %}" class="supplier-link">{{ row.order.supplier.name }}</a></td>
+      <td><span class="status-pill {{ row.status_class }}">{{ row.order.get_status_display }}</span></td>
+      <td>{% if row.order.expected_delivery_date %}<span {% if row.is_overdue %}class="text-danger fw-semibold"{% endif %}>{{ row.order.expected_delivery_date|date:"d M Y" }}{% if row.is_overdue %}<i class="bi bi-exclamation-circle ms-1" title="Teslimat gecikti"></i>{% endif %}</span>{% else %}<span class="text-muted">Belirtilmedi</span>{% endif %}</td>
+      <td class="text-center">{{ row.item_count }}</td><td class="text-end fw-semibold">₺{{ row.total|floatformat:2 }}</td><td class="text-muted" style="font-size:12px;">{{ row.order.created_at|date:"d M Y" }}</td><td class="text-end"><a class="btn btn-sm btn-outline-primary" href="{% url 'purchase-order-detail' row.order.pk %}">Aç <i class="bi bi-arrow-right ms-1"></i></a></td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="8" class="empty-state"><i class="bi bi-bag-x"></i><div class="fw-medium">Gösterilecek satın alma siparişi bulunamadı.</div><a href="{% url 'purchase-order-create' %}" class="btn btn-primary btn-sm mt-3">İlk siparişi oluştur</a></td></tr>
+    {% endfor %}
+  </tbody></table></div>
 </div>
 {% endblock %}

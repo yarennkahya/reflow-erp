@@ -6,8 +6,8 @@ from .models import Business, Lot, Product, StockMovement , Warehouse
 
 @admin.register(Business)
 class BusinessAdmin(admin.ModelAdmin):
-    list_display = ('name', 'business_type', 'contact_email', 'created_at')
-    list_filter = ('business_type',)
+    list_display = ('name', 'business_type', 'contact_email', 'is_active', 'created_at')
+    list_filter = ('business_type', 'is_active')
     search_fields = ('name', 'contact_email')
 
 

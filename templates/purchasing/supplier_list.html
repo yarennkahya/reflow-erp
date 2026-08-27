@@ -1,26 +1,25 @@
 {% extends 'base.html' %}
-{% block title %}Tedarikçiler - Reflow Coffee ERP{% endblock %}
-{% block content %}
-<div class="mb-4">
-  <div class="btn-group btn-group-sm" role="group">
-    <a href="/purchasing/" class="btn btn-outline-primary">Siparişler</a>
-    <a href="/purchasing/suppliers/" class="btn btn-primary">Tedarikçiler</a>
-  </div>
-</div>
+{% block title %}Tedarikçiler — Reflow Coffee ERP{% endblock %}
+{% block nav_purchasing %}active{% endblock %}
+{% block nav_purchasing_suppliers %}active{% endblock %}
+{% block page_title %}Satın Alma / Tedarikçiler{% endblock %}
 
-<h1 class="mb-4">Tedarikçiler</h1>
-<table class="table bg-white">
-  <thead>
-    <tr><th>İsim</th><th>E-posta</th><th>Telefon</th></tr>
-  </thead>
-  <tbody>
-    {% for supplier in suppliers %}
-    <tr>
-      <td>{{ supplier.name }}</td>
-      <td>{{ supplier.contact_email }}</td>
-      <td>{{ supplier.contact_phone }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+{% block extra_head %}
+<style>
+  .purchase-stat, .data-card { background:#fff; border:1px solid #e2e8f0; border-radius:12px; }.purchase-stat { height:100%; padding:16px; display:flex; align-items:center; gap:12px; }.purchase-stat-icon { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; }.purchase-stat-value { color:#0f172a; font-size:22px; font-weight:700; line-height:1.1; }.purchase-stat-label { color:#64748b; font-size:11px; font-weight:600; letter-spacing:.6px; margin-top:3px; text-transform:uppercase; }
+  .data-card { overflow:hidden; }.data-card .table { margin:0; font-size:13px; }.data-card .table thead th { background:#f8fafc; border-bottom:1px solid #e2e8f0; color:#64748b; font-size:11px; font-weight:700; letter-spacing:.65px; padding:11px 16px; text-transform:uppercase; white-space:nowrap; }.data-card .table tbody td { border-color:#f1f5f9; color:#334155; padding:13px 16px; vertical-align:middle; }.data-card .table tbody tr:hover { background:#f8fafc; }
+  .supplier-avatar { width:36px; height:36px; border-radius:10px; background:#fff7ed; color:#c2410c; display:inline-flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; flex:0 0 auto; }.supplier-link { color:#0f172a; font-weight:600; text-decoration:none; }.supplier-link:hover { color:#ea580c; }.supplier-contact { color:#64748b; font-size:12px; margin-top:2px; }.status-dot { width:7px; height:7px; display:inline-block; border-radius:50%; margin-right:5px; }.empty-state { color:#94a3b8; padding:52px 24px; text-align:center; }.empty-state i { display:block; font-size:34px; margin-bottom:8px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4"><div><h4 class="fw-bold mb-1 text-dark"><i class="bi bi-truck me-2" style="color:#ea580c;"></i>Tedarikçi Yönetimi</h4><p class="mb-0 text-muted" style="font-size:13px;">Tedarikçi bilgilerini, kataloglarını ve satın alma geçmişlerini yönetin.</p></div><div class="d-flex gap-2"><a href="{% url 'purchasing-list' %}" class="btn btn-outline-primary"><i class="bi bi-basket3 me-1"></i>Siparişler</a><a href="{% url 'supplier-create' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Yeni Tedarikçi</a></div></div>
+
+<div class="row g-3 mb-4"><div class="col-md-6"><div class="purchase-stat"><div class="purchase-stat-icon" style="background:#fff7ed;color:#ea580c;"><i class="bi bi-truck"></i></div><div><div class="purchase-stat-value">{{ supplier_count }}</div><div class="purchase-stat-label">Toplam Tedarikçi</div></div></div></div><div class="col-md-6"><div class="purchase-stat"><div class="purchase-stat-icon" style="background:#f0fdf4;color:#16a34a;"><i class="bi bi-patch-check"></i></div><div><div class="purchase-stat-value">{{ active_supplier_count }}</div><div class="purchase-stat-label">Aktif Tedarikçi</div></div></div></div></div>
+
+<div class="data-card"><div class="p-3 border-bottom"><form method="get" class="row g-2 align-items-center"><div class="col-md-5"><div class="input-group"><span class="input-group-text bg-white"><i class="bi bi-search"></i></span><input type="search" name="q" value="{{ query }}" class="form-control" placeholder="Tedarikçi, e-posta veya telefon ara"></div></div><div class="col-sm-5 col-md-3"><select name="status" class="form-select" onchange="this.form.submit()"><option value="active" {% if selected_status == 'active' %}selected{% endif %}>Aktif tedarikçiler</option><option value="inactive" {% if selected_status == 'inactive' %}selected{% endif %}>Pasif tedarikçiler</option><option value="all" {% if selected_status == 'all' %}selected{% endif %}>Tüm tedarikçiler</option></select></div><div class="col-auto"><button type="submit" class="btn btn-outline-secondary"><i class="bi bi-funnel me-1"></i>Filtrele</button></div></form></div>
+<div class="table-responsive"><table class="table table-borderless align-middle"><thead><tr><th>Tedarikçi</th><th>Kayıt tarihi</th><th class="text-center">Siparişler</th><th>Durum</th><th class="text-end">İşlemler</th></tr></thead><tbody>
+{% for supplier in suppliers %}<tr><td><div class="d-flex align-items-center gap-2"><div class="supplier-avatar">{{ supplier.name|first|upper }}</div><div><a class="supplier-link" href="{% url 'supplier-detail' supplier.pk %}">{{ supplier.name }}</a><div class="supplier-contact">{{ supplier.contact_email }} · {{ supplier.contact_phone }}</div></div></div></td><td class="text-muted" style="font-size:12px;">{{ supplier.created_at|date:"d M Y" }}</td><td class="text-center"><span class="fw-semibold">{{ supplier.order_count }}</span>{% if supplier.open_order_count %}<span class="text-primary ms-1" style="font-size:11px;">({{ supplier.open_order_count }} açık)</span>{% endif %}</td><td>{% if supplier.is_active %}<span class="badge bg-success-subtle text-success-emphasis fw-medium"><span class="status-dot bg-success"></span>Aktif</span>{% else %}<span class="badge bg-secondary-subtle text-secondary-emphasis fw-medium"><span class="status-dot bg-secondary"></span>Pasif</span>{% endif %}</td><td class="text-end"><a class="btn btn-sm btn-outline-primary" href="{% url 'supplier-detail' supplier.pk %}">Tedarikçi kartı <i class="bi bi-arrow-right ms-1"></i></a></td></tr>
+{% empty %}<tr><td colspan="5" class="empty-state"><i class="bi bi-truck-flatbed"></i><div class="fw-medium">Gösterilecek tedarikçi bulunamadı.</div><a href="{% url 'supplier-create' %}" class="btn btn-primary btn-sm mt-3">İlk tedarikçiyi ekle</a></td></tr>{% endfor %}
+</tbody></table></div></div>
 {% endblock %}

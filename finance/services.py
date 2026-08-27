@@ -1,5 +1,7 @@
 from decimal import Decimal
 
+from django.db import transaction
+
 from sales.models import Order, OrderItem
 
 
@@ -49,3 +51,33 @@ def get_profitability_report(start_date=None, end_date=None):
     }
 
 
+from .models import Invoice, Payment
+
+
+def create_invoice(order, due_date=None):
+    """Karşılanmış bir siparişten fatura oluşturur. Bir siparişin en fazla
+    bir faturası olabilir."""
+    if hasattr(order, 'invoice'):
+        raise ValueError('Bu sipariş için zaten bir fatura oluşturulmuş.')
+    if order.status != 'fulfilled':
+        raise ValueError('Sadece karşılanmış siparişler için fatura oluşturulabilir.')
+    return Invoice.objects.create(order=order, due_date=due_date)
+
+
+def record_payment(invoice, amount, method):
+    """Bir faturaya kısmi veya tam ödeme kaydeder, durumu otomatik günceller.
+    purchasing.services.receive_goods ile ayni desen: kismi islem + otomatik
+    durum gecisi."""
+    amount = Decimal(str(amount))
+    if amount <= 0:
+        raise ValueError('Ödeme tutarı pozitif olmalı.')
+    if amount > invoice.balance_due:
+        raise ValueError(
+            f'Ödeme, kalan bakiyeden ({invoice.balance_due}) fazla olamaz.'
+        )
+
+    with transaction.atomic():
+        Payment.objects.create(invoice=invoice, amount=amount, method=method)
+        invoice.status = Invoice.Status.PAID if invoice.balance_due <= 0 else Invoice.Status.PARTIALLY_PAID
+        invoice.save(update_fields=['status'])
+    return invoice
