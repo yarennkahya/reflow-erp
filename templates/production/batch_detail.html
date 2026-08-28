@@ -36,12 +36,12 @@
 
 {% block content %}
 <div class="prod-subnav">
-  <a href="{% url 'production-list' %}" class="active">Kavurma Partileri</a>
-  <a href="{% url 'production-recipes' %}">Reçeteler (BOM)</a>
+  <a href="{% url 'production-list' %}" class="active" data-i18n="roast-batches-nav">Kavurma Partileri</a>
+  <a href="{% url 'production-recipes' %}" data-i18n="recipes-bom">Reçeteler (BOM)</a>
 </div>
 
 <div class="d-flex align-items-center gap-3 mb-3">
-  <a href="{% url 'production-list' %}" class="text-muted" style="font-size:13px; text-decoration:none;"><i class="bi bi-arrow-left me-1"></i>Parti Listesi</a>
+  <a href="{% url 'production-list' %}" class="text-muted" style="font-size:13px; text-decoration:none;"><i class="bi bi-arrow-left me-1"></i><span data-i18n="batch-list">Parti Listesi</span></a>
 </div>
 
 <div class="row g-3">
@@ -56,18 +56,18 @@
           <div style="font-size:13px; color:#64748b;">{{ batch.roasted_at|date:"d M Y H:i" }}</div>
         </div>
       </div>
-      <div class="info-row"><span class="info-label">Reçete</span><span class="info-value">{{ batch.recipe.name }}</span></div>
-      <div class="info-row"><span class="info-label">Çıktı Ürünü</span><span class="info-value">{{ batch.output_lot.product.name }}</span></div>
+      <div class="info-row"><span class="info-label" data-i18n="recipe">Reçete</span><span class="info-value">{{ batch.recipe.name }}</span></div>
+      <div class="info-row"><span class="info-label" data-i18n="output-product">Çıktı Ürünü</span><span class="info-value">{{ batch.output_lot.product.name }}</span></div>
       <div class="info-row">
-        <span class="info-label">Çıktı Lot Kodu</span>
+        <span class="info-label" data-i18n="output-lot-code">Çıktı Lot Kodu</span>
         <span class="lot-code">{{ batch.output_lot.lot_code }}</span>
       </div>
       <div class="info-row">
-        <span class="info-label">Çıktı Miktarı</span>
+        <span class="info-label" data-i18n="output-quantity">Çıktı Miktarı</span>
         <span class="info-value">{{ batch.total_output_quantity|floatformat:3 }} {{ batch.output_lot.product.unit }}</span>
       </div>
-      <div class="info-row"><span class="info-label">Depo</span><span class="info-value">{{ batch.output_lot.warehouse }}</span></div>
-      <div class="info-row"><span class="info-label">Kavurma Tarihi</span><span class="info-value">{{ batch.roasted_at|date:"d M Y H:i" }}</span></div>
+      <div class="info-row"><span class="info-label" data-i18n="warehouse">Depo</span><span class="info-value">{{ batch.output_lot.warehouse }}</span></div>
+      <div class="info-row"><span class="info-label" data-i18n="roast-date">Kavurma Tarihi</span><span class="info-value">{{ batch.roasted_at|date:"d M Y H:i" }}</span></div>
     </div>
   </div>
 
@@ -76,7 +76,7 @@
       <div class="section-head"><i class="bi bi-journal-bookmark" style="color:#ca8a04;"></i>Reçete Bileşenleri — {{ batch.recipe.name }}</div>
       <table class="table table-borderless">
         <thead>
-          <tr><th>Girdi Ürün</th><th class="text-end">Oran (%)</th></tr>
+          <tr><th data-i18n="input-product">Girdi Ürün</th><th class="text-end" data-i18n="ratio-percent">Oran (%)</th></tr>
         </thead>
         <tbody>
           {% for comp in batch.recipe.components.all %}
@@ -85,7 +85,7 @@
             <td class="text-end">%{{ comp.ratio_percent|floatformat:2 }}</td>
           </tr>
           {% empty %}
-          <tr><td colspan="2" style="padding:24px; text-align:center; color:#94a3b8;">Bileşen tanımlanmamış.</td></tr>
+          <tr><td colspan="2" style="padding:24px; text-align:center; color:#94a3b8;" data-i18n="no-components">Bileşen tanımlanmamış.</td></tr>
           {% endfor %}
         </tbody>
       </table>
@@ -94,7 +94,7 @@
 </div>
 
 <div class="data-card mt-3">
-  <div class="section-head"><i class="bi bi-clipboard2-check" style="color:#ca8a04;"></i>Kalite Kontrolü</div>
+  <div class="section-head"><i class="bi bi-clipboard2-check" style="color:#ca8a04;"></i><span data-i18n="quality-control">Kalite Kontrolü</span></div>
   <div class="quality-body">
     {% if quality_check %}
     <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
@@ -111,7 +111,7 @@
       {% endif %}
     </div>
     {% if quality_check.notes %}
-    <div class="quality-note mt-3"><span class="fw-semibold d-block mb-1">Kontrol notları</span>{{ quality_check.notes }}</div>
+    <div class="quality-note mt-3"><span class="fw-semibold d-block mb-1" data-i18n="inspection-notes">Kontrol notları</span>{{ quality_check.notes }}</div>
     {% endif %}
     {% if quality_check.result == 'fail' %}
     <div class="alert alert-danger py-2 px-3 mt-3 mb-0" style="font-size:12.5px;"><i class="bi bi-trash3-fill me-1"></i>Partide kalan stok kalite kontrolü sonucu otomatik olarak ıskartaya ayrıldı.</div>
@@ -127,7 +127,7 @@
         <div class="col-md-4"><label class="form-label" for="{{ quality_check_form.inspector.id_for_label }}">{{ quality_check_form.inspector.label }}</label>{{ quality_check_form.inspector }}{% for error in quality_check_form.inspector.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div>
         <div class="col-12"><label class="form-label" for="{{ quality_check_form.notes.id_for_label }}">{{ quality_check_form.notes.label }}</label>{{ quality_check_form.notes }}{% for error in quality_check_form.notes.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div>
       </div>
-      <div class="d-flex justify-content-end mt-3"><button class="btn btn-primary" type="submit"><i class="bi bi-clipboard2-check me-1"></i>Kalite kontrolünü kaydet</button></div>
+      <div class="d-flex justify-content-end mt-3"><button class="btn btn-primary" type="submit"><i class="bi bi-clipboard2-check me-1"></i><span data-i18n="save-quality-check">Kalite kontrolünü kaydet</span></button></div>
     </form>
     {% endif %}
   </div>

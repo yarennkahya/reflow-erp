@@ -19,14 +19,14 @@
 {% block content %}
 <div class="mb-4">
   <div class="btn-group btn-group-sm" role="group">
-    <a href="/sales/" class="btn btn-primary">Siparişler</a>
-    <a href="/sales/customers/" class="btn btn-outline-primary">Müşteriler</a>
-    <a href="/sales/forecast/" class="btn btn-outline-primary">Talep Tahmini</a>
-    <a href="/sales/returns/" class="btn btn-outline-primary">İadeler</a>
+    <a href="/sales/" class="btn btn-primary" data-i18n="orders">Siparişler</a>
+    <a href="/sales/customers/" class="btn btn-outline-primary" data-i18n="customers">Müşteriler</a>
+    <a href="/sales/forecast/" class="btn btn-outline-primary" data-i18n="demand-forecast">Talep Tahmini</a>
+    <a href="/sales/returns/" class="btn btn-outline-primary" data-i18n="returns">İadeler</a>
   </div>
 </div>
 <div class="d-flex align-items-baseline gap-3 mb-4">
-  <h4 class="fw-bold mb-0 text-dark"><i class="bi bi-cart3 me-2" style="color:#2563eb;"></i>Siparişler</h4>
+  <h4 class="fw-bold mb-0 text-dark"><i class="bi bi-cart3 me-2" style="color:#2563eb;"></i><span data-i18n="orders">Siparişler</span></h4>
   <span class="text-muted" style="font-size:13px;">{{ orders|length }} kayıt</span>
 </div>
 
@@ -35,11 +35,11 @@
     <thead>
       <tr>
         <th>#</th>
-        <th>Müşteri</th>
-        <th>Durum</th>
-        <th>Oluşturulma</th>
-        <th>Karşılanma</th>
-        <th class="text-end">Toplam Tutar</th>
+        <th data-i18n="customer">Müşteri</th>
+        <th data-i18n="status">Durum</th>
+        <th data-i18n="created-at">Oluşturulma</th>
+        <th data-i18n="fulfilled-at">Karşılanma</th>
+        <th class="text-end" data-i18n="total-amount">Toplam Tutar</th>
       </tr>
     </thead>
     <tbody>
@@ -60,7 +60,7 @@
       <tr>
         <td colspan="6" class="empty-state">
           <i class="bi bi-inbox"></i>
-          Henüz hiç sipariş yok.
+          <span data-i18n="no-orders">Henüz hiç sipariş yok.</span>
         </td>
       </tr>
       {% endfor %}

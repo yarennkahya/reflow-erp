@@ -26,15 +26,15 @@
 
 {% block content %}
 <div class="prod-subnav">
-  <a href="{% url 'production-list' %}">Üretim Emirleri</a>
-  <a href="{% url 'production-recipes' %}" class="active">Reçeteler (BOM)</a>
+  <a href="{% url 'production-list' %}" data-i18n="production-orders">Üretim Emirleri</a>
+  <a href="{% url 'production-recipes' %}" class="active" data-i18n="recipes-bom">Reçeteler (BOM)</a>
 </div>
 
 <div class="d-flex align-items-center gap-3 mb-3">
-  <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-journal-text me-2" style="color:#ca8a04;"></i>Reçeteler (BOM)</h5>
+  <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-journal-text me-2" style="color:#ca8a04;"></i><span data-i18n="recipes-bom">Reçeteler (BOM)</span></h5>
   <span class="text-muted" style="font-size:13px;">{{ recipes|length }} reçete</span>
   <a href="{% url 'production-recipe-create' %}" class="btn btn-sm ms-auto" style="background:#ca8a04; color:#fff; font-size:13px;">
-    <i class="bi bi-plus-lg me-1"></i>Yeni Reçete
+    <i class="bi bi-plus-lg me-1"></i><span data-i18n="new-recipe">Yeni Reçete</span>
   </a>
 </div>
 
@@ -52,7 +52,7 @@
   {% if components %}
   <table class="table table-borderless">
     <thead>
-      <tr><th>Girdi Ürün</th><th>Oran (%)</th><th style="width:200px;">Görsel Oran</th></tr>
+      <tr><th data-i18n="input-product">Girdi Ürün</th><th data-i18n="ratio-percent">Oran (%)</th><th style="width:200px;" data-i18n="visual-ratio">Görsel Oran</th></tr>
     </thead>
     <tbody>
       {% for comp in components %}
@@ -68,7 +68,7 @@
     </tbody>
   </table>
   {% else %}
-  <div class="empty-state"><i class="bi bi-exclamation-circle"></i>Bileşen tanımlanmamış.</div>
+  <div class="empty-state"><i class="bi bi-exclamation-circle"></i><span data-i18n="no-components">Bileşen tanımlanmamış.</span></div>
   {% endif %}
   {% endwith %}
 </div>
@@ -76,7 +76,7 @@
 <div class="data-card">
   <div class="empty-state" style="padding:48px 24px;">
     <i class="bi bi-inbox" style="font-size:36px; display:block; margin-bottom:8px;"></i>
-    Henüz hiç reçete yok.
+    <span data-i18n="no-recipes">Henüz hiç reçete yok.</span>
   </div>
 </div>
 {% endfor %}

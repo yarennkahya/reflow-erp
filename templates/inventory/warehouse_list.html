@@ -13,7 +13,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4"><div><h4 class="fw-bold mb-1 text-dark"><i class="bi bi-buildings me-2" style="color:#2563eb;"></i>Depo Yönetimi</h4><p class="mb-0 text-muted" style="font-size:13px;">Depoları, içlerindeki lotları ve dikkat gerektiren stokları tek yerden takip edin.</p></div><div class="d-flex gap-2"><a href="{% url 'inventory-list' %}" class="btn btn-outline-primary"><i class="bi bi-boxes me-1"></i>Stoklar</a><a href="{% url 'warehouse-create' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Yeni Depo</a></div></div>
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4"><div><h4 class="fw-bold mb-1 text-dark"><i class="bi bi-buildings me-2" style="color:#2563eb;"></i><span data-i18n="warehouse-management">Depo Yönetimi</span></h4><p class="mb-0 text-muted" style="font-size:13px;" data-i18n="warehouse-management-desc">Depoları, içlerindeki lotları ve dikkat gerektiren stokları tek yerden takip edin.</p></div><div class="d-flex gap-2"><a href="{% url 'inventory-list' %}" class="btn btn-outline-primary" data-i18n="stocks"><i class="bi bi-boxes me-1"></i>Stoklar</a><a href="{% url 'warehouse-create' %}" class="btn btn-primary" data-i18n="new-warehouse"><i class="bi bi-plus-lg me-1"></i>Yeni Depo</a></div></div>
 
 {% include 'inventory/partials/warehouse_results.html' %}
 {% endblock %}

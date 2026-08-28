@@ -23,15 +23,15 @@
 
 {% block content %}
 <div class="prod-subnav">
-  <a href="{% url 'production-list' %}" class="active">Üretim Emirleri</a>
-  <a href="{% url 'production-recipes' %}">Reçeteler (BOM)</a>
+  <a href="{% url 'production-list' %}" class="active" data-i18n="production-orders">Üretim Emirleri</a>
+  <a href="{% url 'production-recipes' %}" data-i18n="recipes-bom">Reçeteler (BOM)</a>
 </div>
 
 <div class="d-flex align-items-center gap-3 mb-4">
-  <h4 class="fw-bold mb-0 text-dark"><i class="bi bi-fire me-2" style="color:#ca8a04;"></i>Üretim Emirleri</h4>
+  <h4 class="fw-bold mb-0 text-dark"><i class="bi bi-fire me-2" style="color:#ca8a04;"></i><span data-i18n="production-orders">Üretim Emirleri</span></h4>
   <span class="text-muted" style="font-size:13px;">{{ batches|length }} kayıt</span>
   <a href="{% url 'production-batch-create' %}" class="btn btn-sm ms-auto" style="background:#ca8a04; color:#fff; font-size:13px;">
-    <i class="bi bi-plus-lg me-1"></i>Yeni Üretim Emri
+    <i class="bi bi-plus-lg me-1"></i><span data-i18n="new-production-order">Yeni Üretim Emri</span>
   </a>
 </div>
 
@@ -40,11 +40,11 @@
     <thead>
       <tr>
         <th>#</th>
-        <th>Tarif (Reçete)</th>
-        <th>Çıktı Ürünü</th>
-        <th>Çıktı Lot Kodu</th>
-        <th>Çıktı Miktarı</th>
-        <th>Kavurma Tarihi</th>
+        <th data-i18n="recipe">Tarif (Reçete)</th>
+        <th data-i18n="output-product">Çıktı Ürünü</th>
+        <th data-i18n="output-lot-code">Çıktı Lot Kodu</th>
+        <th data-i18n="output-quantity">Çıktı Miktarı</th>
+        <th data-i18n="roast-date">Kavurma Tarihi</th>
       </tr>
     </thead>
     <tbody>
@@ -63,7 +63,7 @@
       <tr>
         <td colspan="6" class="empty-state">
           <i class="bi bi-inbox"></i>
-          Henüz hiç üretim emri yok.
+          <span data-i18n="no-production-orders">Henüz hiç üretim emri yok.</span>
         </td>
       </tr>
       {% endfor %}

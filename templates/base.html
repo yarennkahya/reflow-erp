@@ -550,7 +550,190 @@
                 height: 30px;
             }
         }
+
+        /* ── Dil & Tema toggle butonları ── */
+        .topbar-toggle-btn {
+            align-items: center;
+            background: #f8fafc;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            color: #475569;
+            cursor: pointer;
+            display: inline-flex;
+            font-size: 11.5px;
+            font-weight: 700;
+            height: 32px;
+            justify-content: center;
+            letter-spacing: 0.3px;
+            line-height: 1;
+            min-width: 32px;
+            padding: 0 8px;
+            transition: background 0.15s, color 0.15s, border-color 0.15s;
+        }
+
+        .topbar-toggle-btn:hover {
+            background: #e2e8f0;
+            border-color: #cbd5e1;
+            color: #0f172a;
+        }
+
+        .topbar-toggle-btn .bi { font-size: 14px; }
+
+        /* ══════════════════════════════════════════
+           DARK MODE – Kapsamlı override
+           Tüm sayfalara ve modüllere uygulanır.
+           html.dark-mode seçici, child template
+           stillerinden her zaman daha yüksek
+           özgüllüğe sahiptir (0,2,x > 0,1,x).
+           ══════════════════════════════════════════ */
+
+        /* ── Layout temeli ── */
+        html.dark-mode body { background: #0f172a; color: #e2e8f0; }
+
+        html.dark-mode #topbar {
+            background: #1e293b;
+            border-bottom-color: #334155;
+        }
+        html.dark-mode #topbar .page-title { color: #f1f5f9; }
+        html.dark-mode .sb-toggle-btn { color: #94a3b8; }
+        html.dark-mode .sb-toggle-btn:hover { color: #f1f5f9; }
+
+        /* ── Bildirimler ── */
+        html.dark-mode .notification-bell { color: #94a3b8; }
+        html.dark-mode .notification-bell:hover,
+        html.dark-mode .notification-bell:focus { background: #334155; color: #60a5fa; }
+        html.dark-mode .status-pill { background: #022c22; border-color: #064e3b; color: #34d399; }
+        html.dark-mode .notification-dropdown {
+            background: #1e293b; border-color: #334155;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.45);
+        }
+        html.dark-mode .notification-dropdown-head { background: #0f172a; border-bottom-color: #334155; color: #f1f5f9; }
+        html.dark-mode .notification-dropdown-item { border-bottom-color: #334155; color: #cbd5e1; }
+        html.dark-mode .notification-dropdown-item:hover { background: #334155; color: #93c5fd; }
+        html.dark-mode .notification-dropdown-time { color: #64748b; }
+        html.dark-mode .notification-empty { color: #64748b; }
+        html.dark-mode .notification-dropdown-footer { background: #1e293b; color: #60a5fa; }
+        html.dark-mode .notification-dropdown-footer:hover { background: #334155; }
+
+        /* ── Toggle butonları ── */
+        html.dark-mode .topbar-toggle-btn { background: #1e293b; border-color: #475569; color: #94a3b8; }
+        html.dark-mode .topbar-toggle-btn:hover { background: #334155; border-color: #64748b; color: #f1f5f9; }
+
+        /* ── Genel kart/panel arka planları ── */
+        html.dark-mode .data-card,
+        html.dark-mode .module-card,
+        html.dark-mode .lot-card,
+        html.dark-mode .profile-card,
+        html.dark-mode .stat-card,
+        html.dark-mode .info-card,
+        html.dark-mode .stock-stat,
+        html.dark-mode .warehouse-stat,
+        html.dark-mode .form-card,
+        html.dark-mode .payment-form-card,
+        html.dark-mode .summary-card {
+            background: #1e293b;
+            border-color: #334155;
+        }
+
+        /* ── Kart başlık/header alanları ── */
+        html.dark-mode .data-card thead th,
+        html.dark-mode .form-card-head,
+        html.dark-mode .section-head {
+            background: #0f172a;
+            border-color: #334155;
+            color: #94a3b8;
+        }
+
+        /* ── Metin renkleri ── */
+        html.dark-mode .metric-value,
+        html.dark-mode .stock-stat-value,
+        html.dark-mode .summary-card .value,
+        html.dark-mode .info-value { color: #f1f5f9; }
+
+        html.dark-mode .stat-row,
+        html.dark-mode .info-label,
+        html.dark-mode .section-title,
+        html.dark-mode .summary-card .label { color: #94a3b8; }
+
+        html.dark-mode .stat-row strong { color: #e2e8f0; }
+        html.dark-mode .summary-card .sub { color: #64748b; }
+        html.dark-mode .warehouse-link { color: #e2e8f0; }
+        html.dark-mode .warehouse-sub { color: #64748b; }
+        html.dark-mode .empty-state { color: #64748b; }
+        html.dark-mode .form-help { color: #64748b; }
+
+        /* ── Çizgi / ayraç renkleri ── */
+        html.dark-mode .stat-list,
+        html.dark-mode .info-row { border-color: #334155; }
+
+        /* ── İkon alanları ── */
+        html.dark-mode .stock-stat-icon,
+        html.dark-mode .warehouse-stat-icon,
+        html.dark-mode .warehouse-icon,
+        html.dark-mode .lot-icon,
+        html.dark-mode .warehouse-avatar-lg { background: #1e3a8a; color: #93c5fd; }
+
+        /* ── Lot kodu chip ── */
+        html.dark-mode .lot-code { background: #0f172a; color: #94a3b8; }
+
+        /* ── Hareket miktarı renkleri ── */
+        html.dark-mode .qty-in { color: #4ade80; }
+        html.dark-mode .qty-out { color: #f87171; }
+
+        /* ── Tazelik pilleri ── */
+        html.dark-mode .freshness-normal    { background: #052e16; color: #4ade80; }
+        html.dark-mode .freshness-priority_sale { background: #431407; color: #fb923c; }
+        html.dark-mode .freshness-waste     { background: #450a0a; color: #f87171; }
+
+        /* ── Stok hareket pilleri ── */
+        html.dark-mode .movement-in         { background: #052e16; color: #4ade80; }
+        html.dark-mode .movement-production { background: #431407; color: #fb923c; }
+        html.dark-mode .movement-sale       { background: #1e3a8a; color: #93c5fd; }
+        html.dark-mode .movement-waste      { background: #450a0a; color: #f87171; }
+
+        /* ── Form not kutusu ── */
+        html.dark-mode .form-note { background: #1e3a8a; border-color: #1d4ed8; color: #93c5fd; }
+
+        /* ── Üretim: Reçete kartı başlığı ── */
+        html.dark-mode .recipe-head { background: #1c1403; border-bottom-color: #713f12; }
+        html.dark-mode .recipe-title { color: #fde68a; }
+        html.dark-mode .recipe-output { color: #d97706; }
+
+        /* ── Üretim: Kalite badge ── */
+        html.dark-mode .quality-pass  { background: #052e16; color: #4ade80; }
+        html.dark-mode .quality-fail  { background: #450a0a; color: #f87171; }
+        html.dark-mode .quality-score { background: #1e293b; border-color: #334155; color: #e2e8f0; }
+
+        /* ── Üretim: Alt navigasyon ── */
+        html.dark-mode .prod-subnav { border-bottom-color: #334155; }
+        html.dark-mode .prod-subnav a { color: #94a3b8; }
+        html.dark-mode .prod-subnav a:hover { color: #f1f5f9; }
+
+        /* ── Tablolar ── */
+        html.dark-mode .table { color: #e2e8f0; border-color: #334155; }
+        html.dark-mode .table th,
+        html.dark-mode .table td { border-color: #334155; }
+        html.dark-mode .table thead th { background: #0f172a; color: #94a3b8; }
+        html.dark-mode .table-hover tbody tr:hover td { background: rgba(255,255,255,0.04); }
+        html.dark-mode .bg-white { background: #1e293b !important; }
+
+        /* ── Bootstrap genel ── */
+        html.dark-mode .text-dark { color: #f1f5f9 !important; }
+        html.dark-mode .text-muted { color: #64748b !important; }
+        html.dark-mode .border-bottom { border-color: #334155 !important; }
+
+        @media (max-width: 575px) {
+            .topbar-toggle-btn { height: 28px; min-width: 28px; font-size: 10.5px; }
+        }
     </style>
+    <script>
+    (function () {
+        if (localStorage.getItem('reflow-theme') === 'dark') {
+            document.documentElement.classList.add('dark-mode');
+            document.documentElement.setAttribute('data-bs-theme', 'dark');
+        }
+    })();
+    </script>
     {% block extra_head %}{% endblock %}
 </head>
 <body>
@@ -568,16 +751,16 @@
     </div>
 
     <div class="sb-section">
-        <div class="sb-label">Genel</div>
+        <div class="sb-label" data-i18n="general">Genel</div>
         <nav class="sb-nav">
             <a href="/" class="{% block nav_dashboard %}{% endblock %}">
-                <i class="bi bi-grid-1x2-fill"></i> Dashboard
+                <i class="bi bi-grid-1x2-fill"></i> <span data-i18n="nav-dashboard">Dashboard</span>
             </a>
             <a href="/chat/" class="{% block nav_chat %}{% endblock %}">
-                <i class="bi bi-robot"></i> AI Asistan
+                <i class="bi bi-robot"></i> <span data-i18n="nav-ai">AI Asistan</span>
             </a>
             <a href="/meetings/" class="{% block nav_meetings %}{% endblock %}">
-                <i class="bi bi-calendar3"></i> Takvim
+                <i class="bi bi-calendar3"></i> <span data-i18n="nav-calendar">Takvim</span>
             </a>
         </nav>
     </div>
@@ -585,51 +768,51 @@
     <div class="sb-divider"></div>
 
     <div class="sb-section">
-        <div class="sb-label">Modüller</div>
+        <div class="sb-label" data-i18n="modules">Modüller</div>
         <nav class="sb-nav">
             <div class="sb-module-group {% block nav_inventory %}{% endblock %}">
                 <button class="sb-module-heading" type="button">
-                    <i class="bi bi-boxes"></i> Stok
+                    <i class="bi bi-boxes"></i> <span data-i18n="nav-inventory">Stok</span>
                     <i class="bi bi-chevron-down sb-chevron"></i>
                 </button>
                 <div class="sb-subnav">
-                    <a href="/inventory/" class="{% block nav_inventory_lots %}{% endblock %}">Stoklar</a>
-                    <a href="/inventory/warehouses/" class="{% block nav_inventory_warehouses %}{% endblock %}">Depolar</a>
+                    <a href="/inventory/" class="{% block nav_inventory_lots %}{% endblock %}" data-i18n="nav-inventory-lots">Stoklar</a>
+                    <a href="/inventory/warehouses/" class="{% block nav_inventory_warehouses %}{% endblock %}" data-i18n="nav-inventory-warehouses">Depolar</a>
                 </div>
             </div>
             <div class="sb-module-group {% block nav_purchasing %}{% endblock %}">
                 <button class="sb-module-heading" type="button">
-                    <i class="bi bi-basket3"></i> Satın Alma
+                    <i class="bi bi-basket3"></i> <span data-i18n="nav-purchasing">Satın Alma</span>
                     <i class="bi bi-chevron-down sb-chevron"></i>
                 </button>
                 <div class="sb-subnav">
-                    <a href="/purchasing/" class="{% block nav_purchasing_orders %}{% endblock %}">Siparişler</a>
-                    <a href="/purchasing/suppliers/" class="{% block nav_purchasing_suppliers %}{% endblock %}">Tedarikçiler</a>
+                    <a href="/purchasing/" class="{% block nav_purchasing_orders %}{% endblock %}" data-i18n="nav-purchasing-orders">Siparişler</a>
+                    <a href="/purchasing/suppliers/" class="{% block nav_purchasing_suppliers %}{% endblock %}" data-i18n="nav-purchasing-suppliers">Tedarikçiler</a>
                 </div>
             </div>
-            <a href="/production/" class="{% block nav_production %}{% endblock %}"><i class="bi bi-fire"></i> Üretim</a>
-            <a href="/sales/"      class="{% block nav_sales %}{% endblock %}"><i class="bi bi-cart3"></i> Satış</a>
-            <a href="/finance/"    class="{% block nav_finance %}{% endblock %}"><i class="bi bi-graph-up-arrow"></i> Finans</a>
+            <a href="/production/" class="{% block nav_production %}{% endblock %}"><i class="bi bi-fire"></i> <span data-i18n="nav-production">Üretim</span></a>
+            <a href="/sales/"      class="{% block nav_sales %}{% endblock %}"><i class="bi bi-cart3"></i> <span data-i18n="nav-sales">Satış</span></a>
+            <a href="/finance/"    class="{% block nav_finance %}{% endblock %}"><i class="bi bi-graph-up-arrow"></i> <span data-i18n="nav-finance">Finans</span></a>
             <div class="sb-module-group {% block nav_crm %}{% endblock %}">
                 <button class="sb-module-heading" type="button">
-                    <i class="bi bi-building"></i> CRM
+                    <i class="bi bi-building"></i> <span data-i18n="nav-crm">CRM</span>
                     <i class="bi bi-chevron-down sb-chevron"></i>
                 </button>
                 <div class="sb-subnav">
-                    <a href="/crm/" class="{% block nav_crm_customers %}{% endblock %}">Müşteriler</a>
-                    <a href="/crm/sales/" class="{% block nav_crm_sales %}{% endblock %}">Satış Takibi</a>
+                    <a href="/crm/" class="{% block nav_crm_customers %}{% endblock %}" data-i18n="nav-customers">Müşteriler</a>
+                    <a href="/crm/sales/" class="{% block nav_crm_sales %}{% endblock %}" data-i18n="nav-sales-tracking">Satış Takibi</a>
                 </div>
             </div>
-            <a href="/hr/"         class="{% block nav_hr %}{% endblock %}"><i class="bi bi-people"></i> İnsan Kaynakları</a>
+            <a href="/hr/"         class="{% block nav_hr %}{% endblock %}"><i class="bi bi-people"></i> <span data-i18n="nav-hr">İnsan Kaynakları</span></a>
         </nav>
     </div>
 
     <div class="sb-divider"></div>
 
     <div class="sb-section">
-        <div class="sb-label">Sistem</div>
+        <div class="sb-label" data-i18n="system">Sistem</div>
         <nav class="sb-nav">
-            <a href="/audit/" class="{% block nav_audit %}{% endblock %}"><i class="bi bi-clock-history"></i> Denetim Kaydı</a>
+            <a href="/audit/" class="{% block nav_audit %}{% endblock %}"><i class="bi bi-clock-history"></i> <span data-i18n="nav-audit">Denetim Kaydı</span></a>
         </nav>
     </div>
 
@@ -646,6 +829,10 @@
         </button>
         <span class="page-title">{% block page_title %}Reflow Coffee ERP{% endblock %}</span>
         <div class="topbar-right">
+            <button class="topbar-toggle-btn" id="langToggleBtn" aria-label="Dil değiştir" title="Dil / Language">EN</button>
+            <button class="topbar-toggle-btn" id="themeToggleBtn" aria-label="Tema değiştir" title="Tema / Theme">
+                <i class="bi bi-moon-fill" id="themeIcon"></i>
+            </button>
             <div class="dropdown">
                 <button class="btn btn-sm notification-bell" type="button" id="notificationsDropdown" data-bs-toggle="dropdown" data-notification-feed-url="{% url 'notification-feed' %}" aria-expanded="false" aria-label="Bildirimler">
                     <i class="bi bi-bell"></i>
@@ -658,7 +845,7 @@
                 </div>
             </div>
             <div class="status-pill">
-                <i class="bi bi-circle-fill"></i> Sistem Aktif
+                <i class="bi bi-circle-fill"></i> <span data-i18n="system-active">Sistem Aktif</span>
             </div>
         </div>
     </header>
@@ -1067,5 +1254,96 @@
 })();
 </script>
 {% block extra_scripts %}{% endblock %}
+<script>
+(function () {
+    'use strict';
+
+    var TRANS = {
+        tr: {
+            'general': 'Genel',
+            'modules': 'Modüller',
+            'system': 'Sistem',
+            'nav-dashboard': 'Dashboard',
+            'nav-ai': 'AI Asistan',
+            'nav-calendar': 'Takvim',
+            'nav-inventory': 'Stok',
+            'nav-inventory-lots': 'Stoklar',
+            'nav-inventory-warehouses': 'Depolar',
+            'nav-purchasing': 'Satın Alma',
+            'nav-purchasing-orders': 'Siparişler',
+            'nav-purchasing-suppliers': 'Tedarikçiler',
+            'nav-production': 'Üretim',
+            'nav-sales': 'Satış',
+            'nav-finance': 'Finans',
+            'nav-crm': 'CRM',
+            'nav-customers': 'Müşteriler',
+            'nav-sales-tracking': 'Satış Takibi',
+            'nav-hr': 'İnsan Kaynakları',
+            'nav-audit': 'Denetim Kaydı',
+            'system-active': 'Sistem Aktif'
+        },
+        en: {
+            'general': 'General',
+            'modules': 'Modules',
+            'system': 'System',
+            'nav-dashboard': 'Dashboard',
+            'nav-ai': 'AI Assistant',
+            'nav-calendar': 'Calendar',
+            'nav-inventory': 'Inventory',
+            'nav-inventory-lots': 'Stock',
+            'nav-inventory-warehouses': 'Warehouses',
+            'nav-purchasing': 'Purchasing',
+            'nav-purchasing-orders': 'Orders',
+            'nav-purchasing-suppliers': 'Suppliers',
+            'nav-production': 'Production',
+            'nav-sales': 'Sales',
+            'nav-finance': 'Finance',
+            'nav-crm': 'CRM',
+            'nav-customers': 'Customers',
+            'nav-sales-tracking': 'Sales Pipeline',
+            'nav-hr': 'Human Resources',
+            'nav-audit': 'Audit Log',
+            'system-active': 'System Active'
+        }
+    };
+
+    function applyLang(lang) {
+        var t = TRANS[lang] || TRANS.tr;
+        document.querySelectorAll('[data-i18n]').forEach(function (el) {
+            var key = el.getAttribute('data-i18n');
+            if (t[key] !== undefined) el.textContent = t[key];
+        });
+        var btn = document.getElementById('langToggleBtn');
+        if (btn) btn.textContent = lang === 'tr' ? 'EN' : 'TR';
+        document.documentElement.lang = lang;
+        try { localStorage.setItem('reflow-lang', lang); } catch (e) {}
+    }
+
+    function applyTheme(theme) {
+        var isDark = theme === 'dark';
+        document.documentElement.classList.toggle('dark-mode', isDark);
+        document.documentElement.setAttribute('data-bs-theme', isDark ? 'dark' : 'light');
+        var icon = document.getElementById('themeIcon');
+        if (icon) icon.className = isDark ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+        try { localStorage.setItem('reflow-theme', theme); } catch (e) {}
+    }
+
+    var savedLang = 'tr';
+    try { savedLang = localStorage.getItem('reflow-lang') || 'tr'; } catch (e) {}
+    applyLang(savedLang);
+
+    var savedTheme = 'light';
+    try { savedTheme = localStorage.getItem('reflow-theme') || 'light'; } catch (e) {}
+    applyTheme(savedTheme);
+
+    document.getElementById('langToggleBtn')?.addEventListener('click', function () {
+        applyLang(document.documentElement.lang === 'tr' ? 'en' : 'tr');
+    });
+
+    document.getElementById('themeToggleBtn')?.addEventListener('click', function () {
+        applyTheme(document.documentElement.classList.contains('dark-mode') ? 'light' : 'dark');
+    });
+})();
+</script>
 </body>
 </html>

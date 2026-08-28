@@ -17,13 +17,13 @@
 
 {% block content %}
 <div class="prod-subnav">
-  <a href="{% url 'production-list' %}">Üretim Emirleri</a>
-  <a href="{% url 'production-recipes' %}">Reçeteler (BOM)</a>
+  <a href="{% url 'production-list' %}" data-i18n="production-orders">Üretim Emirleri</a>
+  <a href="{% url 'production-recipes' %}" data-i18n="recipes-bom">Reçeteler (BOM)</a>
 </div>
 
 <div class="d-flex align-items-center gap-3 mb-4">
-  <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-fire me-2" style="color:#ca8a04;"></i>Yeni Üretim Emri</h5>
-  <a href="{% url 'production-list' %}" class="btn btn-sm btn-outline-secondary ms-auto">Vazgeç</a>
+  <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-fire me-2" style="color:#ca8a04;"></i><span data-i18n="new-production-order">Yeni Üretim Emri</span></h5>
+  <a href="{% url 'production-list' %}" class="btn btn-sm btn-outline-secondary ms-auto" data-i18n="cancel">Vazgeç</a>
 </div>
 
 {% if messages %}
@@ -36,7 +36,7 @@
 
 <!-- Adım 1: Reçete seç -->
 <div class="form-card">
-  <div class="section-title">1. Reçete Seçimi</div>
+  <div class="section-title" data-i18n="step-recipe-selection">1. Reçete Seçimi</div>
   <form method="get" class="d-flex gap-3 align-items-end flex-wrap">
     <div style="flex:1; min-width:220px;">
       <label class="form-label fw-medium" style="font-size:13px;">Reçete</label>
@@ -49,7 +49,7 @@
         {% endfor %}
       </select>
     </div>
-    <button type="submit" class="btn" style="background:#ca8a04; color:#fff;">Reçeteyi Yükle</button>
+    <button type="submit" class="btn" style="background:#ca8a04; color:#fff;" data-i18n="load-recipe">Reçeteyi Yükle</button>
   </form>
 </div>
 
@@ -87,7 +87,7 @@
 </div>
 
 <div class="form-card">
-  <div class="section-title">3. Çıktı Bilgileri</div>
+  <div class="section-title" data-i18n="step-output-info">3. Çıktı Bilgileri</div>
   <div class="row g-3">
     <div class="col-md-3">
       <label class="form-label fw-medium" style="font-size:13px;">Çıktı Miktarı ({{ selected_recipe.output_product.unit }})</label>
@@ -105,8 +105,8 @@
 </div>
 
 <div class="d-flex gap-2">
-  <button type="submit" class="btn" style="background:#ca8a04; color:#fff;">Üretim Emrini Oluştur</button>
-  <a href="{% url 'production-list' %}" class="btn btn-outline-secondary">İptal</a>
+  <button type="submit" class="btn" style="background:#ca8a04; color:#fff;" data-i18n="create-production-order">Üretim Emrini Oluştur</button>
+  <a href="{% url 'production-list' %}" class="btn btn-outline-secondary" data-i18n="cancel-alt">İptal</a>
 </div>
 </form>
 {% endif %}

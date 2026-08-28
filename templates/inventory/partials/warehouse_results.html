@@ -3,13 +3,13 @@
     <div class="col-md-6">
       <div class="warehouse-stat">
         <div class="warehouse-stat-icon" style="background:#eff6ff;color:#2563eb;"><i class="bi bi-buildings"></i></div>
-        <div><div class="warehouse-stat-value">{{ warehouse_count }}</div><div class="warehouse-stat-label">Toplam Depo</div></div>
+        <div><div class="warehouse-stat-value">{{ warehouse_count }}</div><div class="warehouse-stat-label" data-i18n="total-warehouses">Toplam Depo</div></div>
       </div>
     </div>
     <div class="col-md-6">
       <div class="warehouse-stat">
         <div class="warehouse-stat-icon" style="background:#f0fdf4;color:#16a34a;"><i class="bi bi-check2-circle"></i></div>
-        <div><div class="warehouse-stat-value">{{ active_warehouse_count }}</div><div class="warehouse-stat-label">Aktif Depo</div></div>
+        <div><div class="warehouse-stat-value">{{ active_warehouse_count }}</div><div class="warehouse-stat-label" data-i18n="active-warehouses">Aktif Depo</div></div>
       </div>
     </div>
   </div>
@@ -30,23 +30,23 @@
             <option value="all" {% if selected_status == 'all' %}selected{% endif %}>Tüm depolar</option>
           </select>
         </div>
-        <div class="col-auto"><button type="submit" class="btn btn-outline-secondary"><i class="bi bi-funnel me-1"></i>Filtrele</button></div>
+        <div class="col-auto"><button type="submit" class="btn btn-outline-secondary"><i class="bi bi-funnel me-1"></i><span data-i18n="filter">Filtrele</span></button></div>
       </form>
     </div>
     <div class="table-responsive">
       <table class="table table-borderless align-middle">
-        <thead><tr><th>Depo</th><th>Şehir</th><th class="text-center">Lot sayısı</th><th>Durum</th><th class="text-end">İşlemler</th></tr></thead>
+        <thead><tr><th data-i18n="warehouse">Depo</th><th data-i18n="city">Şehir</th><th class="text-center" data-i18n="lot-count">Lot sayısı</th><th data-i18n="status">Durum</th><th class="text-end" data-i18n="actions">İşlemler</th></tr></thead>
         <tbody>
           {% for warehouse in warehouses %}
           <tr>
-            <td><div class="d-flex align-items-center gap-2"><div class="warehouse-icon"><i class="bi bi-building"></i></div><div><a class="warehouse-link" href="{% url 'warehouse-detail' warehouse.pk %}">{{ warehouse.name }}</a><div class="warehouse-sub">Lot ve stok yerleşimini görüntüle</div></div></div></td>
+            <td><div class="d-flex align-items-center gap-2"><div class="warehouse-icon"><i class="bi bi-building"></i></div><div><a class="warehouse-link" href="{% url 'warehouse-detail' warehouse.pk %}">{{ warehouse.name }}</a><div class="warehouse-sub" data-i18n="view-lot-layout">Lot ve stok yerleşimini görüntüle</div></div></div></td>
             <td><i class="bi bi-geo-alt text-muted me-1"></i>{{ warehouse.city }}</td>
             <td class="text-center"><span class="fw-semibold">{{ warehouse.lot_count }}</span></td>
-            <td>{% if warehouse.is_active %}<span class="badge bg-success-subtle text-success-emphasis fw-medium"><span class="status-dot bg-success"></span>Aktif</span>{% else %}<span class="badge bg-secondary-subtle text-secondary-emphasis fw-medium"><span class="status-dot bg-secondary"></span>Pasif</span>{% endif %}</td>
-            <td class="text-end"><a class="btn btn-sm btn-outline-primary" href="{% url 'warehouse-detail' warehouse.pk %}">Depo kartı <i class="bi bi-arrow-right ms-1"></i></a></td>
+            <td>{% if warehouse.is_active %}<span class="badge bg-success-subtle text-success-emphasis fw-medium"><span class="status-dot bg-success"></span><span data-i18n="active">Aktif</span></span>{% else %}<span class="badge bg-secondary-subtle text-secondary-emphasis fw-medium"><span class="status-dot bg-secondary"></span><span data-i18n="passive">Pasif</span></span>{% endif %}</td>
+            <td class="text-end"><a class="btn btn-sm btn-outline-primary" href="{% url 'warehouse-detail' warehouse.pk %}"><span data-i18n="warehouse-card">Depo kartı</span> <i class="bi bi-arrow-right ms-1"></i></a></td>
           </tr>
           {% empty %}
-          <tr><td colspan="5" class="empty-state"><i class="bi bi-buildings"></i><div class="fw-medium">Gösterilecek depo bulunamadı.</div><a href="{% url 'warehouse-create' %}" class="btn btn-primary btn-sm mt-3">İlk depoyu ekle</a></td></tr>
+          <tr><td colspan="5" class="empty-state"><i class="bi bi-buildings"></i><div class="fw-medium" data-i18n="no-warehouses-found">Gösterilecek depo bulunamadı.</div><a href="{% url 'warehouse-create' %}" class="btn btn-primary btn-sm mt-3" data-i18n="add-first-warehouse">İlk depoyu ekle</a></td></tr>
           {% endfor %}
         </tbody>
       </table>

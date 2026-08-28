@@ -70,8 +70,8 @@
 
 {% block content %}
 <div class="d-flex align-items-baseline gap-3 mb-4">
-  <h4 class="fw-bold mb-0 text-dark">ERP Modülleri</h4>
-  <span class="text-muted" style="font-size:13px;">Operasyonel metriklere genel bakış</span>
+  <h4 class="fw-bold mb-0 text-dark" data-i18n="erp-modules">ERP Modülleri</h4>
+  <span class="text-muted" style="font-size:13px;" data-i18n="operational-overview">Operasyonel metriklere genel bakış</span>
 </div>
 
 <div class="row g-3">
@@ -81,17 +81,17 @@
     <div class="module-card">
       <div class="d-flex align-items-start justify-content-between mb-3">
         <div>
-          <div class="card-module-label">Stok Yönetimi</div>
+          <div class="card-module-label" data-i18n="inventory-management">Stok Yönetimi</div>
           <div class="metric-value">{{ inventory.total_lots }}</div>
-          <div class="metric-sub">Aktif Lot</div>
+          <div class="metric-sub" data-i18n="active-lots">Aktif Lot</div>
         </div>
         <div class="card-icon" style="background:#eff6ff; color:#3b82f6;">
           <i class="bi bi-boxes"></i>
         </div>
       </div>
       <div class="stat-list">
-        <div class="stat-row"><span>Depo sayısı</span><strong>{{ inventory.warehouses }}</strong></div>
-        <div class="stat-row"><span>Kritik stok</span><strong class="text-danger">{{ inventory.critical_lots }}</strong></div>
+        <div class="stat-row"><span data-i18n="warehouse-count">Depo sayısı</span><strong>{{ inventory.warehouses }}</strong></div>
+        <div class="stat-row"><span data-i18n="critical-stock">Kritik stok</span><strong class="text-danger">{{ inventory.critical_lots }}</strong></div>
       </div>
     </div>
   </div>
@@ -101,16 +101,16 @@
     <div class="module-card">
       <div class="d-flex align-items-start justify-content-between mb-3">
         <div>
-          <div class="card-module-label">Satın Alma</div>
+          <div class="card-module-label" data-i18n="purchasing">Satın Alma</div>
           <div class="metric-value">{{ purchasing.total_orders }}</div>
-          <div class="metric-sub">Toplam Sipariş</div>
+          <div class="metric-sub" data-i18n="total-orders">Toplam Sipariş</div>
         </div>
         <div class="card-icon" style="background:#fff7ed; color:#f97316;">
           <i class="bi bi-basket3"></i>
         </div>
       </div>
       <div class="stat-list">
-        <div class="stat-row"><span>Açık sipariş</span><strong class="text-warning">{{ purchasing.open_orders }}</strong></div>
+        <div class="stat-row"><span data-i18n="open-orders">Açık sipariş</span><strong class="text-warning">{{ purchasing.open_orders }}</strong></div>
       </div>
     </div>
   </div>
@@ -120,16 +120,16 @@
     <div class="module-card">
       <div class="d-flex align-items-start justify-content-between mb-3">
         <div>
-          <div class="card-module-label">Üretim</div>
+          <div class="card-module-label" data-i18n="production">Üretim</div>
           <div class="metric-value">{{ production.total_batches }}</div>
-          <div class="metric-sub">Kavurma Partisi</div>
+          <div class="metric-sub" data-i18n="roast-batches">Kavurma Partisi</div>
         </div>
         <div class="card-icon" style="background:#fefce8; color:#ca8a04;">
           <i class="bi bi-fire"></i>
         </div>
       </div>
       <div class="stat-list">
-        <div class="stat-row"><span>Reçete (BOM)</span><strong>—</strong></div>
+        <div class="stat-row"><span data-i18n="recipe-bom">Reçete (BOM)</span><strong>—</strong></div>
       </div>
     </div>
   </div>
@@ -139,17 +139,17 @@
     <div class="module-card accent-left-blue">
       <div class="d-flex align-items-start justify-content-between mb-3">
         <div>
-          <div class="card-module-label">Satış</div>
+          <div class="card-module-label" data-i18n="sales">Satış</div>
           <div class="metric-value">₺{{ sales.total_revenue }}</div>
-          <div class="metric-sub">Toplam Gelir</div>
+          <div class="metric-sub" data-i18n="total-revenue">Toplam Gelir</div>
         </div>
         <div class="card-icon" style="background:#eff6ff; color:#2563eb;">
           <i class="bi bi-cart3"></i>
         </div>
       </div>
       <div class="stat-list">
-        <div class="stat-row"><span>Müşteri sayısı</span><strong>{{ sales.total_customers }}</strong></div>
-        <div class="stat-row"><span>Tamamlanan sipariş</span><strong>{{ sales.fulfilled_orders }}</strong></div>
+        <div class="stat-row"><span data-i18n="customer-count">Müşteri sayısı</span><strong>{{ sales.total_customers }}</strong></div>
+        <div class="stat-row"><span data-i18n="fulfilled-orders">Tamamlanan sipariş</span><strong>{{ sales.fulfilled_orders }}</strong></div>
       </div>
     </div>
   </div>
@@ -159,16 +159,16 @@
     <div class="module-card">
       <div class="d-flex align-items-start justify-content-between mb-3">
         <div>
-          <div class="card-module-label">CRM</div>
+          <div class="card-module-label" data-i18n="crm">CRM</div>
           <div class="metric-value">{{ crm.active_sales }}</div>
-          <div class="metric-sub">Aktif Satış</div>
+          <div class="metric-sub" data-i18n="active-sales">Aktif Satış</div>
         </div>
         <div class="card-icon" style="background:#f0fdf4; color:#16a34a;">
           <i class="bi bi-building"></i>
         </div>
       </div>
       <div class="stat-list">
-        <div class="stat-row"><span>Kazanılan satış</span><strong class="text-success">{{ crm.won_sales }}</strong></div>
+        <div class="stat-row"><span data-i18n="won-sales">Kazanılan satış</span><strong class="text-success">{{ crm.won_sales }}</strong></div>
       </div>
     </div>
   </div>
@@ -178,22 +178,22 @@
     <div class="module-card">
       <div class="d-flex align-items-start justify-content-between mb-3">
         <div>
-          <div class="card-module-label">İnsan Kaynakları</div>
+          <div class="card-module-label" data-i18n="human-resources">İnsan Kaynakları</div>
           <div class="metric-value">{{ hr.total_employees }}</div>
-          <div class="metric-sub">Toplam Personel</div>
+          <div class="metric-sub" data-i18n="total-staff">Toplam Personel</div>
         </div>
         <div class="card-icon" style="background:#fdf4ff; color:#9333ea;">
           <i class="bi bi-people"></i>
         </div>
       </div>
       <div class="stat-list">
-        <div class="stat-row"><span>Bekleyen izin</span><strong>{{ hr.pending_leaves }}</strong></div>
+        <div class="stat-row"><span data-i18n="pending-leaves">Bekleyen izin</span><strong>{{ hr.pending_leaves }}</strong></div>
         <div class="stat-row" style="border-top:1px solid #f1f5f9; margin-top:6px; padding-top:8px; gap:8px; flex-wrap:wrap;">
-          <a href="/hr/employees/" style="font-size:12px; color:#9333ea; text-decoration:none;">Çalışanlar</a>
+          <a href="/hr/employees/" style="font-size:12px; color:#9333ea; text-decoration:none;" data-i18n="employees">Çalışanlar</a>
           <span style="color:#cbd5e1;">·</span>
-          <a href="/hr/leave/" style="font-size:12px; color:#9333ea; text-decoration:none;">İzinler</a>
+          <a href="/hr/leave/" style="font-size:12px; color:#9333ea; text-decoration:none;" data-i18n="leaves">İzinler</a>
           <span style="color:#cbd5e1;">·</span>
-          <a href="/hr/recruitment/" style="font-size:12px; color:#9333ea; text-decoration:none;">İşe Alım</a>
+          <a href="/hr/recruitment/" style="font-size:12px; color:#9333ea; text-decoration:none;" data-i18n="recruitment">İşe Alım</a>
         </div>
       </div>
     </div>
@@ -204,16 +204,16 @@
     <div class="module-card accent-left-green">
       <div class="d-flex align-items-start justify-content-between mb-3">
         <div>
-          <div class="card-module-label">Finans</div>
+          <div class="card-module-label" data-i18n="finance">Finans</div>
           <div class="metric-value text-success">₺{{ finance.total_profit }}</div>
-          <div class="metric-sub">Net Kâr</div>
+          <div class="metric-sub" data-i18n="net-profit">Net Kâr</div>
         </div>
         <div class="card-icon" style="background:#f0fdf4; color:#22c55e;">
           <i class="bi bi-graph-up-arrow"></i>
         </div>
       </div>
       <div class="stat-list">
-        <div class="stat-row"><span>Kâr marjı</span><strong class="text-success">%{{ finance.margin_percent }}</strong></div>
+        <div class="stat-row"><span data-i18n="profit-margin">Kâr marjı</span><strong class="text-success">%{{ finance.margin_percent }}</strong></div>
       </div>
     </div>
   </div>
@@ -223,9 +223,9 @@
     <div class="module-card" style="background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%); border-color:transparent;">
       <div class="d-flex align-items-start justify-content-between mb-3">
         <div>
-          <div class="card-module-label" style="color:#475569;">AI Asistan</div>
+          <div class="card-module-label" style="color:#475569;" data-i18n="ai-assistant">AI Asistan</div>
           <div class="metric-value" style="color:#f8fafc;">RAG + GPT</div>
-          <div class="metric-sub" style="color:#334155;">Function Calling Aktif</div>
+          <div class="metric-sub" style="color:#334155;" data-i18n="function-calling-active">Function Calling Aktif</div>
         </div>
         <div class="card-icon" style="background:rgba(59,130,246,0.15); color:#60a5fa;">
           <i class="bi bi-robot"></i>
@@ -233,7 +233,7 @@
       </div>
       <a href="/chat/" class="btn btn-sm mt-1"
          style="background:#3b82f6;color:#fff;border:none;border-radius:6px;font-size:13px;padding:6px 14px;">
-        <i class="bi bi-chat-dots me-1"></i> Sohbet Başlat
+        <i class="bi bi-chat-dots me-1"></i> <span data-i18n="start-chat">Sohbet Başlat</span>
       </a>
     </div>
   </div>

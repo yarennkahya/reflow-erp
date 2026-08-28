@@ -19,13 +19,13 @@
 
 {% block content %}
 <div class="prod-subnav">
-  <a href="{% url 'production-list' %}">Üretim Emirleri</a>
-  <a href="{% url 'production-recipes' %}">Reçeteler (BOM)</a>
+  <a href="{% url 'production-list' %}" data-i18n="production-orders">Üretim Emirleri</a>
+  <a href="{% url 'production-recipes' %}" data-i18n="recipes-bom">Reçeteler (BOM)</a>
 </div>
 
 <div class="d-flex align-items-center gap-3 mb-4">
-  <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-journal-plus me-2" style="color:#ca8a04;"></i>Yeni Reçete</h5>
-  <a href="{% url 'production-recipes' %}" class="btn btn-sm btn-outline-secondary ms-auto">Vazgeç</a>
+  <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-journal-plus me-2" style="color:#ca8a04;"></i><span data-i18n="new-recipe">Yeni Reçete</span></h5>
+  <a href="{% url 'production-recipes' %}" class="btn btn-sm btn-outline-secondary ms-auto" data-i18n="cancel">Vazgeç</a>
 </div>
 
 {% if messages %}
@@ -40,7 +40,7 @@
 {% csrf_token %}
 
 <div class="form-card">
-  <div class="section-title">Reçete Bilgileri</div>
+  <div class="section-title" data-i18n="recipe-information">Reçete Bilgileri</div>
   <div class="row g-3">
     <div class="col-md-5">
       <label class="form-label fw-medium" style="font-size:13px;">{{ form.name.label }}</label>
@@ -61,17 +61,17 @@
 
 <div class="form-card">
   <div class="d-flex align-items-center mb-3">
-    <div class="section-title mb-0">Bileşenler</div>
+    <div class="section-title mb-0" data-i18n="components">Bileşenler</div>
     <button type="button" class="btn btn-sm btn-outline-secondary ms-auto" onclick="addComponent()" style="font-size:12px;">
-      <i class="bi bi-plus-lg me-1"></i>Bileşen Ekle
+      <i class="bi bi-plus-lg me-1"></i><span data-i18n="add-component">Bileşen Ekle</span>
     </button>
   </div>
   <p class="text-muted" style="font-size:12.5px; margin-bottom:12px;">Oranların toplamı tam olarak 100 olmalıdır.</p>
   <table class="table table-borderless" style="font-size:13.5px;">
     <thead>
       <tr style="font-size:11px; color:#64748b; font-weight:600; text-transform:uppercase; letter-spacing:0.7px;">
-        <th style="width:55%;">Girdi Ürünü</th>
-        <th style="width:30%;">Oran (%)</th>
+        <th style="width:55%;" data-i18n="input-product">Girdi Ürünü</th>
+        <th style="width:30%;" data-i18n="ratio-percent">Oran (%)</th>
         <th style="width:15%;"></th>
       </tr>
     </thead>
@@ -98,8 +98,8 @@
 </div>
 
 <div class="d-flex gap-2">
-  <button type="submit" class="btn" style="background:#ca8a04; color:#fff;">Reçete Oluştur</button>
-  <a href="{% url 'production-recipes' %}" class="btn btn-outline-secondary">İptal</a>
+  <button type="submit" class="btn" style="background:#ca8a04; color:#fff;" data-i18n="create-recipe">Reçete Oluştur</button>
+  <a href="{% url 'production-recipes' %}" class="btn btn-outline-secondary" data-i18n="cancel-alt">İptal</a>
 </div>
 </form>
 
