@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block title %}{{ meeting.title }} — Reflow Coffee ERP{% endblock %}
+{% block nav_meetings %}active{% endblock %}
+{% block page_title %}Takvim / Toplantı Detayı{% endblock %}
+
+{% block extra_head %}
+<style>
+  .detail-card, .info-card { background:#fff; border:1px solid #e2e8f0; border-radius:12px; }
+  .detail-card { padding:22px; }.info-card { overflow:hidden; }
+  .meeting-icon { align-items:center; background:#eff6ff; border-radius:14px; color:#2563eb; display:flex; font-size:22px; height:52px; justify-content:center; width:52px; }
+  .info-head { background:#f8fafc; border-bottom:1px solid #e2e8f0; color:#475569; font-size:13px; font-weight:700; padding:12px 15px; }
+  .info-body { padding:3px 15px; }
+  .info-row { align-items:flex-start; border-bottom:1px solid #f1f5f9; display:flex; gap:10px; padding:12px 0; }
+  .info-row:last-child { border-bottom:0; }.info-row i { color:#2563eb; margin-top:2px; width:16px; }
+  .info-label { color:#64748b; font-size:12px; min-width:100px; }.info-value { color:#334155; font-size:13px; font-weight:600; }
+  .status-badge { border-radius:20px; display:inline-block; font-size:11.5px; font-weight:700; padding:5px 9px; }
+  .status-scheduled { background:#dbeafe; color:#1d4ed8; }.status-completed { background:#dcfce7; color:#15803d; }.status-cancelled { background:#fee2e2; color:#b91c1c; }
+  .description { color:#475569; font-size:13px; line-height:1.65; margin:0; white-space:pre-line; }
+  .attendee { align-items:center; border-bottom:1px solid #f1f5f9; display:flex; gap:9px; padding:10px 15px; }.attendee:last-child { border-bottom:0; }
+  .attendee-avatar { align-items:center; background:#f1f5f9; border-radius:50%; color:#475569; display:flex; font-size:11px; font-weight:700; height:29px; justify-content:center; width:29px; }
+  .empty-copy { color:#94a3b8; font-size:12.5px; padding:20px 15px; text-align:center; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mb-3"><a href="{% url 'meeting-calendar' %}" class="text-decoration-none" style="font-size:13px;"><i class="bi bi-arrow-left me-1"></i>Takvime dön</a></div>
+
+<div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
+  <div class="d-flex align-items-center gap-3">
+    <div class="meeting-icon"><i class="bi bi-calendar-event"></i></div>
+    <div>
+      <div class="d-flex flex-wrap align-items-center gap-2"><h4 class="fw-bold mb-0">{{ meeting.title }}</h4><span class="status-badge status-{{ meeting.status }}">{{ meeting.get_status_display }}</span></div>
+      <div class="text-muted mt-1" style="font-size:13px;"><i class="bi bi-clock me-1"></i>{{ meeting.start_time|date:"d M Y, H:i" }} — {{ meeting.end_time|date:"H:i" }}</div>
+    </div>
+  </div>
+  <a href="{% url 'meeting-create' %}" class="btn btn-outline-primary"><i class="bi bi-plus-lg me-1"></i>Yeni Toplantı</a>
+</div>
+
+<div class="row g-4">
+  <div class="col-xl-8">
+    <div class="detail-card mb-4">
+      <h6 class="fw-bold mb-3">Açıklama</h6>
+      {% if meeting.description %}<p class="description">{{ meeting.description }}</p>{% else %}<p class="description text-muted">Bu toplantı için açıklama eklenmemiş.</p>{% endif %}
+    </div>
+    <div class="info-card">
+      <div class="info-head"><i class="bi bi-people me-1" style="color:#2563eb;"></i>Katılımcılar</div>
+      {% for attendee in meeting.attendees.all %}
+      <div class="attendee"><span class="attendee-avatar">{{ attendee.name|first|upper }}</span><div><div class="fw-semibold" style="font-size:13px;">{{ attendee.name }}</div><div class="text-muted" style="font-size:11.5px;">{{ attendee.position }}</div></div></div>
+      {% empty %}
+      <div class="empty-copy"><i class="bi bi-person-plus d-block fs-4 mb-1"></i>Henüz katılımcı eklenmemiş.</div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="col-xl-4">
+    <div class="info-card mb-4">
+      <div class="info-head"><i class="bi bi-info-circle me-1" style="color:#2563eb;"></i>Toplantı Bilgileri</div>
+      <div class="info-body">
+        <div class="info-row"><i class="bi bi-calendar-event"></i><span class="info-label">Tarih</span><span class="info-value">{{ meeting.start_time|date:"d M Y" }}</span></div>
+        <div class="info-row"><i class="bi bi-clock"></i><span class="info-label">Saat</span><span class="info-value">{{ meeting.start_time|date:"H:i" }} – {{ meeting.end_time|date:"H:i" }}</span></div>
+        <div class="info-row"><i class="bi bi-person-badge"></i><span class="info-label">Organizatör</span><span class="info-value">{{ meeting.organizer }}</span></div>
+        <div class="info-row"><i class="bi bi-geo-alt"></i><span class="info-label">Konum</span><span class="info-value">{{ meeting.location|default:"Belirtilmedi" }}</span></div>
+        <div class="info-row"><i class="bi bi-activity"></i><span class="info-label">Durum</span><span class="info-value"><span class="status-badge status-{{ meeting.status }}">{{ meeting.get_status_display }}</span></span></div>
+      </div>
+    </div>
+    <div class="info-card">
+      <div class="info-head"><i class="bi bi-link-45deg me-1" style="color:#2563eb;"></i>Bağlantılar</div>
+      <div class="info-body">
+        <div class="info-row"><i class="bi bi-building"></i><span class="info-label">Müşteri</span><span class="info-value">{% if meeting.customer %}<a class="text-decoration-none" href="{% url 'crm-customer-detail' meeting.customer.pk %}">{{ meeting.customer }}</a>{% else %}—{% endif %}</span></div>
+        <div class="info-row"><i class="bi bi-graph-up-arrow"></i><span class="info-label">Fırsat</span><span class="info-value">{% if meeting.opportunity %}<a class="text-decoration-none" href="{% url 'crm-sale-edit' meeting.opportunity.pk %}">{{ meeting.opportunity.title }}</a>{% else %}—{% endif %}</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

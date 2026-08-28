@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Yeni Toplantı — Reflow Coffee ERP{% endblock %}
+{% block nav_meetings %}active{% endblock %}
+{% block page_title %}Takvim / Yeni Toplantı{% endblock %}
+
+{% block extra_head %}
+<style>
+  .form-card { background:#fff; border:1px solid #e2e8f0; border-radius:12px; max-width:900px; overflow:hidden; }
+  .form-card-head { background:#f8fafc; border-bottom:1px solid #e2e8f0; padding:18px 22px; }
+  .form-card-body { padding:22px; }.form-label { color:#334155; font-size:13px; font-weight:600; }
+  .form-help { color:#64748b; font-size:11.5px; }.form-note { background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; color:#1e40af; font-size:12.5px; padding:12px 13px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mb-3"><a href="{% url 'meeting-calendar' %}" class="text-decoration-none" style="font-size:13px;"><i class="bi bi-arrow-left me-1"></i>Takvime dön</a></div>
+
+<div class="form-card">
+  <div class="form-card-head"><h5 class="mb-1 fw-bold">Yeni toplantı planla</h5><p class="mb-0 text-muted" style="font-size:13px;">Toplantının zamanını, sorumlusunu ve varsa müşteri/fırsat bağlantısını ekleyin.</p></div>
+  <form method="post" class="form-card-body">
+    {% csrf_token %}
+    <div class="row g-3">
+      <div class="col-12"><label for="title" class="form-label">Başlık</label><input id="title" name="title" type="text" class="form-control" maxlength="255" placeholder="Örn. Yeni hasat teklif görüşmesi" required></div>
+      <div class="col-md-6"><label for="start_time" class="form-label">Başlangıç</label><input id="start_time" name="start_time" type="datetime-local" class="form-control" required></div>
+      <div class="col-md-6"><label for="end_time" class="form-label">Bitiş</label><input id="end_time" name="end_time" type="datetime-local" class="form-control" required></div>
+      <div class="col-md-6"><label for="organizer" class="form-label">Organizatör</label><select id="organizer" name="organizer" class="form-select" required><option value="">Çalışan seçin</option>{% for employee in employees %}<option value="{{ employee.pk }}">{{ employee.name }} · {{ employee.position }}</option>{% endfor %}</select></div>
+      <div class="col-md-6"><label for="location" class="form-label">Konum</label><input id="location" name="location" type="text" class="form-control" maxlength="255" placeholder="Örn. Merkez ofis / Google Meet"></div>
+      <div class="col-md-6"><label for="customer" class="form-label">Müşteri <span class="text-muted fw-normal">(isteğe bağlı)</span></label><select id="customer" name="customer" class="form-select"><option value="">Müşteri seçilmedi</option>{% for customer in customers %}<option value="{{ customer.pk }}">{{ customer.name }}</option>{% endfor %}</select></div>
+      <div class="col-md-6"><label for="opportunity" class="form-label">Fırsat <span class="text-muted fw-normal">(isteğe bağlı)</span></label><select id="opportunity" name="opportunity" class="form-select"><option value="">Fırsat seçilmedi</option>{% for opportunity in opportunities %}<option value="{{ opportunity.pk }}">{{ opportunity.title }} · {{ opportunity.customer.name }}</option>{% endfor %}</select><div class="form-help mt-1">Kazanılmış veya kaybedilmiş fırsatlar listelenmez.</div></div>
+      <div class="col-12"><label for="description" class="form-label">Açıklama <span class="text-muted fw-normal">(isteğe bağlı)</span></label><textarea id="description" name="description" class="form-control" rows="4" placeholder="Gündem, hazırlık notları veya görüşme hedefi..."></textarea></div>
+    </div>
+    <div class="form-note mt-4"><i class="bi bi-info-circle-fill me-1"></i>Katılımcılar toplantı kaydedildikten sonra yönetim panelinden eklenebilir.</div>
+    <div class="d-flex justify-content-end gap-2 border-top mt-4 pt-3"><a href="{% url 'meeting-calendar' %}" class="btn btn-light">Vazgeç</a><button class="btn btn-primary" type="submit"><i class="bi bi-calendar-check me-1"></i>Toplantıyı planla</button></div>
+  </form>
+</div>
+{% endblock %}
