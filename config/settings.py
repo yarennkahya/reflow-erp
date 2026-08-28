@@ -159,6 +159,10 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'inventory.tasks.scan_lot_freshness',
         'schedule': crontab(hour=2, minute=0),
     },
+    'nightly-low-stock-scan': {
+        'task': 'purchasing.tasks.scan_low_stock',
+        'schedule': crontab(hour=2, minute=30),
+    },
 }
 
 

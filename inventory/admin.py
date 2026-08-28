@@ -13,9 +13,10 @@ class BusinessAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'unit', 'business', 'created_at')
+    list_display = ('name', 'category', 'unit', 'business', 'reorder_point', 'reorder_quantity', 'created_at')
     list_filter = ('category', 'unit', 'business')
     search_fields = ('name',)
+    list_editable = ('reorder_point', 'reorder_quantity')
 
 
 @admin.register(Lot)

@@ -50,6 +50,14 @@ class Product(models.Model):
         on_delete=models.PROTECT,
         related_name='products',
     )
+    reorder_point = models.DecimalField(
+        max_digits=12, decimal_places=3, null=True, blank=True,
+        help_text='Toplam stok bu miktarın altına düşünce otomatik taslak sipariş oluşturulur.',
+    )
+    reorder_quantity = models.DecimalField(
+        max_digits=12, decimal_places=3, null=True, blank=True,
+        help_text='Otomatik oluşturulacak taslak siparişin miktarı.',
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

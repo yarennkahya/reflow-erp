@@ -4,6 +4,7 @@ from django.db import transaction
 
 from audit.services import log_action
 from inventory.models import Lot
+from notifications.services import notify_group
 
 from .models import GoodsReceipt, PurchaseOrder, PurchaseOrderItem
 
@@ -119,3 +120,50 @@ def receive_goods(
 
     log_action(user, 'Mal teslim alındı', receipt)
     return receipt
+
+
+def check_and_create_reorder(product):
+    """
+    Bir ürünün toplam stoğu reorder_point'in altındaysa, o ürünün
+    tedarikçisine (product.business) otomatik bir TASLAK (draft) satın
+    alma siparişi oluşturur. Zaten açık (draft/sent/confirmed/partially_
+    received) bir siparişi varsa tekrar oluşturmaz -- çift sipariş
+    önlenir. Taslak durumunda olduğu için hiçbir şey otomatik "gönderilmez",
+    bir insanın PurchaseOrder'i SENT'e çevirmesi gerekir.
+    """
+    if product.reorder_point is None or product.reorder_quantity is None:
+        return None
+
+    total_stock = sum(
+        (lot.remaining_quantity for lot in product.lots.all()), Decimal('0')
+    )
+    if total_stock >= product.reorder_point:
+        return None
+
+    has_open_order = PurchaseOrderItem.objects.filter(
+        product=product,
+        purchase_order__status__in=['draft', 'sent', 'confirmed', 'partially_received'],
+    ).exists()
+    if has_open_order:
+        return None
+
+    last_item = (
+        PurchaseOrderItem.objects.filter(product=product)
+        .order_by('-purchase_order__created_at')
+        .first()
+    )
+    unit_price = last_item.unit_price if last_item else Decimal('0')
+
+    with transaction.atomic():
+        po = PurchaseOrder.objects.create(supplier=product.business, status='draft')
+        PurchaseOrderItem.objects.create(
+            purchase_order=po, product=product,
+            quantity_ordered=product.reorder_quantity, unit_price=unit_price,
+        )
+        notify_group(
+            'Satın Alma Ekibi',
+            f'{product.name} stoğu kritik seviyenin altına düştü '
+            f'(kalan: {total_stock}). Otomatik taslak sipariş oluşturuldu: PO #{po.pk}.',
+            url=f'/purchasing/orders/{po.pk}/',
+        )
+    return po
