@@ -4,7 +4,7 @@ from django.db import transaction
 
 from inventory.models import Lot, MovementType, StockMovement
 
-from .models import RoastBatch
+from .models import QualityCheck, RoastBatch
 
 
 def create_roast_batch(*, recipe, input_lots, output_quantity,
@@ -59,3 +59,32 @@ def create_roast_batch(*, recipe, input_lots, output_quantity,
             total_output_quantity=output_quantity,
         )
     return batch
+
+
+def perform_quality_check(batch, result, inspector, score=None, notes=''):
+    """
+    Bir kavurma partisi icin kalite kontrolu kaydeder. Sonuc 'FAIL' ise,
+    o partinin kalan tum stogu otomatik olarak WASTE hareketi ile
+    isaretlenir -- create_roast_batch'teki 'olay -> otomatik sonuc'
+    deseninin ayni siyla.
+    """
+    if hasattr(batch, 'quality_check'):
+        raise ValueError('Bu parti icin zaten bir kalite kontrolu yapilmis.')
+
+    with transaction.atomic():
+        check = QualityCheck.objects.create(
+            batch=batch,
+            result=result,
+            score=score,
+            inspector=inspector,
+            notes=notes,
+        )
+        if result == QualityCheck.Result.FAIL:
+            remaining = batch.output_lot.remaining_quantity
+            if remaining > 0:
+                StockMovement.objects.create(
+                    lot=batch.output_lot,
+                    movement_type=MovementType.WASTE,
+                    quantity=-remaining,
+                )
+    return check

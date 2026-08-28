@@ -21,6 +21,16 @@
   .data-card .table tbody td { padding:11px 16px; vertical-align:middle; color:#334155; border-color:#f1f5f9; }
   .data-card .table tbody tr:last-child td { border-bottom:none; }
   .section-head { font-size:13px; font-weight:600; color:#475569; padding:10px 16px; background:#f8fafc; border-bottom:1px solid #e2e8f0; display:flex; align-items:center; gap:8px; }
+  .quality-body { padding:18px 20px; }
+  .quality-badge { display:inline-flex; align-items:center; gap:5px; border-radius:20px; font-size:12px; font-weight:700; padding:5px 10px; }
+  .quality-pass { background:#f0fdf4; color:#15803d; }
+  .quality-fail { background:#fef2f2; color:#b91c1c; }
+  .quality-meta { color:#64748b; font-size:12px; }
+  .quality-score { background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; color:#334155; display:inline-flex; flex-direction:column; min-width:86px; padding:9px 11px; }
+  .quality-score strong { color:#0f172a; font-size:18px; line-height:1.1; }
+  .form-label { color:#334155; font-size:12.5px; font-weight:600; }
+  .form-help { color:#64748b; font-size:11.5px; }
+  .quality-note { background:#f8fafc; border-radius:8px; color:#475569; font-size:13px; padding:11px 12px; white-space:pre-line; }
 </style>
 {% endblock %}
 
@@ -80,6 +90,46 @@
         </tbody>
       </table>
     </div>
+  </div>
+</div>
+
+<div class="data-card mt-3">
+  <div class="section-head"><i class="bi bi-clipboard2-check" style="color:#ca8a04;"></i>Kalite Kontrolü</div>
+  <div class="quality-body">
+    {% if quality_check %}
+    <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
+      <div>
+        {% if quality_check.result == 'pass' %}
+        <span class="quality-badge quality-pass"><i class="bi bi-check-circle-fill"></i>{{ quality_check.get_result_display }}</span>
+        {% else %}
+        <span class="quality-badge quality-fail"><i class="bi bi-x-circle-fill"></i>{{ quality_check.get_result_display }}</span>
+        {% endif %}
+        <div class="quality-meta mt-2"><i class="bi bi-person-check me-1"></i>{{ quality_check.inspector }} tarafından kontrol edildi · {{ quality_check.checked_at|date:"d M Y H:i" }}</div>
+      </div>
+      {% if quality_check.score is not None %}
+      <div class="quality-score"><span class="quality-meta">Cupping skoru</span><strong>{{ quality_check.score }}<small class="fs-6 text-muted">/100</small></strong></div>
+      {% endif %}
+    </div>
+    {% if quality_check.notes %}
+    <div class="quality-note mt-3"><span class="fw-semibold d-block mb-1">Kontrol notları</span>{{ quality_check.notes }}</div>
+    {% endif %}
+    {% if quality_check.result == 'fail' %}
+    <div class="alert alert-danger py-2 px-3 mt-3 mb-0" style="font-size:12.5px;"><i class="bi bi-trash3-fill me-1"></i>Partide kalan stok kalite kontrolü sonucu otomatik olarak ıskartaya ayrıldı.</div>
+    {% endif %}
+    {% else %}
+    <p class="text-muted mb-3" style="font-size:13px;">Bu parti için henüz kalite kontrolü kaydedilmedi. Sonuç kaydedildiğinde başarısız partinin kalan stoğu otomatik olarak ıskartaya ayrılır.</p>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if quality_check_form.non_field_errors %}<div class="alert alert-danger py-2">{{ quality_check_form.non_field_errors }}</div>{% endif %}
+      <div class="row g-3">
+        <div class="col-md-4"><label class="form-label" for="{{ quality_check_form.result.id_for_label }}">{{ quality_check_form.result.label }}</label>{{ quality_check_form.result }}{% for error in quality_check_form.result.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div>
+        <div class="col-md-4"><label class="form-label" for="{{ quality_check_form.score.id_for_label }}">{{ quality_check_form.score.label }}</label>{{ quality_check_form.score }}<div class="form-help mt-1">{{ quality_check_form.score.help_text }}</div>{% for error in quality_check_form.score.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div>
+        <div class="col-md-4"><label class="form-label" for="{{ quality_check_form.inspector.id_for_label }}">{{ quality_check_form.inspector.label }}</label>{{ quality_check_form.inspector }}{% for error in quality_check_form.inspector.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div>
+        <div class="col-12"><label class="form-label" for="{{ quality_check_form.notes.id_for_label }}">{{ quality_check_form.notes.label }}</label>{{ quality_check_form.notes }}{% for error in quality_check_form.notes.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div>
+      </div>
+      <div class="d-flex justify-content-end mt-3"><button class="btn btn-primary" type="submit"><i class="bi bi-clipboard2-check me-1"></i>Kalite kontrolünü kaydet</button></div>
+    </form>
+    {% endif %}
   </div>
 </div>
 {% endblock %}

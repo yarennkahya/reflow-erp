@@ -3,6 +3,7 @@ from decimal import Decimal
 from django.core.validators import MinValueValidator
 from django.db import models
 
+from hr.models import Employee
 from inventory.models import Lot, Product
 
 
@@ -54,5 +55,27 @@ class RoastBatch(models.Model):
 
     def __str__(self):
         return f'{self.recipe.name} batch -> {self.output_lot}'
+
+
+class QualityCheck(models.Model):
+    class Result(models.TextChoices):
+        PASS = 'pass', 'Geçti'
+        FAIL = 'fail', 'Kaldı'
+
+    batch = models.OneToOneField(
+        RoastBatch, on_delete=models.PROTECT, related_name='quality_check'
+    )
+    result = models.CharField(max_length=10, choices=Result.choices)
+    score = models.PositiveIntegerField(
+        null=True, blank=True, help_text='Cupping skoru (0-100)'
+    )
+    inspector = models.ForeignKey(
+        Employee, on_delete=models.PROTECT, related_name='quality_checks'
+    )
+    notes = models.TextField(blank=True)
+    checked_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.batch} - {self.get_result_display()}'
 
 # Create your models here.

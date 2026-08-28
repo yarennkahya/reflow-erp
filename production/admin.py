@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Recipe, RecipeComponent, RoastBatch
+from .models import QualityCheck, Recipe, RecipeComponent, RoastBatch
 
 
 class RecipeComponentInline(admin.TabularInline):
@@ -20,5 +20,10 @@ class RoastBatchAdmin(admin.ModelAdmin):
     list_display = ('recipe', 'output_lot', 'total_output_quantity', 'roasted_at')
     list_filter = ('recipe',)
     ordering = ('-roasted_at',)
+
+
+@admin.register(QualityCheck)
+class QualityCheckAdmin(admin.ModelAdmin):
+    list_display = ('batch', 'result', 'score', 'inspector', 'checked_at')
 
 # Register your models here.
