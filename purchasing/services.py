@@ -2,6 +2,7 @@ from decimal import Decimal
 
 from django.db import transaction
 
+from audit.services import log_action
 from inventory.models import Lot
 
 from .models import GoodsReceipt, PurchaseOrder, PurchaseOrderItem
@@ -54,7 +55,14 @@ def delete_draft_purchase_order(purchase_order):
     purchase_order.delete()
 
 
-def receive_goods(purchase_order_item, quantity_received, lot_code, expiry_date, warehouse=None):
+def receive_goods(
+    purchase_order_item,
+    quantity_received,
+    lot_code,
+    expiry_date,
+    warehouse=None,
+    user=None,
+):
     """
     Bir satin alma kalemi icin mal teslim alma islemini gerceklestirir.
     Kismi teslimat destekler -- ayni kalem icin birden fazla kez cagrilabilir.
@@ -109,4 +117,5 @@ def receive_goods(purchase_order_item, quantity_received, lot_code, expiry_date,
             po.status = PurchaseOrder.Status.PARTIALLY_RECEIVED
         po.save(update_fields=['status', 'updated_at'])
 
+    log_action(user, 'Mal teslim alındı', receipt)
     return receipt

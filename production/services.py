@@ -2,6 +2,7 @@ from decimal import Decimal
 
 from django.db import transaction
 
+from audit.services import log_action
 from inventory.models import Lot, MovementType, StockMovement
 
 from .models import QualityCheck, RoastBatch
@@ -61,7 +62,7 @@ def create_roast_batch(*, recipe, input_lots, output_quantity,
     return batch
 
 
-def perform_quality_check(batch, result, inspector, score=None, notes=''):
+def perform_quality_check(batch, result, inspector, score=None, notes='', user=None):
     """
     Bir kavurma partisi icin kalite kontrolu kaydeder. Sonuc 'FAIL' ise,
     o partinin kalan tum stogu otomatik olarak WASTE hareketi ile
@@ -87,4 +88,5 @@ def perform_quality_check(batch, result, inspector, score=None, notes=''):
                     movement_type=MovementType.WASTE,
                     quantity=-remaining,
                 )
+    log_action(user, f'Kalite kontrolü: {result}', check)
     return check

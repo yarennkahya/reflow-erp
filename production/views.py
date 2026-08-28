@@ -49,6 +49,7 @@ def batch_detail_view(request, pk):
                     inspector=quality_check_form.cleaned_data['inspector'],
                     score=quality_check_form.cleaned_data['score'],
                     notes=quality_check_form.cleaned_data['notes'],
+                    user=request.user,
                 )
             except ValueError as error:
                 messages.error(request, str(error))

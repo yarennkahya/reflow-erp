@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'crm',
     'hr',
     'dashboard',
+    'audit',
 ]
 
 MIDDLEWARE = [
@@ -171,5 +172,4 @@ sentry_sdk.init(
     send_default_pii=False,
     environment='development' if DEBUG else 'production',
 )
-
 

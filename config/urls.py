@@ -28,6 +28,7 @@ urlpatterns = [
     path('crm/', include('crm.urls')),
     path('hr/', include('hr.urls')),
     path('finance/', include('finance.urls')),
+    path('audit/', include('audit.urls')),
     path('', include('dashboard.urls')),
         path('accounts/', include('django.contrib.auth.urls')),
 ]

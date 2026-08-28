@@ -29,7 +29,7 @@ def invoice_detail_view(request, pk):
         amount_raw = request.POST.get('amount', '').strip()
         method = request.POST.get('method', '').strip()
         try:
-            record_payment(invoice, amount_raw, method)
+            record_payment(invoice, amount_raw, method, user=request.user)
             return redirect('invoice-detail', pk=pk)
         except (ValueError, Exception) as e:
             error = str(e)

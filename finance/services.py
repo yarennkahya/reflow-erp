@@ -2,6 +2,7 @@ from decimal import Decimal
 
 from django.db import transaction
 
+from audit.services import log_action
 from sales.models import Order, OrderItem
 
 
@@ -64,7 +65,7 @@ def create_invoice(order, due_date=None):
     return Invoice.objects.create(order=order, due_date=due_date)
 
 
-def record_payment(invoice, amount, method):
+def record_payment(invoice, amount, method, user=None):
     """Bir faturaya kısmi veya tam ödeme kaydeder, durumu otomatik günceller.
     purchasing.services.receive_goods ile ayni desen: kismi islem + otomatik
     durum gecisi."""
@@ -77,7 +78,8 @@ def record_payment(invoice, amount, method):
         )
 
     with transaction.atomic():
-        Payment.objects.create(invoice=invoice, amount=amount, method=method)
+        payment = Payment.objects.create(invoice=invoice, amount=amount, method=method)
         invoice.status = Invoice.Status.PAID if invoice.balance_due <= 0 else Invoice.Status.PARTIALLY_PAID
         invoice.save(update_fields=['status'])
+    log_action(user, 'Ödeme kaydedildi', payment)
     return invoice

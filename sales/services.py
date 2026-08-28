@@ -5,12 +5,13 @@ from django.db import transaction
 from django.db.models import Sum
 from django.utils import timezone
 
+from audit.services import log_action
 from inventory.models import MovementType, Product, StockMovement
 
 from .models import Order, OrderItem
 
 
-def fulfill_order(order):
+def fulfill_order(order, user=None):
     """
     Bir siparisi karsilar: her kalem icin stoktan duser (StockMovement
     OUT_SALE olarak), siparisi FULFILLED isaretler. Hepsi tek transaction --
@@ -36,6 +37,7 @@ def fulfill_order(order):
         order.status = Order.Status.FULFILLED
         order.fulfilled_at = timezone.now()
         order.save(update_fields=['status', 'fulfilled_at'])
+    log_action(user, 'Sipariş karşılandı', order)
     return order
 
 
