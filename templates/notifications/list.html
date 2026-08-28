@@ -37,16 +37,19 @@
         {% for notification in notifications %}
         <tr {% if not notification.is_read %}class="unread-row"{% endif %}>
           <td>
-            <a href="{% url 'notification-read' notification.pk %}" class="notification-message">
-              {% if not notification.is_read %}<span class="unread-dot"></span>{% endif %}{{ notification.message }}
-            </a>
+            <form method="post" action="{% url 'notification-read' notification.pk %}" data-notification-read data-notification-redirect="{{ notification.url }}">
+              {% csrf_token %}
+              <button type="submit" class="notification-message border-0 bg-transparent p-0 text-start">
+                {% if not notification.is_read %}<span class="unread-dot"></span>{% endif %}{{ notification.message }}
+              </button>
+            </form>
           </td>
           <td class="text-muted" style="font-size:12px;">{{ notification.created_at|date:"d M Y, H:i" }}</td>
           <td>
             {% if notification.is_read %}
-            <span class="badge bg-secondary-subtle text-secondary-emphasis fw-medium">Okundu</span>
+            <span class="badge bg-secondary-subtle text-secondary-emphasis fw-medium" data-notification-status>Okundu</span>
             {% else %}
-            <span class="badge bg-primary-subtle text-primary-emphasis fw-medium">Yeni</span>
+            <span class="badge bg-primary-subtle text-primary-emphasis fw-medium" data-notification-status>Yeni</span>
             {% endif %}
           </td>
         </tr>

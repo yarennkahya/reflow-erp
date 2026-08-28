@@ -25,6 +25,10 @@ _APP_STAGE = {
 }
 
 
+def _is_ajax(request):
+    return request.headers.get('x-requested-with') == 'XMLHttpRequest'
+
+
 @login_required
 def hr_list(request):
     emp_data = [
@@ -58,11 +62,16 @@ def employee_list_view(request):
         }
         for emp in qs
     ]
-    return render(request, 'hr/employee_list.html', {
+    context = {
         'employees': emp_data,
         'departments': departments,
         'selected_dept': dept_id,
-    })
+    }
+    template_name = (
+        'hr/partials/employee_results.html'
+        if _is_ajax(request) else 'hr/employee_list.html'
+    )
+    return render(request, template_name, context)
 
 
 @login_required
@@ -100,11 +109,16 @@ def leave_list_view(request):
         }
         for lr in qs
     ]
-    return render(request, 'hr/leave_list.html', {
+    context = {
         'leaves': leave_data,
         'selected_status': status_filter,
         'status_choices': LeaveRequest.Status.choices,
-    })
+    }
+    template_name = (
+        'hr/partials/leave_results.html'
+        if _is_ajax(request) else 'hr/leave_list.html'
+    )
+    return render(request, template_name, context)
 
 
 @login_required

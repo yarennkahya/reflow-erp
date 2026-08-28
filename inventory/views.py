@@ -28,6 +28,10 @@ MOVEMENT_META = {
 }
 
 
+def _is_ajax(request):
+    return request.headers.get('x-requested-with') == 'XMLHttpRequest'
+
+
 def _with_remaining_quantity(queryset):
     movement_total = Coalesce(
         Sum('stock_movements__quantity'),
@@ -85,7 +89,7 @@ def lot_list(request):
     else:
         selected_freshness = 'all'
 
-    return render(request, 'inventory/list.html', {
+    context = {
         'lots': rows,
         'query': query,
         'selected_warehouse': selected_warehouse,
@@ -97,7 +101,12 @@ def lot_list(request):
         'attention_lots': sum(
             row['freshness'] != 'NORMAL' and not row['is_empty'] for row in rows
         ),
-    })
+    }
+    template_name = (
+        'inventory/partials/lot_results.html'
+        if _is_ajax(request) else 'inventory/list.html'
+    )
+    return render(request, template_name, context)
 
 
 @login_required
@@ -179,13 +188,18 @@ def warehouse_list(request):
             Q(name__icontains=query) | Q(city__icontains=query)
         )
 
-    return render(request, 'inventory/warehouse_list.html', {
+    context = {
         'warehouses': warehouses.order_by('-is_active', 'name'),
         'query': query,
         'selected_status': selected_status,
         'warehouse_count': Warehouse.objects.count(),
         'active_warehouse_count': Warehouse.objects.filter(is_active=True).count(),
-    })
+    }
+    template_name = (
+        'inventory/partials/warehouse_results.html'
+        if _is_ajax(request) else 'inventory/warehouse_list.html'
+    )
+    return render(request, template_name, context)
 
 
 @login_required

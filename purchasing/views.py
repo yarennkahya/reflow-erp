@@ -92,7 +92,7 @@ def order_list(request):
         ),
     )
 
-    response = render(request, 'purchasing/list.html', {
+    context = {
         'orders': _order_rows(orders.order_by('-created_at')),
         'query': query,
         'selected_status': selected_status,
@@ -102,7 +102,11 @@ def order_list(request):
             status__in=(PurchaseOrder.Status.SENT, PurchaseOrder.Status.CONFIRMED)
         ).count(),
         'overdue_count': overdue_orders.count(),
-    })
+    }
+    template_name = 'purchasing/partials/order_list_region.html'
+    if request.headers.get('x-requested-with') != 'XMLHttpRequest':
+        template_name = 'purchasing/list.html'
+    response = render(request, template_name, context)
     response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
     response['Pragma'] = 'no-cache'
     response['Expires'] = '0'
@@ -360,7 +364,7 @@ def supplier_list_view(request):
         ),
     ).order_by('-is_active', 'name')
 
-    return render(request, 'purchasing/supplier_list.html', {
+    context = {
         'suppliers': suppliers,
         'query': query,
         'selected_status': selected_status,
@@ -371,7 +375,10 @@ def supplier_list_view(request):
             business_type=Business.BusinessType.SUPPLIER,
             is_active=True,
         ).count(),
-    })
+    }
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return render(request, 'purchasing/partials/supplier_list_region.html', context)
+    return render(request, 'purchasing/supplier_list.html', context)
 
 
 @login_required

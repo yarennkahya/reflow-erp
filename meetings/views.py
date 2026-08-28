@@ -8,6 +8,7 @@ from django.utils import timezone
 from hr.models import Employee
 
 from .models import Meeting
+from .tasks import send_meeting_invites_task
 
 
 MONTH_NAMES = [
@@ -19,8 +20,14 @@ MONTH_NAMES = [
 @login_required
 def calendar_view(request):
     today = timezone.localdate()
-    year = int(request.GET.get('year', today.year))
-    month = int(request.GET.get('month', today.month))
+    try:
+        year = int(request.GET.get('year', today.year))
+        month = int(request.GET.get('month', today.month))
+    except (TypeError, ValueError):
+        year, month = today.year, today.month
+
+    if not 1 <= year <= 9999 or not 1 <= month <= 12:
+        year, month = today.year, today.month
 
     cal = pycal.Calendar(firstweekday=0)
     month_days = cal.monthdayscalendar(year, month)
@@ -53,7 +60,7 @@ def calendar_view(request):
         start_time__gte=timezone.now(), status='scheduled'
     ).select_related('organizer', 'customer').order_by('start_time')[:5]
 
-    return render(request, 'meetings/calendar.html', {
+    context = {
         'weeks': weeks,
         'month_label': f'{MONTH_NAMES[month]} {year}',
         'prev_year': prev_year,
@@ -61,7 +68,10 @@ def calendar_view(request):
         'next_year': next_year,
         'next_month': next_month,
         'upcoming': upcoming,
-    })
+    }
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return render(request, 'meetings/_calendar_results.html', context)
+    return render(request, 'meetings/calendar.html', context)
 
 
 @login_required
@@ -73,6 +83,7 @@ def meeting_detail_view(request, pk):
 @login_required
 def meeting_create_view(request):
     if request.method == 'POST':
+        attendee_ids = request.POST.getlist('attendees')
         meeting = Meeting.objects.create(
             title=request.POST['title'],
             description=request.POST.get('description', ''),
@@ -83,6 +94,8 @@ def meeting_create_view(request):
             customer_id=request.POST.get('customer') or None,
             opportunity_id=request.POST.get('opportunity') or None,
         )
+        meeting.attendees.set(attendee_ids)
+        send_meeting_invites_task.delay(meeting.pk)
         return redirect('meeting-detail', pk=meeting.pk)
 
     from crm.models import Opportunity

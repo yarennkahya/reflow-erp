@@ -1,0 +1,16 @@
+<div class="notification-dropdown-head">
+    <span>Bildirimler</span>
+    {% if nav_notification_count > 0 %}<span class="badge bg-danger">{{ nav_notification_count }}</span>{% endif %}
+</div>
+{% for notification in nav_notifications %}
+<form method="post" action="{% url 'notification-read' notification.pk %}" data-notification-read data-notification-redirect="{{ notification.url }}">
+    {% csrf_token %}
+    <button class="notification-dropdown-item" type="submit">
+        {{ notification.message|truncatechars:90 }}
+        <span class="notification-dropdown-time">{{ notification.created_at|date:"d M, H:i" }}</span>
+    </button>
+</form>
+{% empty %}
+<div class="notification-empty"><i class="bi bi-bell-slash d-block fs-5 mb-1"></i>Yeni bildirim yok</div>
+{% endfor %}
+<a class="notification-dropdown-footer" href="{% url 'notification-list' %}">Tümünü Gör</a>

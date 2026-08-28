@@ -1,0 +1,48 @@
+<div id="meeting-calendar-results" data-ajax-region>
+  <div class="row g-4">
+    <div class="col-xl-9">
+      <div class="calendar-card">
+        <div class="calendar-header">
+          <a class="btn btn-sm btn-outline-primary" href="?year={{ prev_year }}&month={{ prev_month }}" data-ajax-link data-ajax-target="#meeting-calendar-results"><i class="bi bi-chevron-left me-1"></i>Önceki Ay</a>
+          <h5 class="calendar-title">{{ month_label }}</h5>
+          <a class="btn btn-sm btn-outline-primary" href="?year={{ next_year }}&month={{ next_month }}" data-ajax-link data-ajax-target="#meeting-calendar-results">Sonraki Ay<i class="bi bi-chevron-right ms-1"></i></a>
+        </div>
+        <div class="calendar-scroll">
+          <div class="calendar-weekdays">
+            <div class="calendar-weekday">Pzt</div><div class="calendar-weekday">Sal</div><div class="calendar-weekday">Çar</div><div class="calendar-weekday">Per</div><div class="calendar-weekday">Cum</div><div class="calendar-weekday">Cmt</div><div class="calendar-weekday">Paz</div>
+          </div>
+          {% for week in weeks %}
+          <div class="calendar-week">
+            {% for day_data in week %}
+              {% if day_data %}
+              <div class="calendar-day {% if day_data.is_today %}is-today{% endif %}">
+                <span class="calendar-day-number">{{ day_data.day }}</span>
+                {% for meeting in day_data.meetings %}
+                <a href="{% url 'meeting-detail' meeting.pk %}" class="meeting-tag" title="{{ meeting.title }}"><span class="meeting-time">{{ meeting.start_time|date:"H:i" }}</span>{{ meeting.title }}</a>
+                {% endfor %}
+              </div>
+              {% else %}
+              <div class="calendar-blank" aria-hidden="true"></div>
+              {% endif %}
+            {% endfor %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    <div class="col-xl-3">
+      <div class="upcoming-card">
+        <div class="upcoming-head"><i class="bi bi-clock-history" style="color:#2563eb;"></i>Yaklaşan Toplantılar</div>
+        {% for meeting in upcoming %}
+        <a class="upcoming-item" href="{% url 'meeting-detail' meeting.pk %}">
+          <div class="upcoming-title">{{ meeting.title }}</div>
+          <div class="upcoming-meta"><i class="bi bi-calendar-event me-1"></i>{{ meeting.start_time|date:"d M, H:i" }}</div>
+          <div class="upcoming-meta"><i class="bi bi-person me-1"></i>{{ meeting.organizer }}{% if meeting.customer %} · {{ meeting.customer }}{% endif %}</div>
+        </a>
+        {% empty %}
+        <div class="empty-upcoming"><i class="bi bi-calendar-x d-block fs-4 mb-2"></i>Yaklaşan toplantı yok.</div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>

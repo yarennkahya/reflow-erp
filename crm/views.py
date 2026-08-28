@@ -40,14 +40,17 @@ def customer_list(request):
         ),
     ).order_by('-is_active', 'name')
 
-    return render(request, 'crm/list.html', {
+    context = {
         'customers': customers,
         'query': query,
         'selected_status': selected_status,
         'total_customers': Customer.objects.count(),
         'active_customers': Customer.objects.filter(is_active=True).count(),
         'active_sales': Opportunity.objects.filter(status=Opportunity.Status.ACTIVE).count(),
-    })
+    }
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return render(request, 'crm/partials/customer_list_region.html', context)
+    return render(request, 'crm/list.html', context)
 
 
 @login_required
@@ -136,7 +139,7 @@ def sale_list(request):
     if query:
         sales = sales.filter(Q(title__icontains=query) | Q(customer__name__icontains=query))
 
-    return render(request, 'crm/sale_list.html', {
+    context = {
         'sales': sales.order_by('-updated_at'),
         'query': query,
         'selected_status': selected_status,
@@ -146,7 +149,10 @@ def sale_list(request):
         'active_sales': Opportunity.objects.filter(status=Opportunity.Status.ACTIVE).count(),
         'passive_sales': Opportunity.objects.filter(status=Opportunity.Status.PASSIVE).count(),
         'won_sales': Opportunity.objects.filter(status=Opportunity.Status.WON).count(),
-    })
+    }
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return render(request, 'crm/partials/sale_list_region.html', context)
+    return render(request, 'crm/sale_list.html', context)
 
 
 @login_required
