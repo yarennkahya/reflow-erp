@@ -23,13 +23,16 @@
 
 {% block content %}
 <div class="prod-subnav">
-  <a href="{% url 'production-list' %}" class="active">Kavurma Partileri</a>
+  <a href="{% url 'production-list' %}" class="active">Üretim Emirleri</a>
   <a href="{% url 'production-recipes' %}">Reçeteler (BOM)</a>
 </div>
 
-<div class="d-flex align-items-baseline gap-3 mb-4">
-  <h4 class="fw-bold mb-0 text-dark"><i class="bi bi-fire me-2" style="color:#ca8a04;"></i>Kavurma Partileri</h4>
+<div class="d-flex align-items-center gap-3 mb-4">
+  <h4 class="fw-bold mb-0 text-dark"><i class="bi bi-fire me-2" style="color:#ca8a04;"></i>Üretim Emirleri</h4>
   <span class="text-muted" style="font-size:13px;">{{ batches|length }} kayıt</span>
+  <a href="{% url 'production-batch-create' %}" class="btn btn-sm ms-auto" style="background:#ca8a04; color:#fff; font-size:13px;">
+    <i class="bi bi-plus-lg me-1"></i>Yeni Üretim Emri
+  </a>
 </div>
 
 <div class="data-card">
@@ -60,7 +63,7 @@
       <tr>
         <td colspan="6" class="empty-state">
           <i class="bi bi-inbox"></i>
-          Henüz hiç kavurma partisi yok.
+          Henüz hiç üretim emri yok.
         </td>
       </tr>
       {% endfor %}

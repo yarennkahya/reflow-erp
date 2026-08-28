@@ -131,9 +131,22 @@
             align-items: center;
             gap: 9px;
             color: var(--sidebar-text);
-            padding: 8px 10px 5px;
+            padding: 8px 10px;
+            border-radius: 6px;
             font-size: 13.5px;
             font-weight: 500;
+            width: 100%;
+            background: none;
+            border: none;
+            cursor: pointer;
+            text-align: left;
+            margin-bottom: 1px;
+            transition: color 0.12s, background 0.12s;
+        }
+
+        .sb-module-heading:hover {
+            color: var(--sidebar-text-hover);
+            background: rgba(255,255,255,0.06);
         }
 
         .sb-module-heading i {
@@ -143,14 +156,32 @@
             flex-shrink: 0;
         }
 
-        .sb-module-group.active .sb-module-heading {
+        .sb-module-group.active .sb-module-heading,
+        .sb-module-group.open .sb-module-heading {
             color: #f9fafb;
         }
 
+        .sb-chevron {
+            margin-left: auto;
+            font-size: 11px !important;
+            width: auto !important;
+            transition: transform 0.2s;
+            opacity: 0.55;
+        }
+
+        .sb-module-group.open .sb-chevron {
+            transform: rotate(-180deg);
+        }
+
         .sb-subnav {
+            display: none;
             border-left: 1px solid rgba(255,255,255,0.12);
             margin: 0 0 4px 18px;
             padding-left: 8px;
+        }
+
+        .sb-module-group.open .sb-subnav {
+            display: block;
         }
 
         .sb-nav .sb-subnav a {
@@ -557,14 +588,20 @@
         <div class="sb-label">Modüller</div>
         <nav class="sb-nav">
             <div class="sb-module-group {% block nav_inventory %}{% endblock %}">
-                <div class="sb-module-heading"><i class="bi bi-boxes"></i> Stok</div>
+                <button class="sb-module-heading" type="button">
+                    <i class="bi bi-boxes"></i> Stok
+                    <i class="bi bi-chevron-down sb-chevron"></i>
+                </button>
                 <div class="sb-subnav">
                     <a href="/inventory/" class="{% block nav_inventory_lots %}{% endblock %}">Stoklar</a>
                     <a href="/inventory/warehouses/" class="{% block nav_inventory_warehouses %}{% endblock %}">Depolar</a>
                 </div>
             </div>
             <div class="sb-module-group {% block nav_purchasing %}{% endblock %}">
-                <div class="sb-module-heading"><i class="bi bi-basket3"></i> Satın Alma</div>
+                <button class="sb-module-heading" type="button">
+                    <i class="bi bi-basket3"></i> Satın Alma
+                    <i class="bi bi-chevron-down sb-chevron"></i>
+                </button>
                 <div class="sb-subnav">
                     <a href="/purchasing/" class="{% block nav_purchasing_orders %}{% endblock %}">Siparişler</a>
                     <a href="/purchasing/suppliers/" class="{% block nav_purchasing_suppliers %}{% endblock %}">Tedarikçiler</a>
@@ -574,7 +611,10 @@
             <a href="/sales/"      class="{% block nav_sales %}{% endblock %}"><i class="bi bi-cart3"></i> Satış</a>
             <a href="/finance/"    class="{% block nav_finance %}{% endblock %}"><i class="bi bi-graph-up-arrow"></i> Finans</a>
             <div class="sb-module-group {% block nav_crm %}{% endblock %}">
-                <div class="sb-module-heading"><i class="bi bi-building"></i> CRM</div>
+                <button class="sb-module-heading" type="button">
+                    <i class="bi bi-building"></i> CRM
+                    <i class="bi bi-chevron-down sb-chevron"></i>
+                </button>
                 <div class="sb-subnav">
                     <a href="/crm/" class="{% block nav_crm_customers %}{% endblock %}">Müşteriler</a>
                     <a href="/crm/sales/" class="{% block nav_crm_sales %}{% endblock %}">Satış Takibi</a>
@@ -1009,6 +1049,20 @@
     /* Pencere genişleyince mobil drawer state'i temizle */
     window.addEventListener('resize', function () {
         if (window.innerWidth > MOBILE_BP) mobileClose();
+    });
+})();
+</script>
+<script>
+(function () {
+    /* Aktif sayfanın grubunu otomatik aç */
+    document.querySelectorAll('.sb-module-group.active').forEach(function (g) {
+        g.classList.add('open');
+    });
+    /* Başlık butonuna tıklanınca aç/kapat */
+    document.querySelectorAll('.sb-module-heading').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            btn.closest('.sb-module-group').classList.toggle('open');
+        });
     });
 })();
 </script>

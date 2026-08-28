@@ -26,13 +26,16 @@
 
 {% block content %}
 <div class="prod-subnav">
-  <a href="{% url 'production-list' %}">Kavurma Partileri</a>
+  <a href="{% url 'production-list' %}">Üretim Emirleri</a>
   <a href="{% url 'production-recipes' %}" class="active">Reçeteler (BOM)</a>
 </div>
 
-<div class="d-flex align-items-baseline gap-3 mb-3">
+<div class="d-flex align-items-center gap-3 mb-3">
   <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-journal-text me-2" style="color:#ca8a04;"></i>Reçeteler (BOM)</h5>
   <span class="text-muted" style="font-size:13px;">{{ recipes|length }} reçete</span>
+  <a href="{% url 'production-recipe-create' %}" class="btn btn-sm ms-auto" style="background:#ca8a04; color:#fff; font-size:13px;">
+    <i class="bi bi-plus-lg me-1"></i>Yeni Reçete
+  </a>
 </div>
 
 {% for recipe in recipes %}

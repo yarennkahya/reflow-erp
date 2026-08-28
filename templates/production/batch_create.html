@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block title %}Yeni Üretim Emri — Reflow Coffee ERP{% endblock %}
+{% block nav_production %}active{% endblock %}
+{% block page_title %}Üretim{% endblock %}
+
+{% block extra_head %}
+<style>
+  .prod-subnav { display:flex; gap:4px; margin-bottom:20px; border-bottom:1px solid #e2e8f0; padding-bottom:0; }
+  .prod-subnav a { padding:8px 14px; font-size:13px; font-weight:500; color:#64748b; text-decoration:none; border-bottom:2px solid transparent; margin-bottom:-1px; white-space:nowrap; }
+  .prod-subnav a:hover { color:#0f172a; }
+  .prod-subnav a.active { color:#ca8a04; border-bottom-color:#ca8a04; font-weight:600; }
+  .form-card { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:24px; margin-bottom:20px; }
+  .section-title { font-size:13px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:14px; }
+  .lot-badge { font-size:11.5px; color:#64748b; font-family:monospace; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="prod-subnav">
+  <a href="{% url 'production-list' %}">Üretim Emirleri</a>
+  <a href="{% url 'production-recipes' %}">Reçeteler (BOM)</a>
+</div>
+
+<div class="d-flex align-items-center gap-3 mb-4">
+  <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-fire me-2" style="color:#ca8a04;"></i>Yeni Üretim Emri</h5>
+  <a href="{% url 'production-list' %}" class="btn btn-sm btn-outline-secondary ms-auto">Vazgeç</a>
+</div>
+
+{% if messages %}
+{% for msg in messages %}
+<div class="alert alert-{{ msg.tags|default:'info' }} alert-dismissible" role="alert">
+  {{ msg }} <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{% endfor %}
+{% endif %}
+
+<!-- Adım 1: Reçete seç -->
+<div class="form-card">
+  <div class="section-title">1. Reçete Seçimi</div>
+  <form method="get" class="d-flex gap-3 align-items-end flex-wrap">
+    <div style="flex:1; min-width:220px;">
+      <label class="form-label fw-medium" style="font-size:13px;">Reçete</label>
+      <select name="recipe" class="form-select">
+        <option value="">Reçete seçin...</option>
+        {% for r in recipes %}
+        <option value="{{ r.pk }}" {% if selected_recipe and selected_recipe.pk == r.pk %}selected{% endif %}>
+          {{ r.name }} → {{ r.output_product.name }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="btn" style="background:#ca8a04; color:#fff;">Reçeteyi Yükle</button>
+  </form>
+</div>
+
+{% if selected_recipe %}
+<!-- Adım 2: Üretim detayları -->
+<form method="post">
+{% csrf_token %}
+<input type="hidden" name="recipe" value="{{ selected_recipe.pk }}">
+
+<div class="form-card">
+  <div class="section-title">2. Girdi Lotları — {{ selected_recipe.name }}</div>
+  {% for cd in component_data %}
+  <div class="mb-3">
+    <label class="form-label fw-medium" style="font-size:13px;">
+      {{ cd.component.input_product.name }}
+      <span class="text-muted fw-normal">(%{{ cd.component.ratio_percent|floatformat:1 }})</span>
+    </label>
+    {% if cd.lots %}
+    <select name="lot_{{ cd.component.input_product.pk }}" class="form-select" required>
+      <option value="">Lot seçin...</option>
+      {% for lot in cd.lots %}
+      <option value="{{ lot.pk }}">
+        {{ lot.lot_code }} · Kalan: {{ lot.remaining_quantity|floatformat:3 }} · Son kullanma: {{ lot.expiry_date }}
+      </option>
+      {% endfor %}
+    </select>
+    {% else %}
+    <div class="alert alert-warning py-2 mb-0" style="font-size:13px;">
+      <i class="bi bi-exclamation-triangle me-1"></i>
+      {{ cd.component.input_product.name }} için stokta lot yok.
+    </div>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+
+<div class="form-card">
+  <div class="section-title">3. Çıktı Bilgileri</div>
+  <div class="row g-3">
+    <div class="col-md-3">
+      <label class="form-label fw-medium" style="font-size:13px;">Çıktı Miktarı ({{ selected_recipe.output_product.unit }})</label>
+      <input type="number" name="output_quantity" class="form-control" step="0.001" min="0.001" required placeholder="ör. 50.000">
+    </div>
+    <div class="col-md-4">
+      <label class="form-label fw-medium" style="font-size:13px;">Çıktı Lot Kodu</label>
+      <input type="text" name="output_lot_code" class="form-control" required placeholder="ör. LOT-2026-001">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label fw-medium" style="font-size:13px;">Son Kullanma Tarihi</label>
+      <input type="date" name="output_expiry_date" class="form-control" required>
+    </div>
+  </div>
+</div>
+
+<div class="d-flex gap-2">
+  <button type="submit" class="btn" style="background:#ca8a04; color:#fff;">Üretim Emrini Oluştur</button>
+  <a href="{% url 'production-list' %}" class="btn btn-outline-secondary">İptal</a>
+</div>
+</form>
+{% endif %}
+{% endblock %}

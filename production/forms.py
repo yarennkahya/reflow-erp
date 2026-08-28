@@ -1,8 +1,9 @@
 from django import forms
 
 from hr.models import Employee
+from inventory.models import Product
 
-from .models import QualityCheck
+from .models import QualityCheck, Recipe, RecipeComponent
 
 
 class QualityCheckForm(forms.Form):
@@ -37,3 +38,24 @@ class QualityCheckForm(forms.Form):
             field.widget.attrs.setdefault('class', 'form-control')
         self.fields['result'].widget.attrs['class'] = 'form-select'
         self.fields['inspector'].widget.attrs['class'] = 'form-select'
+
+
+class RecipeForm(forms.ModelForm):
+    class Meta:
+        model = Recipe
+        fields = ['name', 'output_product', 'description']
+        labels = {
+            'name': 'Reçete adı',
+            'output_product': 'Çıktı ürünü',
+            'description': 'Açıklama',
+        }
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 3}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['output_product'].queryset = Product.objects.order_by('name')
+        for name, field in self.fields.items():
+            cls = 'form-select' if name == 'output_product' else 'form-control'
+            field.widget.attrs.setdefault('class', cls)
