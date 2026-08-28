@@ -88,5 +88,11 @@ def perform_quality_check(batch, result, inspector, score=None, notes='', user=N
                     movement_type=MovementType.WASTE,
                     quantity=-remaining,
                 )
+                from notifications.services import notify_group
+                notify_group(
+                    'Üretim & Stok Ekibi',
+                    f'{batch} kalite kontrolünden kaldı, stok ıskartaya çıkarıldı.',
+                    url='/production/',
+                )
     log_action(user, f'Kalite kontrolü: {result}', check)
     return check
