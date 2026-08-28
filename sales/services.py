@@ -8,7 +8,7 @@ from django.utils import timezone
 from audit.services import log_action
 from inventory.models import MovementType, Product, StockMovement
 
-from .models import Order, OrderItem
+from .models import Order, OrderItem, ReturnRequest
 
 
 def fulfill_order(order, user=None):
@@ -76,3 +76,47 @@ def get_demand_forecast(product_name, days_ahead=30):
         'current_stock': float(current_stock),
         'stock_sufficient': current_stock >= forecasted_demand,
     }
+
+
+def approve_return(return_request, user=None):
+    """
+    Bir iade talebini onaylar. 'Müşteri vazgeçti' ise urun tek bir IN
+    hareketiyle satilabilir stoga geri doner. 'Kusurlu urun' ise once IN
+    (fiziksel geri donus) sonra WASTE (satilamaz durumda) olarak iki ayri
+    hareket kaydedilir -- net stok degismez ama gercek olay izi korunur.
+    """
+    if return_request.status != ReturnRequest.Status.REQUESTED:
+        raise ValueError('Bu iade talebi zaten sonuçlandırılmış.')
+    order_item = return_request.order_item
+    if return_request.quantity > order_item.quantity:
+        raise ValueError('İade miktarı, satılan miktardan fazla olamaz.')
+
+    with transaction.atomic():
+        StockMovement.objects.create(
+            lot=order_item.lot,
+            movement_type=MovementType.IN,
+            quantity=return_request.quantity,
+        )
+        if return_request.reason == ReturnRequest.Reason.DEFECTIVE:
+            StockMovement.objects.create(
+                lot=order_item.lot,
+                movement_type=MovementType.WASTE,
+                quantity=-return_request.quantity,
+            )
+        return_request.status = ReturnRequest.Status.COMPLETED
+        return_request.resolved_at = timezone.now()
+        return_request.save(update_fields=['status', 'resolved_at'])
+        log_action(user, 'İade onaylandı', return_request)
+    return return_request
+
+
+def reject_return(return_request, user=None):
+    """Bir iade talebini reddeder, stokta hiçbir değişiklik yapmaz."""
+    if return_request.status != ReturnRequest.Status.REQUESTED:
+        raise ValueError('Bu iade talebi zaten sonuçlandırılmış.')
+    with transaction.atomic():
+        return_request.status = ReturnRequest.Status.REJECTED
+        return_request.resolved_at = timezone.now()
+        return_request.save(update_fields=['status', 'resolved_at'])
+        log_action(user, 'İade reddedildi', return_request)
+    return return_request

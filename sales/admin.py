@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Customer, Order, OrderItem
+from .models import Customer, Order, OrderItem, ReturnRequest
 
 
 class OrderItemInline(admin.TabularInline):
@@ -21,3 +21,16 @@ class OrderAdmin(admin.ModelAdmin):
     list_filter = ('status', 'customer__customer_type')
     inlines = [OrderItemInline]
     ordering = ('-created_at',)
+
+
+@admin.register(ReturnRequest)
+class ReturnRequestAdmin(admin.ModelAdmin):
+    list_display = (
+        'order_item',
+        'reason',
+        'quantity',
+        'status',
+        'requested_at',
+        'resolved_at',
+    )
+    list_filter = ('status', 'reason')

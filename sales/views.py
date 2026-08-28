@@ -1,9 +1,10 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
 
 from inventory.models import Product
-from .models import Order, Customer
-from .services import get_demand_forecast
+from .models import Customer, Order, OrderItem, ReturnRequest
+from .services import approve_return, get_demand_forecast, reject_return
 
 _STATUS = {
     'pending':   'bg-warning-subtle text-warning',
@@ -52,3 +53,47 @@ def forecast_view(request):
     ).distinct()
     forecasts = [get_demand_forecast(p.name) for p in products_with_sales]
     return render(request, 'sales/forecast.html', {'forecasts': forecasts})
+
+
+@login_required
+def return_list_view(request):
+    return_requests = ReturnRequest.objects.select_related(
+        'order_item__order__customer', 'order_item__product'
+    ).order_by('-requested_at')
+    return render(request, 'sales/return_list.html', {
+        'return_requests': return_requests,
+    })
+
+
+@login_required
+@require_POST
+def return_request_create_view(request, item_pk):
+    order_item = get_object_or_404(OrderItem, pk=item_pk)
+    ReturnRequest.objects.create(
+        order_item=order_item,
+        reason=request.POST.get('reason'),
+        quantity=request.POST.get('quantity'),
+    )
+    return redirect('order-detail', pk=order_item.order_id)
+
+
+@login_required
+@require_POST
+def return_approve_view(request, pk):
+    return_request = get_object_or_404(ReturnRequest, pk=pk)
+    try:
+        approve_return(return_request, user=request.user)
+    except ValueError:
+        pass
+    return redirect('return-list')
+
+
+@login_required
+@require_POST
+def return_reject_view(request, pk):
+    return_request = get_object_or_404(ReturnRequest, pk=pk)
+    try:
+        reject_return(return_request, user=request.user)
+    except ValueError:
+        pass
+    return redirect('return-list')

@@ -63,3 +63,37 @@ class OrderItem(models.Model):
         
     def __str__(self):
         return f'{self.product} x {self.quantity}'
+
+
+class ReturnRequest(models.Model):
+    class Reason(models.TextChoices):
+        CUSTOMER_CHANGED_MIND = 'customer_changed_mind', 'Müşteri vazgeçti'
+        DEFECTIVE = 'defective', 'Kusurlu ürün'
+
+    class Status(models.TextChoices):
+        REQUESTED = 'requested', 'Talep Edildi'
+        COMPLETED = 'completed', 'Tamamlandı'
+        REJECTED = 'rejected', 'Reddedildi'
+
+    order_item = models.ForeignKey(
+        OrderItem, on_delete=models.PROTECT, related_name='return_requests'
+    )
+    quantity = models.DecimalField(
+        max_digits=12,
+        decimal_places=3,
+        validators=[MinValueValidator(Decimal('0.001'))],
+    )
+    reason = models.CharField(max_length=30, choices=Reason.choices)
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.REQUESTED,
+    )
+    requested_at = models.DateTimeField(auto_now_add=True)
+    resolved_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return (
+            f'{self.order_item} - {self.get_reason_display()} '
+            f'({self.get_status_display()})'
+        )

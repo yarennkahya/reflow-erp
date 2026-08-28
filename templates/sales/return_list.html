@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block title %}İadeler — Reflow Coffee ERP{% endblock %}
+{% block nav_sales %}active{% endblock %}
+{% block page_title %}Satış / İadeler{% endblock %}
+
+{% block extra_head %}
+<style>
+  .data-card { background:#fff; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden; }
+  .data-card .table { margin-bottom:0; font-size:13.5px; }
+  .data-card .table thead th { background:#f8fafc; color:#64748b; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.7px; border-bottom:1px solid #e2e8f0; padding:10px 16px; white-space:nowrap; }
+  .data-card .table tbody td { padding:11px 16px; vertical-align:middle; color:#334155; border-color:#f1f5f9; }
+  .data-card .table tbody tr:last-child td { border-bottom:none; }
+  .data-card .table tbody tr:hover { background:#f8fafc; }
+  .empty-state { padding:48px 24px; text-align:center; color:#94a3b8; }
+  .empty-state i { font-size:36px; display:block; margin-bottom:8px; }
+  .reason-sub { color:#64748b; font-size:11.5px; margin-top:2px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+  <div class="btn-group btn-group-sm" role="group">
+    <a href="/sales/" class="btn btn-outline-primary">Siparişler</a>
+    <a href="/sales/customers/" class="btn btn-outline-primary">Müşteriler</a>
+    <a href="/sales/forecast/" class="btn btn-outline-primary">Talep Tahmini</a>
+    <a href="/sales/returns/" class="btn btn-primary">İadeler</a>
+  </div>
+</div>
+
+<div class="d-flex align-items-baseline gap-3 mb-4">
+  <h4 class="fw-bold mb-0 text-dark"><i class="bi bi-arrow-return-left me-2" style="color:#dc2626;"></i>İade Talepleri</h4>
+  <span class="text-muted" style="font-size:13px;">{{ return_requests|length }} kayıt</span>
+</div>
+
+<div class="data-card">
+  <div class="table-responsive">
+    <table class="table table-borderless">
+      <thead>
+        <tr>
+          <th>Ürün</th>
+          <th>Müşteri</th>
+          <th class="text-end">Miktar</th>
+          <th>Sebep</th>
+          <th>Durum</th>
+          <th>Talep Tarihi</th>
+          <th class="text-end">İşlemler</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for return_request in return_requests %}
+        <tr>
+          <td class="fw-medium">{{ return_request.order_item.product.name }}</td>
+          <td>{{ return_request.order_item.order.customer.name }}</td>
+          <td class="text-end">{{ return_request.quantity|floatformat:3 }} {{ return_request.order_item.product.get_unit_display }}</td>
+          <td><span class="fw-medium">{{ return_request.get_reason_display }}</span><div class="reason-sub">Sipariş #{{ return_request.order_item.order_id }}</div></td>
+          <td>
+            {% if return_request.status == 'requested' %}
+            <span class="badge bg-warning-subtle text-warning-emphasis fw-medium">Talep Edildi</span>
+            {% elif return_request.status == 'completed' %}
+            <span class="badge bg-success-subtle text-success-emphasis fw-medium">Tamamlandı</span>
+            {% else %}
+            <span class="badge bg-danger-subtle text-danger-emphasis fw-medium">Reddedildi</span>
+            {% endif %}
+          </td>
+          <td class="text-muted" style="font-size:12.5px;">{{ return_request.requested_at|date:"d M Y H:i" }}</td>
+          <td class="text-end">
+            {% if return_request.status == 'requested' %}
+            <div class="d-inline-flex gap-1">
+              <form method="post" action="{% url 'return-approve' return_request.pk %}">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-success">Onayla</button></form>
+              <form method="post" action="{% url 'return-reject' return_request.pk %}">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-danger">Reddet</button></form>
+            </div>
+            {% else %}
+            <span class="text-muted" style="font-size:12px;">{{ return_request.resolved_at|date:"d M Y H:i" }}</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7" class="empty-state"><i class="bi bi-arrow-return-left"></i>Henüz iade talebi yok.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

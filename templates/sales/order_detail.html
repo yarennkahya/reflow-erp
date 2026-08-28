@@ -6,6 +6,7 @@
     <a href="/sales/" class="btn btn-primary">Siparişler</a>
     <a href="/sales/customers/" class="btn btn-outline-primary">Müşteriler</a>
     <a href="/sales/forecast/" class="btn btn-outline-primary">Talep Tahmini</a>
+    <a href="/sales/returns/" class="btn btn-outline-primary">İadeler</a>
   </div>
 </div>
 <h1 class="mb-1">Sipariş #{{ order.pk }}</h1>
@@ -22,6 +23,7 @@
       <th>Miktar</th>
       <th>Birim Fiyat</th>
       <th>Toplam</th>
+      <th>İade</th>
     </tr>
   </thead>
   <tbody>
@@ -32,6 +34,17 @@
       <td>{{ item.quantity }}</td>
       <td>₺{{ item.unit_price }}</td>
       <td>₺{{ item.line_total }}</td>
+      <td>
+        <form method="post" action="{% url 'return-request-create' item.pk %}" class="d-flex align-items-center gap-1">
+          {% csrf_token %}
+          <select name="reason" class="form-select form-select-sm" required aria-label="İade sebebi">
+            <option value="customer_changed_mind">Müşteri vazgeçti</option>
+            <option value="defective">Kusurlu ürün</option>
+          </select>
+          <input type="number" name="quantity" class="form-control form-control-sm" min="0.001" max="{{ item.quantity }}" step="0.001" placeholder="Miktar" required aria-label="İade miktarı">
+          <button type="submit" class="btn btn-sm btn-outline-danger text-nowrap">İade Talep Et</button>
+        </form>
+      </td>
     </tr>
     {% endfor %}
   </tbody>
