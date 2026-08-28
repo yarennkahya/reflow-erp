@@ -38,6 +38,7 @@
             flex-direction: column;
             z-index: 200;
             overflow-y: auto;
+            transition: transform 0.25s ease;
         }
 
         .sb-brand {
@@ -205,6 +206,15 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            transition: margin-left 0.25s ease;
+        }
+
+        /* Masaüstü: sidebar kapatılmış durumu */
+        body.sb-desktop-collapsed #sidebar {
+            transform: translateX(-100%);
+        }
+        body.sb-desktop-collapsed #main {
+            margin-left: 0;
         }
 
         #topbar {
@@ -379,6 +389,136 @@
             opacity: .65;
             pointer-events: none;
         }
+
+        /* Sidebar toggle — masaüstü ve mobilde görünür */
+        .sb-toggle-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            color: #0f172a;
+            font-size: 20px;
+            padding: 4px 8px;
+            cursor: pointer;
+            line-height: 1;
+            flex-shrink: 0;
+            touch-action: manipulation;
+        }
+
+        .sb-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.5);
+            z-index: 295; /* sidebar(300) altında ama topbar(310) ve main content üstünde */
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .sb-close-btn {
+            display: none;
+            position: fixed;
+            top: 12px;
+            left: calc(var(--sidebar-w) - 44px);
+            z-index: 320;
+            background: rgba(255,255,255,0.12);
+            border: none;
+            border-radius: 6px;
+            color: #d1d5db;
+            font-size: 16px;
+            line-height: 1;
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        .sb-close-btn.sb-open { display: flex; align-items: center; justify-content: center; }
+        .sb-close-btn:hover { color: #f9fafb; background: rgba(255,255,255,0.2); }
+
+        /* Tablo taşması — tüm sayfalarda genel koruma */
+        .table-responsive-auto {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* ── Tablet (≤991px): sidebar drawer modu ── */
+        @media (max-width: 991px) {
+            #sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.25s ease;
+                z-index: 300;
+                max-width: min(var(--sidebar-w), 85vw);
+            }
+            #sidebar.sb-open {
+                transform: translateX(0);
+            }
+            #main {
+                margin-left: 0;
+            }
+            #topbar {
+                padding: 0 12px;
+                gap: 8px;
+                z-index: 310;
+            }
+            #topbar .page-title {
+                flex: 1;
+                min-width: 0;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            .sb-backdrop.sb-open {
+                display: block;
+            }
+            body.sb-open {
+                overflow: hidden;
+            }
+            #page-content {
+                padding: 16px 16px 24px;
+            }
+            .notification-dropdown {
+                min-width: min(330px, calc(100vw - 24px));
+            }
+        }
+
+        /* ── Telefon (≤767px): daha dar düzen ── */
+        @media (max-width: 767px) {
+            .status-pill {
+                display: none; /* dar ekranda yer kaplar, gizle */
+            }
+            #page-content {
+                padding: 12px 12px 20px;
+            }
+            #ajax-feedback {
+                right: 12px;
+                left: 12px;
+                max-width: none;
+            }
+            .notification-dropdown {
+                min-width: min(300px, calc(100vw - 16px));
+                right: 0;
+            }
+        }
+
+        /* ── Küçük telefon (≤575px): minimum boşluk ── */
+        @media (max-width: 575px) {
+            #topbar {
+                padding: 0 8px;
+                gap: 6px;
+            }
+            #topbar .page-title {
+                font-size: 13px;
+            }
+            #page-content {
+                padding: 10px 10px 16px;
+            }
+            .notification-bell {
+                width: 30px;
+                height: 30px;
+            }
+        }
     </style>
     {% block extra_head %}{% endblock %}
 </head>
@@ -455,10 +595,15 @@
 
     <div class="sb-footer">v0.1.0 &mdash; MVP</div>
 </aside>
+<button class="sb-close-btn" id="sbCloseBtn" aria-label="Menüyü kapat"><i class="bi bi-x-lg"></i></button>
+<div class="sb-backdrop" id="sbBackdrop" onclick="window.sbClose&&window.sbClose()" role="button" aria-label="Menüyü kapat"></div>
 
 <!-- Main content -->
 <div id="main">
     <header id="topbar">
+        <button class="sb-toggle-btn" id="sbToggleBtn" aria-label="Menüyü aç/kapat">
+            <i class="bi bi-list"></i>
+        </button>
         <span class="page-title">{% block page_title %}Reflow Coffee ERP{% endblock %}</span>
         <div class="topbar-right">
             <div class="dropdown">
@@ -774,6 +919,98 @@
       }
     });
   })();
+</script>
+<script>
+(function () {
+    var MOBILE_BP = 991;
+    var LS_KEY    = 'reflow-sb';
+
+    var sidebar    = document.getElementById('sidebar');
+    var toggleBtn  = document.getElementById('sbToggleBtn');
+    var closeBtn   = document.getElementById('sbCloseBtn');
+    var backdrop   = document.getElementById('sbBackdrop');
+
+    if (!sidebar || !toggleBtn || !backdrop) return;
+
+    /* ── Masaüstü: collapse / expand ── */
+    function desktopOpen() {
+        document.body.classList.remove('sb-desktop-collapsed');
+        localStorage.setItem(LS_KEY, 'open');
+    }
+    function desktopClose() {
+        document.body.classList.add('sb-desktop-collapsed');
+        localStorage.setItem(LS_KEY, 'closed');
+    }
+    function isDesktopCollapsed() {
+        return document.body.classList.contains('sb-desktop-collapsed');
+    }
+
+    /* ── Mobil: drawer aç/kapat ── */
+    function mobileOpen() {
+        sidebar.classList.add('sb-open');
+        backdrop.classList.add('sb-open');
+        document.body.classList.add('sb-open');
+        if (closeBtn) closeBtn.classList.add('sb-open');
+    }
+    function mobileClose() {
+        sidebar.classList.remove('sb-open');
+        backdrop.classList.remove('sb-open');
+        document.body.classList.remove('sb-open');
+        if (closeBtn) closeBtn.classList.remove('sb-open');
+    }
+    function isMobileOpen() {
+        return sidebar.classList.contains('sb-open');
+    }
+
+    /* Global referans — backdrop onclick için */
+    window.sbClose = function () {
+        if (window.innerWidth <= MOBILE_BP) mobileClose();
+        else desktopClose();
+    };
+
+    /* Sayfa açılışında masaüstü durumunu localStorage'dan geri yükle */
+    if (window.innerWidth > MOBILE_BP && localStorage.getItem(LS_KEY) === 'closed') {
+        document.body.classList.add('sb-desktop-collapsed');
+    }
+
+    /* Hamburger toggle */
+    toggleBtn.addEventListener('click', function () {
+        if (window.innerWidth > MOBILE_BP) {
+            isDesktopCollapsed() ? desktopOpen() : desktopClose();
+        } else {
+            isMobileOpen() ? mobileClose() : mobileOpen();
+        }
+    });
+
+    /* X kapat butonu (sadece mobilde görünür) */
+    if (closeBtn) closeBtn.addEventListener('click', mobileClose);
+
+    /* Backdrop: click + touchend */
+    backdrop.addEventListener('click', mobileClose);
+    backdrop.addEventListener('touchend', function (e) {
+        e.preventDefault();
+        mobileClose();
+    });
+
+    /* Escape */
+    document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape') return;
+        if (window.innerWidth <= MOBILE_BP && isMobileOpen()) mobileClose();
+        else if (window.innerWidth > MOBILE_BP && !isDesktopCollapsed()) desktopClose();
+    });
+
+    /* Mobilde nav linkine tıklanınca drawer kapansın */
+    sidebar.querySelectorAll('a[href]').forEach(function (link) {
+        link.addEventListener('click', function () {
+            if (window.innerWidth <= MOBILE_BP) mobileClose();
+        });
+    });
+
+    /* Pencere genişleyince mobil drawer state'i temizle */
+    window.addEventListener('resize', function () {
+        if (window.innerWidth > MOBILE_BP) mobileClose();
+    });
+})();
 </script>
 {% block extra_scripts %}{% endblock %}
 </body>
