@@ -2,11 +2,12 @@ from datetime import timedelta
 from decimal import Decimal
 
 from django.db import transaction
-from django.db.models import Sum
+from django.db.models import Count, Sum
 from django.utils import timezone
 
 from audit.services import log_action
 from inventory.models import MovementType, Product, StockMovement
+from notifications.services import notify_group
 
 from .models import Order, OrderItem, ReturnRequest
 
@@ -120,3 +121,37 @@ def reject_return(return_request, user=None):
         return_request.save(update_fields=['status', 'resolved_at'])
         log_action(user, 'İade reddedildi', return_request)
     return return_request
+
+
+DEFECTIVE_RETURN_THRESHOLD = 3
+DEFECTIVE_RETURN_LOOKBACK_DAYS = 30
+
+
+def scan_defective_return_patterns():
+    """
+    Son N gunde bir urunde esik sayida (veya fazla) kusurlu/tamamlanmis
+    iade varsa, Uretim & Stok Ekibi'ne bildirim gonderir.
+    """
+    since = timezone.now() - timedelta(days=DEFECTIVE_RETURN_LOOKBACK_DAYS)
+    rows = (
+        ReturnRequest.objects.filter(
+            reason=ReturnRequest.Reason.DEFECTIVE,
+            status=ReturnRequest.Status.COMPLETED,
+            resolved_at__gte=since,
+        )
+        .values('order_item__product')
+        .annotate(total=Count('id'))
+        .filter(total__gte=DEFECTIVE_RETURN_THRESHOLD)
+    )
+    flagged = []
+    for row in rows:
+        product = Product.objects.get(pk=row['order_item__product'])
+        notify_group(
+            'Üretim & Stok Ekibi',
+            f'{product.name} için son {DEFECTIVE_RETURN_LOOKBACK_DAYS} günde '
+            f'{row["total"]} kusurlu iade geldi, tarif/tedarikçi gözden '
+            f'geçirilmeli.',
+            url='/sales/returns/',
+        )
+        flagged.append(product.pk)
+    return {'flagged_products': flagged}

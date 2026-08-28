@@ -1,3 +1,6 @@
+from notifications.services import notify_group
+from sales.models import Order
+
 from .models import Opportunity
 
 STAGE_ORDER = [
@@ -22,6 +25,14 @@ def advance_stage(opportunity):
     if opportunity.stage == Opportunity.Stage.WON:
         opportunity.status = Opportunity.Status.WON
     opportunity.save(update_fields=['stage', 'status', 'updated_at'])
+    if opportunity.stage == Opportunity.Stage.WON:
+        order = Order.objects.create(customer=opportunity.customer)
+        notify_group(
+            'Satış & CRM Ekibi',
+            f'{opportunity.title} kazanıldı, {opportunity.customer.name} için '
+            f'taslak sipariş oluşturuldu (henüz kalemsiz).',
+            url=f'/sales/orders/{order.pk}/',
+        )
     return opportunity
 
 

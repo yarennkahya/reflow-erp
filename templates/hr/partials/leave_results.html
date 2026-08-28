@@ -26,6 +26,7 @@
           <th>Talep Tarihi</th>
           <th>Onaylayan</th>
           <th>Durum</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -46,10 +47,25 @@
               {{ row.leave.get_status_display }}
             </span>
           </td>
+          <td>
+            {% if row.leave.status == 'pending' %}
+            <form method="post" class="d-flex gap-1 align-items-center flex-wrap">
+              {% csrf_token %}
+              <select name="approver" class="form-select form-select-sm" style="min-width:130px; font-size:12px;">
+                <option value="">Onaylayan seç</option>
+                {% for emp in employees %}
+                <option value="{{ emp.pk }}">{{ emp.name }}</option>
+                {% endfor %}
+              </select>
+              <button type="submit" formaction="{% url 'leave-approve' row.leave.pk %}" class="btn btn-sm btn-success" style="font-size:12px; padding:3px 10px;">Onayla</button>
+              <button type="submit" formaction="{% url 'leave-reject' row.leave.pk %}" class="btn btn-sm btn-danger" style="font-size:12px; padding:3px 10px;">Reddet</button>
+            </form>
+            {% endif %}
+          </td>
         </tr>
         {% empty %}
         <tr>
-          <td colspan="7" class="empty-state">
+          <td colspan="8" class="empty-state">
             <i class="bi bi-inbox"></i>
             İzin talebi bulunamadı.
           </td>

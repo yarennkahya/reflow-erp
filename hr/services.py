@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.db.models import Q
 
 from .models import Application, Employee, JobOpening, LeaveRequest
 
@@ -59,3 +60,22 @@ def hire_candidate(application, hire_date, salary=None, manager=None):
         job_opening.save(update_fields=['status'])
 
     return employee
+
+
+def check_meeting_conflicts(leave_request):
+    """
+    Bir izin talebinin tarih aralığıyla, çalışanın organizatör veya
+    katılımcı olduğu, iptal edilmemiş toplantılar arasında çakışma
+    olup olmadığını kontrol eder. Engellemez, sadece bilgi amaçlıdır.
+    """
+    from meetings.models import Meeting
+    employee = leave_request.employee
+    return (
+        Meeting.objects.filter(status='scheduled')
+        .filter(Q(organizer=employee) | Q(attendees=employee))
+        .filter(
+            start_time__date__lte=leave_request.end_date,
+            end_time__date__gte=leave_request.start_date,
+        )
+        .distinct()
+    )

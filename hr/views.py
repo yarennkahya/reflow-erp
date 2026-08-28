@@ -1,7 +1,9 @@
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 
 from .models import Department, Employee, JobOpening, LeaveRequest
+from .services import approve_leave_request, check_meeting_conflicts, reject_leave_request
 
 _EMP_STATUS = {
     'active':     'bg-success-subtle text-success',
@@ -113,12 +115,51 @@ def leave_list_view(request):
         'leaves': leave_data,
         'selected_status': status_filter,
         'status_choices': LeaveRequest.Status.choices,
+        'employees': Employee.objects.all(),
     }
     template_name = (
         'hr/partials/leave_results.html'
         if _is_ajax(request) else 'hr/leave_list.html'
     )
     return render(request, template_name, context)
+
+
+@login_required
+def leave_approve_view(request, pk):
+    leave_request = get_object_or_404(LeaveRequest, pk=pk)
+    if request.method == 'POST':
+        approver_id = request.POST.get('approver')
+        approver = get_object_or_404(Employee, pk=approver_id) if approver_id else None
+        conflicts = check_meeting_conflicts(leave_request)
+        try:
+            approve_leave_request(leave_request, approved_by=approver)
+            if conflicts.exists():
+                names = ', '.join(m.title for m in conflicts)
+                messages.warning(
+                    request,
+                    f'{leave_request.employee.name} bu tarihlerde şu '
+                    f'toplantılarla çakışıyor: {names}. İzin yine de '
+                    f'onaylandı.'
+                )
+            else:
+                messages.success(request, 'İzin talebi onaylandı.')
+        except ValueError as exc:
+            messages.error(request, str(exc))
+    return redirect('hr-leave')
+
+
+@login_required
+def leave_reject_view(request, pk):
+    leave_request = get_object_or_404(LeaveRequest, pk=pk)
+    if request.method == 'POST':
+        approver_id = request.POST.get('approver')
+        approver = get_object_or_404(Employee, pk=approver_id) if approver_id else None
+        try:
+            reject_leave_request(leave_request, approved_by=approver)
+            messages.success(request, 'İzin talebi reddedildi.')
+        except ValueError as exc:
+            messages.error(request, str(exc))
+    return redirect('hr-leave')
 
 
 @login_required
