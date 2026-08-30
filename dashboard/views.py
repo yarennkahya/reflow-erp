@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
 
 from inventory.models import Lot, Warehouse
 from inventory.services import get_freshness_status
@@ -8,6 +9,12 @@ from sales.models import Customer, Order
 from crm.models import Opportunity
 from hr.models import Employee, LeaveRequest
 from finance.services import get_profitability_report
+
+
+def landing_view(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard-home')
+    return render(request, 'public/landing.html')
 
 
 def chat_page_view(request):

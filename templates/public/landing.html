@@ -1,0 +1,1921 @@
+<!DOCTYPE html>
+<!-- Brand name: [TBD] — replace placeholder text when product name is finalized -->
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ERP Platform — Connected Business Operations</title>
+<meta name="description" content="An AI-assisted ERP platform that connects inventory, purchasing, production, sales, finance and HR into one operational system.">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/meridian.css' %}">
+<script>
+(function(){
+  if(localStorage.getItem('reflow-theme')==='dark'){
+    document.documentElement.classList.add('dark-mode');
+  }
+})();
+</script>
+<style>
+/* ── Landing dark mode overrides ── */
+html.dark-mode .pub-page    { background: var(--g-bg); }
+html.dark-mode .pub-nav     { background: var(--g-bg); }
+html.dark-mode .pub-nav.scrolled { background: var(--g-surface); border-bottom-color: var(--g-border); }
+html.dark-mode .pub-nav-name { color: var(--g-text); }
+html.dark-mode .pub-nav-links a { color: var(--g-text-3); }
+html.dark-mode .pub-nav-links a:hover { color: var(--g-text); }
+html.dark-mode .pub-hero    { background: var(--g-bg); }
+html.dark-mode .pub-hero-title { color: var(--g-text); }
+html.dark-mode .pub-hero-eyebrow { color: var(--g-brand); }
+html.dark-mode .pub-hero-sub { color: var(--g-text-3); }
+html.dark-mode .pub-hero-demo-note { color: var(--g-text-3); background: var(--g-surface); border-color: var(--g-border); }
+html.dark-mode .pub-section { background: var(--g-bg); }
+html.dark-mode .pub-section-alt { background: var(--g-surface); }
+html.dark-mode .pub-title   { color: var(--g-text); }
+html.dark-mode .pub-sub     { color: var(--g-text-3); }
+html.dark-mode .pub-label   { color: var(--g-brand); }
+html.dark-mode .pub-problem-col { background: var(--g-surface); border-color: var(--g-border); }
+html.dark-mode .pub-problem-col-head { color: var(--g-text); border-bottom-color: var(--g-border); }
+html.dark-mode .pub-problem-item { color: var(--g-text-2); border-bottom-color: var(--g-border-sub); }
+html.dark-mode .pub-problem-icon.x { background: var(--g-danger-lt); }
+html.dark-mode .pub-problem-icon.check { background: var(--g-success-lt); }
+html.dark-mode .pub-module-tabs { background: var(--g-surface); border-color: var(--g-border); }
+html.dark-mode .pub-module-tab { color: var(--g-text-3); border-bottom-color: var(--g-border); }
+html.dark-mode .pub-module-tab:hover { background: rgba(255,255,255,0.03); }
+html.dark-mode .pub-module-tab.active { background: var(--g-brand); color: #fff; }
+html.dark-mode .pub-module-tab-sub { color: var(--g-text-3); }
+html.dark-mode .pub-module-detail { background: var(--g-surface); border-color: var(--g-border); }
+html.dark-mode .pub-module-detail-title { color: var(--g-text); }
+html.dark-mode .pub-module-detail-desc  { color: var(--g-text-3); }
+html.dark-mode .pub-module-feature { color: var(--g-text-2); border-bottom-color: var(--g-border-sub); }
+html.dark-mode .pub-flow-card { background: var(--g-surface); border-color: var(--g-border); }
+html.dark-mode .pub-flow-title { color: var(--g-brand); border-bottom-color: var(--g-border); }
+html.dark-mode .pub-flow-step-name { color: var(--g-text); }
+html.dark-mode .pub-flow-step-desc { color: var(--g-text-3); }
+html.dark-mode .pub-flow-step-node { background: var(--g-surface); }
+html.dark-mode .pub-faq-item { border-bottom-color: var(--g-border); }
+html.dark-mode .pub-faq-btn { color: var(--g-text); }
+html.dark-mode .pub-faq-btn:hover { color: var(--g-brand); }
+html.dark-mode .pub-faq-answer { color: var(--g-text-2); }
+html.dark-mode .pub-faq-chevron { color: var(--g-text-3); }
+html.dark-mode .pub-tech-grid .pub-arch-group,
+html.dark-mode .pub-arch-group { background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.07); }
+html.dark-mode .pub-mobile-menu { background: var(--g-surface); border-top-color: var(--g-border); }
+html.dark-mode .pub-mobile-menu a { color: var(--g-text-2); border-bottom-color: var(--g-border-sub); }
+html.dark-mode .pub-footer { background: var(--g-bg); border-top-color: var(--g-border); }
+html.dark-mode .pub-footer-copy { color: var(--g-text-3); }
+</style>
+<style>
+  /* Landing-only extras */
+  .pub-page { min-height: 100vh; }
+
+  /* Animated section labels */
+  .pub-label i { animation: pulse-dot 2s infinite; }
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.4; }
+  }
+
+  /* Meridian line concept — central reference axis */
+  .meridian-line {
+    width: 2px;
+    background: linear-gradient(to bottom, transparent, var(--g-brand) 20%, var(--g-brand) 80%, transparent);
+    position: absolute;
+    left: 50%;
+    top: 0; bottom: 0;
+    opacity: 0.12;
+    pointer-events: none;
+  }
+
+  /* Module tabs detail panels */
+  .pub-module-panel { display: none; }
+  .pub-module-panel.active { display: block; }
+
+  /* Preview tabs */
+  .pub-preview-panel { display: none; }
+  .pub-preview-panel.active { display: block; }
+
+  /* Tech architecture visual */
+  .pub-arch-group {
+    background: var(--g-surface);
+    border: 1px solid var(--g-border);
+    border-radius: var(--g-r-lg);
+    padding: 20px;
+  }
+  .pub-arch-group-title {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--g-text-3);
+    margin-bottom: 12px;
+  }
+  .pub-arch-items { display: flex; flex-direction: column; gap: 8px; }
+  .pub-arch-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: var(--g-n-50);
+    border: 1px solid var(--g-border-sub);
+    border-radius: var(--g-r);
+  }
+  .pub-arch-item-name { font-size: 13px; font-weight: 600; color: var(--g-text); }
+  .pub-arch-item-role { font-size: 12px; color: var(--g-text-3); }
+  .pub-arch-icon {
+    width: 28px; height: 28px;
+    border-radius: var(--g-r-sm);
+    background: var(--g-brand-light);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    color: var(--g-brand);
+    flex-shrink: 0;
+  }
+
+  /* Product preview mockup container */
+  .pub-preview-mockup {
+    background: var(--g-n-900);
+    border-radius: var(--g-r-xl);
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.07);
+    position: relative;
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .pub-preview-topbar {
+    height: 36px;
+    background: rgba(255,255,255,0.04);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .pub-preview-dot { width: 8px; height: 8px; border-radius: 50%; }
+  .pub-preview-dot.r { background: #FF5F57; }
+  .pub-preview-dot.y { background: #FFBD2E; }
+  .pub-preview-dot.g { background: #28C840; }
+  .pub-preview-topbar-title { font-size: 11px; color: rgba(255,255,255,0.35); margin-left: auto; margin-right: auto; }
+
+  .pub-preview-content {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow: hidden;
+  }
+
+  .pub-preview-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+
+  .pub-preview-kpi {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 14px;
+  }
+
+  .pub-preview-kpi-l { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: rgba(255,255,255,0.3); margin-bottom: 6px; }
+  .pub-preview-kpi-v { font-size: 22px; font-weight: 700; color: #E8E4DE; letter-spacing: -0.03em; }
+  .pub-preview-kpi-v.green { color: #4ADE80; }
+  .pub-preview-kpi-v.amber { color: #FBB23A; }
+
+  .pub-preview-table-mock {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 8px;
+    overflow: hidden;
+    flex: 1;
+  }
+
+  .pub-preview-th {
+    display: grid;
+    padding: 8px 14px;
+    background: rgba(255,255,255,0.04);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+
+  .pub-preview-th span { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: rgba(255,255,255,0.2); }
+
+  .pub-preview-td-row {
+    display: grid;
+    padding: 9px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    align-items: center;
+  }
+
+  .pub-preview-td-row span { font-size: 11px; color: rgba(255,255,255,0.4); }
+  .pub-preview-td-row .n  { color: rgba(255,255,255,0.7); font-weight: 500; }
+
+  .pub-preview-badge {
+    display: inline-block;
+    padding: 2px 7px;
+    border-radius: 3px;
+    font-size: 9px;
+    font-weight: 700;
+  }
+  .pub-preview-badge.g { background: rgba(34,145,60,.2); color: #4ADE80; }
+  .pub-preview-badge.a { background: rgba(160,94,10,.2);  color: #FBB23A; }
+  .pub-preview-badge.b { background: rgba(27,58,92,.5);   color: #6B9BC8; }
+
+  /* Architecture diagram */
+  .arch-diagram {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 40px;
+  }
+
+  .arch-layer {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: var(--g-r-lg);
+    padding: 20px;
+  }
+
+  .arch-layer-title {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--g-brand-mid);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(107,155,200,0.15);
+  }
+
+  .arch-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 12.5px;
+    color: var(--g-n-300);
+  }
+
+  .arch-item:last-child { border-bottom: none; }
+  .arch-item-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--g-brand-mid); opacity: 0.6; flex-shrink: 0; }
+  .arch-item strong { color: var(--g-n-100); font-weight: 600; }
+</style>
+</head>
+<body class="pub-page">
+
+<!-- ────────────────────────────────────────────────────────
+     NAVIGATION
+──────────────────────────────────────────────────────── -->
+<nav class="pub-nav" id="pubNav">
+  <a href="/" class="pub-nav-brand">
+    <div class="pub-nav-logo">E</div>
+    <span class="pub-nav-name">ERP Platform</span>
+  </a>
+
+  <div class="pub-nav-links">
+    <a href="#product" data-en="Product" data-tr="Ürün">Product</a>
+    <a href="#modules" data-en="Modules" data-tr="Modüller">Modules</a>
+    <a href="#how-it-works" data-en="How it works" data-tr="Nasıl Çalışır">How it works</a>
+    <a href="#ai" data-en="AI" data-tr="AI">AI</a>
+    <a href="#technology" data-en="Technology" data-tr="Teknoloji">Technology</a>
+  </div>
+
+  <div class="pub-nav-cta">
+    <button class="pub-nav-ctrl" id="pubLangBtn" aria-label="Toggle language">
+      <i class="bi bi-translate"></i>
+      <span id="pubLangLabel">TR</span>
+    </button>
+    <button class="pub-nav-ctrl" id="pubThemeBtn" aria-label="Toggle theme">
+      <i class="bi bi-moon-fill" id="pubThemeIcon"></i>
+    </button>
+    <a href="/accounts/login/" class="g-btn g-btn-primary g-btn-sm" data-en="Explore Demo" data-tr="Demo'yu Keşfet">
+      <i class="bi bi-box-arrow-in-right"></i> Explore Demo
+    </a>
+  </div>
+
+  <button class="pub-nav-toggle" id="mobileNavToggle" aria-label="Open menu">
+    <i class="bi bi-list"></i>
+  </button>
+</nav>
+
+<!-- Mobile menu -->
+<div class="pub-mobile-menu" id="mobileMenu">
+  <a href="#product" onclick="closeMobileMenu()" data-en="Product" data-tr="Ürün">Product</a>
+  <a href="#modules" onclick="closeMobileMenu()" data-en="Modules" data-tr="Modüller">Modules</a>
+  <a href="#how-it-works" onclick="closeMobileMenu()" data-en="How it works" data-tr="Nasıl Çalışır">How it works</a>
+  <a href="#ai" onclick="closeMobileMenu()" data-en="AI" data-tr="AI">AI</a>
+  <a href="#technology" onclick="closeMobileMenu()" data-en="Technology" data-tr="Teknoloji">Technology</a>
+  <a href="/accounts/login/" class="g-btn g-btn-primary" data-en="Explore Demo →" data-tr="Demo'yu Keşfet →">Explore Demo →</a>
+</div>
+
+<!-- ────────────────────────────────────────────────────────
+     HERO
+──────────────────────────────────────────────────────── -->
+<section class="pub-hero" id="product">
+  <div class="pub-hero-inner">
+
+    <!-- Left: copy -->
+    <div class="pub-hero-left">
+      <div class="pub-hero-eyebrow" data-en="AI-Assisted ERP Platform" data-tr="AI Destekli ERP Platformu">
+        <i class="bi bi-circle-fill" style="font-size:7px;"></i>
+        AI-Assisted ERP Platform
+      </div>
+
+      <h1 class="pub-hero-title" data-en="The single<br><em>reference point</em><br>for every operation." data-tr="Her operasyon için<br>tek <em>referans noktası.</em>">
+        The single<br>
+        <em>reference point</em><br>
+        for every operation.
+      </h1>
+
+      <p class="pub-hero-sub" data-en="Connect inventory, purchasing, production, sales, finance, and HR into one operational system — with an AI intelligence layer that understands your business context." data-tr="Stok, satın alma, üretim, satış, finans ve İK'yı tek sistemde birleştirin — işletme bağlamınızı anlayan bir AI zekâ katmanıyla.">
+        Connect inventory, purchasing, production, sales, finance, and HR into one operational system — with an AI intelligence layer that understands your business context.
+      </p>
+
+      <div class="pub-hero-actions">
+        <a href="/accounts/login/" class="g-btn g-btn-primary g-btn-lg" data-en="Explore the Demo" data-tr="Demo'yu Keşfet">
+          <i class="bi bi-box-arrow-in-right"></i> Explore the Demo
+        </a>
+        <a href="#how-it-works" class="g-btn g-btn-outline g-btn-lg" data-en="See how it works" data-tr="Nasıl çalışır">
+          See how it works <i class="bi bi-arrow-down"></i>
+        </a>
+      </div>
+
+      <div class="pub-hero-demo-note">
+        <i class="bi bi-shield-check"></i>
+        <span data-en="Demo access — " data-tr="Demo erişimi — ">Demo access — </span><code>root</code> / <code>root</code>
+        &nbsp;·&nbsp; <span data-en="No registration required" data-tr="Kayıt gerekmez">No registration required</span>
+      </div>
+    </div>
+
+    <!-- Right: ERP mockup -->
+    <div class="pub-hero-visual">
+      <div class="erp-mockup">
+        <!-- Mini sidebar -->
+        <div class="erp-mock-sb">
+          <div class="erp-mock-sb-brand">
+            <div class="erp-mock-sb-logo"></div>
+            <span class="erp-mock-sb-name">ERP</span>
+          </div>
+          <div class="erp-mock-nav-label">General</div>
+          <div class="erp-mock-nav-item active">
+            <span>▪</span> Dashboard
+          </div>
+          <div class="erp-mock-nav-item">
+            <span>▪</span> AI Assistant
+          </div>
+          <div class="erp-mock-nav-label" style="margin-top:8px;">Operations</div>
+          <div class="erp-mock-nav-item">
+            <span>▪</span> Inventory
+          </div>
+          <div class="erp-mock-nav-item">
+            <span>▪</span> Purchasing
+          </div>
+          <div class="erp-mock-nav-item">
+            <span>▪</span> Production
+          </div>
+          <div class="erp-mock-nav-label" style="margin-top:8px;">Commerce</div>
+          <div class="erp-mock-nav-item">
+            <span>▪</span> Sales
+          </div>
+          <div class="erp-mock-nav-item">
+            <span>▪</span> CRM
+          </div>
+          <div class="erp-mock-nav-label" style="margin-top:8px;">Finance</div>
+          <div class="erp-mock-nav-item">
+            <span>▪</span> Finance
+          </div>
+        </div>
+
+        <!-- Mini content area -->
+        <div class="erp-mock-main">
+          <div class="erp-mock-topbar">
+            <span class="erp-mock-topbar-title">Dashboard</span>
+            <div class="erp-mock-topbar-right">
+              <div class="erp-mock-dot green"></div>
+              <div class="erp-mock-dot amber"></div>
+              <div class="erp-mock-dot"></div>
+            </div>
+          </div>
+          <div class="erp-mock-content">
+            <div class="erp-mock-kpis">
+              <div class="erp-mock-kpi">
+                <div class="erp-mock-kpi-label">Inventory</div>
+                <div class="erp-mock-kpi-value">47</div>
+                <div class="erp-mock-kpi-sub">active lots</div>
+              </div>
+              <div class="erp-mock-kpi positive">
+                <div class="erp-mock-kpi-label">Revenue</div>
+                <div class="erp-mock-kpi-value">₺284k</div>
+                <div class="erp-mock-kpi-sub">this month</div>
+              </div>
+              <div class="erp-mock-kpi warning">
+                <div class="erp-mock-kpi-label">Pending</div>
+                <div class="erp-mock-kpi-value">6</div>
+                <div class="erp-mock-kpi-sub">open orders</div>
+              </div>
+              <div class="erp-mock-kpi">
+                <div class="erp-mock-kpi-label">Staff</div>
+                <div class="erp-mock-kpi-value">23</div>
+                <div class="erp-mock-kpi-sub">active employees</div>
+              </div>
+            </div>
+            <div class="erp-mock-table">
+              <div class="erp-mock-th">
+                <span>Product / Lot</span>
+                <span>Qty</span>
+                <span>Status</span>
+                <span>Warehouse</span>
+              </div>
+              <div class="erp-mock-tr">
+                <span class="name">Ethiopia Yirgacheffe</span>
+                <span>120 kg</span>
+                <span><div class="erp-mock-badge green">Fresh</div></span>
+                <span>WH-01</span>
+              </div>
+              <div class="erp-mock-tr">
+                <span class="name">Colombia Supremo</span>
+                <span>85 kg</span>
+                <span><div class="erp-mock-badge amber">Priority</div></span>
+                <span>WH-01</span>
+              </div>
+              <div class="erp-mock-tr">
+                <span class="name">Brazil Santos</span>
+                <span>200 kg</span>
+                <span><div class="erp-mock-badge blue">In prod.</div></span>
+                <span>WH-02</span>
+              </div>
+              <div class="erp-mock-tr">
+                <span class="name">Guatemala Antigua</span>
+                <span>50 kg</span>
+                <span><div class="erp-mock-badge green">Fresh</div></span>
+                <span>WH-01</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ────────────────────────────────────────────────────────
+     PROBLEM SECTION
+──────────────────────────────────────────────────────── -->
+<section class="pub-section pub-section-alt reveal" id="how-it-works">
+  <div class="pub-section-inner">
+    <div class="pub-label" data-en="The Problem" data-tr="Sorun">The Problem</div>
+    <h2 class="pub-title" data-en="Business operations shouldn't live<br>in <em>separate systems.</em>" data-tr="İş operasyonları<br><em>ayrı sistemlerde</em> yaşamamalı.">Business operations shouldn't live<br>in <em>separate systems.</em></h2>
+    <p class="pub-sub" data-en="When CRM, inventory, finance, and production don't share a common operational context, visibility disappears and decisions are made blind." data-tr="CRM, stok, finans ve üretim ortak bir operasyonel bağlamı paylaşmadığında görünürlük kaybolur ve kararlar körlemesine alınır.">
+      When CRM, inventory, finance, and production don't share a common operational context, visibility disappears and decisions are made blind.
+    </p>
+
+    <div class="pub-problem-grid">
+      <div class="pub-problem-col">
+        <div class="pub-problem-col-head">Without a connected ERP</div>
+        <div class="pub-problem-item">
+          <div class="pub-problem-icon x"><i class="bi bi-x"></i></div>
+          Separate tools for inventory, sales, and finance — no shared context
+        </div>
+        <div class="pub-problem-item">
+          <div class="pub-problem-icon x"><i class="bi bi-x"></i></div>
+          Manual data transfers between spreadsheets and isolated apps
+        </div>
+        <div class="pub-problem-item">
+          <div class="pub-problem-icon x"><i class="bi bi-x"></i></div>
+          Stockouts and overstock discovered too late — no automated detection
+        </div>
+        <div class="pub-problem-item">
+          <div class="pub-problem-icon x"><i class="bi bi-x"></i></div>
+          Finance team reconciling data from 5 different sources every month
+        </div>
+        <div class="pub-problem-item">
+          <div class="pub-problem-icon x"><i class="bi bi-x"></i></div>
+          No traceability — where did that stock go? who placed that order?
+        </div>
+        <div class="pub-problem-item">
+          <div class="pub-problem-icon x"><i class="bi bi-x"></i></div>
+          Decisions made from partial, stale information
+        </div>
+      </div>
+
+      <div class="pub-problem-divider">→</div>
+
+      <div class="pub-problem-col after">
+        <div class="pub-problem-col-head">With one connected system</div>
+        <div class="pub-problem-item">
+          <div class="pub-problem-icon ok"><i class="bi bi-check"></i></div>
+          Every module shares a single operational context and data layer
+        </div>
+        <div class="pub-problem-item">
+          <div class="pub-problem-icon ok"><i class="bi bi-check"></i></div>
+          Events propagate automatically — a sale updates inventory in real time
+        </div>
+        <div class="pub-problem-item">
+          <div class="pub-problem-icon ok"><i class="bi bi-check"></i></div>
+          Background automation detects critical stock and triggers purchasing
+        </div>
+        <div class="pub-problem-item">
+          <div class="pub-problem-icon ok"><i class="bi bi-check"></i></div>
+          Finance data is generated from operational events — no reconciliation
+        </div>
+        <div class="pub-problem-item">
+          <div class="pub-problem-icon ok"><i class="bi bi-check"></i></div>
+          Full traceability — every lot, movement, order, and payment is logged
+        </div>
+        <div class="pub-problem-item">
+          <div class="pub-problem-icon ok"><i class="bi bi-check"></i></div>
+          AI layer provides context-aware decision support on real ERP data
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ────────────────────────────────────────────────────────
+     MODULES
+──────────────────────────────────────────────────────── -->
+<section class="pub-section pub-section-inner reveal" id="modules">
+  <div class="pub-section-inner">
+    <div class="pub-label" data-en="Modules" data-tr="Modüller">Modules</div>
+    <h2 class="pub-title" data-en="Eleven modules.<br><em>One operational context.</em>" data-tr="On bir modül.<br><em>Tek operasyonel bağlam.</em>">Eleven modules.<br><em>One operational context.</em></h2>
+    <p class="pub-sub" data-en="Every department in one system. Not a collection of isolated CRUD screens — a connected environment where every event affects the whole." data-tr="Her departman tek sistemde. İzole CRUD ekranları değil — her olayın bütünü etkilediği bağlı bir ortam.">
+      Every department in one system. Not a collection of isolated CRUD screens — a connected environment where every event affects the whole.
+    </p>
+
+    <div class="pub-modules-grid">
+      <!-- Module tab list -->
+      <div class="pub-module-list">
+        <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g-text-3);padding:4px 12px 8px;">OPERATIONS</div>
+
+        <button class="pub-module-tab active" onclick="selectModule(this,'inventory')">
+          <div class="pub-module-icon"><i class="bi bi-boxes"></i></div>
+          <div>
+            <div class="pub-module-tab-title">Inventory</div>
+            <div class="pub-module-tab-sub">Stock, lots, warehouses</div>
+          </div>
+        </button>
+
+        <button class="pub-module-tab" onclick="selectModule(this,'purchasing')">
+          <div class="pub-module-icon"><i class="bi bi-basket3"></i></div>
+          <div>
+            <div class="pub-module-tab-title">Purchasing</div>
+            <div class="pub-module-tab-sub">Suppliers, purchase orders</div>
+          </div>
+        </button>
+
+        <button class="pub-module-tab" onclick="selectModule(this,'production')">
+          <div class="pub-module-icon"><i class="bi bi-fire"></i></div>
+          <div>
+            <div class="pub-module-tab-title">Production</div>
+            <div class="pub-module-tab-sub">Recipes, batches, quality</div>
+          </div>
+        </button>
+
+        <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g-text-3);padding:12px 12px 8px;">COMMERCE</div>
+
+        <button class="pub-module-tab" onclick="selectModule(this,'sales')">
+          <div class="pub-module-icon"><i class="bi bi-cart3"></i></div>
+          <div>
+            <div class="pub-module-tab-title">Sales</div>
+            <div class="pub-module-tab-sub">Orders, customers, returns</div>
+          </div>
+        </button>
+
+        <button class="pub-module-tab" onclick="selectModule(this,'crm')">
+          <div class="pub-module-icon"><i class="bi bi-building"></i></div>
+          <div>
+            <div class="pub-module-tab-title">CRM</div>
+            <div class="pub-module-tab-sub">Opportunities, pipeline</div>
+          </div>
+        </button>
+
+        <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--g-text-3);padding:12px 12px 8px;">FINANCE · PEOPLE · INTEL</div>
+
+        <button class="pub-module-tab" onclick="selectModule(this,'finance')">
+          <div class="pub-module-icon"><i class="bi bi-graph-up-arrow"></i></div>
+          <div>
+            <div class="pub-module-tab-title">Finance</div>
+            <div class="pub-module-tab-sub">Invoices, payments, reports</div>
+          </div>
+        </button>
+
+        <button class="pub-module-tab" onclick="selectModule(this,'hr')">
+          <div class="pub-module-icon"><i class="bi bi-people"></i></div>
+          <div>
+            <div class="pub-module-tab-title">HR</div>
+            <div class="pub-module-tab-sub">Employees, leave, recruitment</div>
+          </div>
+        </button>
+
+        <button class="pub-module-tab" onclick="selectModule(this,'ai')">
+          <div class="pub-module-icon"><i class="bi bi-robot"></i></div>
+          <div>
+            <div class="pub-module-tab-title">AI Assistant</div>
+            <div class="pub-module-tab-sub">Context-aware intelligence</div>
+          </div>
+        </button>
+      </div>
+
+      <!-- Module detail panel -->
+      <div class="pub-module-detail" id="moduleDetail">
+        <!-- Inventory -->
+        <div class="pub-module-panel active" data-module="inventory">
+          <div class="pub-module-detail-tag">Operations / Inventory</div>
+          <div class="pub-module-detail-title">Complete stock visibility, lot by lot.</div>
+          <div class="pub-module-detail-desc">
+            Manage products, lots, warehouses, and stock movements through a ledger-based approach. Every movement is a recorded event — nothing is simply "changed." This gives full traceability from arrival to consumption.
+            <br><br>
+            Freshness windows are tracked per lot. Automated alerts detect lots approaching expiry before they become a problem. Critical stock levels trigger purchasing workflows.
+          </div>
+          <div class="pub-module-connects">
+            <div class="pub-module-connects-title">Connects with</div>
+            <div class="pub-module-connects-list">
+              <span class="pub-connect-pill"><i class="bi bi-basket3" style="font-size:10px"></i> Purchasing</span>
+              <span class="pub-connect-pill"><i class="bi bi-fire" style="font-size:10px"></i> Production</span>
+              <span class="pub-connect-pill"><i class="bi bi-cart3" style="font-size:10px"></i> Sales</span>
+              <span class="pub-connect-pill"><i class="bi bi-robot" style="font-size:10px"></i> AI Assistant</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Purchasing -->
+        <div class="pub-module-panel" data-module="purchasing">
+          <div class="pub-module-detail-tag">Operations / Purchasing</div>
+          <div class="pub-module-detail-title">From supplier to stock — fully tracked.</div>
+          <div class="pub-module-detail-desc">
+            Manage suppliers and their product catalogs. Create, track, and advance purchase orders through the full lifecycle: Draft → Sent → Confirmed → Received. Goods receipt creates new inventory lots automatically through StockMovement records.
+            <br><br>
+            Low stock detection can trigger draft purchase orders automatically via background tasks — reducing manual monitoring.
+          </div>
+          <div class="pub-module-connects">
+            <div class="pub-module-connects-title">Connects with</div>
+            <div class="pub-module-connects-list">
+              <span class="pub-connect-pill"><i class="bi bi-boxes" style="font-size:10px"></i> Inventory</span>
+              <span class="pub-connect-pill"><i class="bi bi-bell" style="font-size:10px"></i> Notifications</span>
+              <span class="pub-connect-pill"><i class="bi bi-graph-up-arrow" style="font-size:10px"></i> Finance</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Production -->
+        <div class="pub-module-panel" data-module="production">
+          <div class="pub-module-detail-tag">Operations / Production</div>
+          <div class="pub-module-detail-title">Recipe-driven, BOM-based production control.</div>
+          <div class="pub-module-detail-desc">
+            Define recipes (bills of materials) that specify which raw materials are consumed and in what ratios. Create production batches that automatically record material consumption as stock OUT movements and finished goods as stock IN.
+            <br><br>
+            Quality checks are attached to each batch. Passed lots enter regular inventory. Failed lots are handled separately. The entire production chain is traceable.
+          </div>
+          <div class="pub-module-connects">
+            <div class="pub-module-connects-title">Connects with</div>
+            <div class="pub-module-connects-list">
+              <span class="pub-connect-pill"><i class="bi bi-boxes" style="font-size:10px"></i> Inventory</span>
+              <span class="pub-connect-pill"><i class="bi bi-cart3" style="font-size:10px"></i> Sales</span>
+              <span class="pub-connect-pill"><i class="bi bi-robot" style="font-size:10px"></i> AI Assistant</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sales -->
+        <div class="pub-module-panel" data-module="sales">
+          <div class="pub-module-detail-tag">Commerce / Sales</div>
+          <div class="pub-module-detail-title">From order to fulfillment — with full traceability.</div>
+          <div class="pub-module-detail-desc">
+            Manage wholesale and retail customers, their orders, and order items. Fulfillment creates stock OUT movements automatically. Return requests flow through an approval workflow. Demand forecasting provides visibility into future needs.
+            <br><br>
+            Every sales event connects back to inventory, finance, and CRM — no isolated records.
+          </div>
+          <div class="pub-module-connects">
+            <div class="pub-module-connects-title">Connects with</div>
+            <div class="pub-module-connects-list">
+              <span class="pub-connect-pill"><i class="bi bi-boxes" style="font-size:10px"></i> Inventory</span>
+              <span class="pub-connect-pill"><i class="bi bi-graph-up-arrow" style="font-size:10px"></i> Finance</span>
+              <span class="pub-connect-pill"><i class="bi bi-building" style="font-size:10px"></i> CRM</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CRM -->
+        <div class="pub-module-panel" data-module="crm">
+          <div class="pub-module-detail-tag">Commerce / CRM</div>
+          <div class="pub-module-detail-title">Pipeline visibility from prospect to payment.</div>
+          <div class="pub-module-detail-desc">
+            Track sales opportunities through configurable pipeline stages: New → In Discussion → Proposal → Negotiation → Won / Lost. Won opportunities connect directly to order creation, preserving the full customer journey in one system.
+            <br><br>
+            Customer activity logs, meetings, and communication history stay attached to the customer record — not scattered across emails.
+          </div>
+          <div class="pub-module-connects">
+            <div class="pub-module-connects-title">Connects with</div>
+            <div class="pub-module-connects-list">
+              <span class="pub-connect-pill"><i class="bi bi-cart3" style="font-size:10px"></i> Sales</span>
+              <span class="pub-connect-pill"><i class="bi bi-calendar3" style="font-size:10px"></i> Meetings</span>
+              <span class="pub-connect-pill"><i class="bi bi-robot" style="font-size:10px"></i> AI Assistant</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Finance -->
+        <div class="pub-module-panel" data-module="finance">
+          <div class="pub-module-detail-tag">Finance</div>
+          <div class="pub-module-detail-title">Financial clarity from operational data.</div>
+          <div class="pub-module-detail-desc">
+            Invoices, payments, revenue tracking, and profitability reports are generated directly from operational events — not from separate accounting data entry. Revenue comes from fulfilled orders. Costs come from purchase orders.
+            <br><br>
+            Partial payments, payment methods, and invoice status are tracked. Financial summaries are always derived from source operational records.
+          </div>
+          <div class="pub-module-connects">
+            <div class="pub-module-connects-title">Connects with</div>
+            <div class="pub-module-connects-list">
+              <span class="pub-connect-pill"><i class="bi bi-cart3" style="font-size:10px"></i> Sales</span>
+              <span class="pub-connect-pill"><i class="bi bi-basket3" style="font-size:10px"></i> Purchasing</span>
+              <span class="pub-connect-pill"><i class="bi bi-robot" style="font-size:10px"></i> AI Assistant</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- HR -->
+        <div class="pub-module-panel" data-module="hr">
+          <div class="pub-module-detail-tag">People / HR</div>
+          <div class="pub-module-detail-title">Workforce management in the same system.</div>
+          <div class="pub-module-detail-desc">
+            Departments, positions, employees, leave requests, and recruitment pipelines — all managed within the ERP rather than in a separate HR tool. Leave requests flow through approval workflows. Job openings manage applications from applied to hired.
+            <br><br>
+            HR data is connected to meetings, operational activities, and AI insights — your people data lives alongside your operational data.
+          </div>
+          <div class="pub-module-connects">
+            <div class="pub-module-connects-title">Connects with</div>
+            <div class="pub-module-connects-list">
+              <span class="pub-connect-pill"><i class="bi bi-calendar3" style="font-size:10px"></i> Meetings</span>
+              <span class="pub-connect-pill"><i class="bi bi-bell" style="font-size:10px"></i> Notifications</span>
+              <span class="pub-connect-pill"><i class="bi bi-robot" style="font-size:10px"></i> AI Assistant</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI -->
+        <div class="pub-module-panel" data-module="ai">
+          <div class="pub-module-detail-tag">Intelligence / AI Assistant</div>
+          <div class="pub-module-detail-title">Intelligence connected to operational context.</div>
+          <div class="pub-module-detail-desc">
+            The AI layer isn't a generic chatbot attached to the side of the system. It's connected to ERP data through RAG (semantic retrieval) and controlled function calling. Ask it about inventory levels, sales trends, supplier performance, or freshness windows — it reads from the actual operational database.
+            <br><br>
+            The AI cannot directly modify data. It operates through explicitly defined and authorized tools. This is enterprise-grade AI access — not an open endpoint to your database.
+          </div>
+          <div class="pub-module-connects">
+            <div class="pub-module-connects-title">Connects with</div>
+            <div class="pub-module-connects-list">
+              <span class="pub-connect-pill"><i class="bi bi-boxes" style="font-size:10px"></i> Inventory</span>
+              <span class="pub-connect-pill"><i class="bi bi-cart3" style="font-size:10px"></i> Sales</span>
+              <span class="pub-connect-pill"><i class="bi bi-graph-up-arrow" style="font-size:10px"></i> Finance</span>
+              <span class="pub-connect-pill"><i class="bi bi-people" style="font-size:10px"></i> HR</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ────────────────────────────────────────────────────────
+     HOW OPERATIONS FLOW
+──────────────────────────────────────────────────────── -->
+<section class="pub-section pub-section-alt reveal">
+  <div class="pub-section-inner">
+    <div class="pub-label">Operational Flows</div>
+    <h2 class="pub-title" data-en="Not a collection<br>of <em>independent pages.</em>" data-tr="Bağımsız sayfalar değil,<br><em>birleşik bir sistem.</em>">Not a collection<br>of <em>independent pages.</em></h2>
+    <p class="pub-sub" data-en="Every module is connected. An event in one area propagates through the system. Here are three real workflows that run through the platform." data-tr="Her modül birbirine bağlı. Bir alandaki olay tüm sisteme yayılır. İşte platformda çalışan üç gerçek iş akışı.">
+      Every module is connected. An event in one area propagates through the system. Here are three real workflows that run through the platform.
+    </p>
+
+    <div class="pub-flows">
+
+      <!-- Flow 1: Sales to payment -->
+      <div class="pub-flow">
+        <div class="pub-flow-title">
+          <i class="bi bi-cart3"></i> Sales → Revenue
+        </div>
+        <div class="pub-flow-steps">
+          <div class="pub-flow-step">
+            <div class="pub-flow-step-node">1</div>
+            <div class="pub-flow-step-body">
+              <div class="pub-flow-step-name">Customer &amp; Opportunity</div>
+              <div class="pub-flow-step-desc">CRM opportunity enters negotiation</div>
+            </div>
+          </div>
+          <div class="pub-flow-step">
+            <div class="pub-flow-step-node">2</div>
+            <div class="pub-flow-step-body">
+              <div class="pub-flow-step-name">Sales Order</div>
+              <div class="pub-flow-step-desc">Order created, line items assigned</div>
+            </div>
+          </div>
+          <div class="pub-flow-step">
+            <div class="pub-flow-step-node">3</div>
+            <div class="pub-flow-step-body">
+              <div class="pub-flow-step-name">Inventory Update</div>
+              <div class="pub-flow-step-desc">Fulfillment creates StockMovement OUT</div>
+            </div>
+          </div>
+          <div class="pub-flow-step">
+            <div class="pub-flow-step-node">4</div>
+            <div class="pub-flow-step-body">
+              <div class="pub-flow-step-name">Invoice &amp; Payment</div>
+              <div class="pub-flow-step-desc">Finance records updated from order data</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Flow 2: Low stock to restock -->
+      <div class="pub-flow">
+        <div class="pub-flow-title">
+          <i class="bi bi-exclamation-triangle"></i> Low Stock → Restock
+        </div>
+        <div class="pub-flow-steps">
+          <div class="pub-flow-step">
+            <div class="pub-flow-step-node">1</div>
+            <div class="pub-flow-step-body">
+              <div class="pub-flow-step-name">Critical Level Detected</div>
+              <div class="pub-flow-step-desc">Background task scans stock nightly</div>
+            </div>
+          </div>
+          <div class="pub-flow-step">
+            <div class="pub-flow-step-node">2</div>
+            <div class="pub-flow-step-body">
+              <div class="pub-flow-step-name">Draft Purchase Order</div>
+              <div class="pub-flow-step-desc">Auto-created for the affected product</div>
+            </div>
+          </div>
+          <div class="pub-flow-step">
+            <div class="pub-flow-step-node">3</div>
+            <div class="pub-flow-step-body">
+              <div class="pub-flow-step-name">Order Confirmed &amp; Received</div>
+              <div class="pub-flow-step-desc">PO advances through workflow</div>
+            </div>
+          </div>
+          <div class="pub-flow-step">
+            <div class="pub-flow-step-node">4</div>
+            <div class="pub-flow-step-body">
+              <div class="pub-flow-step-name">New Lot + Stock IN</div>
+              <div class="pub-flow-step-desc">Goods receipt creates new inventory lot</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Flow 3: Recipe to sale -->
+      <div class="pub-flow">
+        <div class="pub-flow-title">
+          <i class="bi bi-fire"></i> Recipe → Finished Lot
+        </div>
+        <div class="pub-flow-steps">
+          <div class="pub-flow-step">
+            <div class="pub-flow-step-node">1</div>
+            <div class="pub-flow-step-body">
+              <div class="pub-flow-step-name">Recipe / BOM Defined</div>
+              <div class="pub-flow-step-desc">Components and ratios configured</div>
+            </div>
+          </div>
+          <div class="pub-flow-step">
+            <div class="pub-flow-step-node">2</div>
+            <div class="pub-flow-step-body">
+              <div class="pub-flow-step-name">Production Batch</div>
+              <div class="pub-flow-step-desc">Raw material lots consumed (StockMovement OUT)</div>
+            </div>
+          </div>
+          <div class="pub-flow-step">
+            <div class="pub-flow-step-node">3</div>
+            <div class="pub-flow-step-body">
+              <div class="pub-flow-step-name">Quality Check</div>
+              <div class="pub-flow-step-desc">Batch inspected, score recorded</div>
+            </div>
+          </div>
+          <div class="pub-flow-step">
+            <div class="pub-flow-step-node">4</div>
+            <div class="pub-flow-step-body">
+              <div class="pub-flow-step-name">Finished Lot → Sales</div>
+              <div class="pub-flow-step-desc">New lot enters inventory, available to sell</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ────────────────────────────────────────────────────────
+     AI SECTION
+──────────────────────────────────────────────────────── -->
+<section class="pub-section pub-section-dark reveal" id="ai">
+  <div class="pub-section-inner">
+    <div class="pub-label">AI Intelligence Layer</div>
+    <h2 class="pub-title">Not a chatbot.<br><em>An operational intelligence layer.</em></h2>
+    <p class="pub-sub">
+      The AI layer is connected to the ERP's data through RAG-based semantic retrieval and controlled function calling. It understands your business context — not just keywords.
+    </p>
+
+    <div class="pub-ai-grid">
+      <!-- Left: AI flow -->
+      <div>
+        <div class="pub-ai-flow">
+          <div class="pub-ai-step">
+            <div class="pub-ai-node"><i class="bi bi-person"></i></div>
+            <div>
+              <div class="pub-ai-step-name">Business question asked</div>
+              <div class="pub-ai-step-desc">"Which lots are approaching their freshness window?"</div>
+            </div>
+          </div>
+          <div class="pub-ai-step">
+            <div class="pub-ai-node"><i class="bi bi-search"></i></div>
+            <div>
+              <div class="pub-ai-step-name">Semantic retrieval (RAG)</div>
+              <div class="pub-ai-step-desc">pgvector finds relevant business context from ERP data</div>
+            </div>
+          </div>
+          <div class="pub-ai-step">
+            <div class="pub-ai-node"><i class="bi bi-shield-check"></i></div>
+            <div>
+              <div class="pub-ai-step-name">Authorized function selection</div>
+              <div class="pub-ai-step-desc">AI selects from explicitly permitted tools — no raw DB access</div>
+            </div>
+          </div>
+          <div class="pub-ai-step">
+            <div class="pub-ai-node"><i class="bi bi-cpu"></i></div>
+            <div>
+              <div class="pub-ai-step-name">AI reasoning with context</div>
+              <div class="pub-ai-step-desc">OpenAI model processes query + retrieved operational data</div>
+            </div>
+          </div>
+          <div class="pub-ai-step">
+            <div class="pub-ai-node"><i class="bi bi-chat-text"></i></div>
+            <div>
+              <div class="pub-ai-step-name">Decision-support response</div>
+              <div class="pub-ai-step-desc">Structured, actionable answer grounded in real ERP data</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Safety -->
+        <div class="pub-ai-safety" style="margin-top:28px;">
+          <div class="pub-ai-safety-title"><i class="bi bi-shield-lock" style="margin-right:6px;"></i>Controlled AI Access</div>
+          <div class="pub-ai-safety-body">
+            The AI does not have unrestricted access to the database. It operates through a defined set of authorized functions — it can read operational data and provide insights, but every action is permission-gated. This is an enterprise architectural choice, not a limitation.
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Example queries -->
+      <div class="pub-ai-queries">
+        <div class="pub-ai-queries-title">What you can ask</div>
+
+        <div class="pub-ai-query">
+          <div class="pub-ai-query-icon"><i class="bi bi-boxes"></i></div>
+          <div class="pub-ai-query-text">"Which products are currently below their reorder level?"</div>
+        </div>
+        <div class="pub-ai-query">
+          <div class="pub-ai-query-icon"><i class="bi bi-clock-history"></i></div>
+          <div class="pub-ai-query-text">"Which lots are approaching the end of their freshness window?"</div>
+        </div>
+        <div class="pub-ai-query">
+          <div class="pub-ai-query-icon"><i class="bi bi-graph-up"></i></div>
+          <div class="pub-ai-query-text">"What are our sales trends for the last 30 days?"</div>
+        </div>
+        <div class="pub-ai-query">
+          <div class="pub-ai-query-icon"><i class="bi bi-basket3"></i></div>
+          <div class="pub-ai-query-text">"Which supplier has the highest average cost per unit?"</div>
+        </div>
+        <div class="pub-ai-query">
+          <div class="pub-ai-query-icon"><i class="bi bi-people"></i></div>
+          <div class="pub-ai-query-text">"How many leave requests are pending approval this month?"</div>
+        </div>
+        <div class="pub-ai-query">
+          <div class="pub-ai-query-icon"><i class="bi bi-fire"></i></div>
+          <div class="pub-ai-query-text">"Summarize production output for the last 7 batches."</div>
+        </div>
+        <div class="pub-ai-query">
+          <div class="pub-ai-query-icon"><i class="bi bi-currency-dollar"></i></div>
+          <div class="pub-ai-query-text">"What is our current net profit margin this quarter?"</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ────────────────────────────────────────────────────────
+     AUTOMATION
+──────────────────────────────────────────────────────── -->
+<section class="pub-section pub-section-dark reveal">
+  <div class="pub-section-inner">
+    <div class="pub-label">Automation</div>
+    <h2 class="pub-title">The system monitors<br>so <em>you don't have to.</em></h2>
+    <p class="pub-sub">
+      Background tasks run continuously on the operational data — detecting critical states, generating notifications, and triggering workflows automatically.
+    </p>
+
+    <div class="pub-auto-grid">
+      <div class="pub-auto-card">
+        <div class="pub-auto-icon"><i class="bi bi-exclamation-triangle"></i></div>
+        <div class="pub-auto-title">Critical Stock Detection</div>
+        <div class="pub-auto-desc">Nightly scan compares stock levels against reorder thresholds. Products below the minimum automatically generate draft purchase orders.</div>
+      </div>
+      <div class="pub-auto-card">
+        <div class="pub-auto-icon"><i class="bi bi-clock"></i></div>
+        <div class="pub-auto-title">Freshness Monitoring</div>
+        <div class="pub-auto-desc">Lot freshness status is evaluated continuously. Aging lots are flagged as priority sale or waste, with notifications generated automatically.</div>
+      </div>
+      <div class="pub-auto-card">
+        <div class="pub-auto-icon"><i class="bi bi-arrow-return-left"></i></div>
+        <div class="pub-auto-title">Defective Return Scanning</div>
+        <div class="pub-auto-desc">Pending return requests with quality issues are scanned on schedule. Approved returns update inventory through proper StockMovement records.</div>
+      </div>
+      <div class="pub-auto-card">
+        <div class="pub-auto-icon"><i class="bi bi-bell"></i></div>
+        <div class="pub-auto-title">Automated Notifications</div>
+        <div class="pub-auto-desc">Operational events generate targeted notifications. Leave approvals, stock alerts, order updates — delivered to the right users in real time.</div>
+      </div>
+      <div class="pub-auto-card">
+        <div class="pub-auto-icon"><i class="bi bi-clock-history"></i></div>
+        <div class="pub-auto-title">Scheduled Background Tasks</div>
+        <div class="pub-auto-desc">Celery Beat runs recurring tasks on a schedule — no manual triggers required. Tasks are asynchronous and do not block the application.</div>
+      </div>
+      <div class="pub-auto-card">
+        <div class="pub-auto-icon"><i class="bi bi-shield-check"></i></div>
+        <div class="pub-auto-title">Audit Trail</div>
+        <div class="pub-auto-desc">Every significant action is logged — who changed what and when. Full traceability for every inventory movement, order status change, and workflow transition.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ────────────────────────────────────────────────────────
+     REAL PRODUCT PREVIEW
+──────────────────────────────────────────────────────── -->
+<section class="pub-section reveal">
+  <div class="pub-section-inner">
+    <div class="pub-label">Real Product</div>
+    <h2 class="pub-title">This is what the actual<br><em>system looks like.</em></h2>
+    <p class="pub-sub">
+      Every screen below is the real application — not a mockup. The demo environment runs live data from a specialty coffee operation.
+    </p>
+
+    <div class="pub-preview-tabs">
+      <button class="pub-preview-tab active" onclick="selectPreview(this,'dashboard')">Dashboard</button>
+      <button class="pub-preview-tab" onclick="selectPreview(this,'inventory')">Inventory</button>
+      <button class="pub-preview-tab" onclick="selectPreview(this,'production')">Production</button>
+      <button class="pub-preview-tab" onclick="selectPreview(this,'sales')">Sales</button>
+      <button class="pub-preview-tab" onclick="selectPreview(this,'ai')">AI Assistant</button>
+    </div>
+
+    <!-- Dashboard Preview -->
+    <div class="pub-preview-panel active" id="preview-dashboard">
+      <div class="pub-preview-mockup">
+        <div class="pub-preview-topbar">
+          <div class="pub-preview-dot r"></div>
+          <div class="pub-preview-dot y"></div>
+          <div class="pub-preview-dot g"></div>
+          <span class="pub-preview-topbar-title">Dashboard — ERP Platform</span>
+        </div>
+        <div class="pub-preview-content">
+          <div class="pub-preview-row">
+            <div class="pub-preview-kpi">
+              <div class="pub-preview-kpi-l">Inventory</div>
+              <div class="pub-preview-kpi-v">47</div>
+              <div style="font-size:10px;color:rgba(255,255,255,.25);margin-top:3px;">active lots</div>
+            </div>
+            <div class="pub-preview-kpi">
+              <div class="pub-preview-kpi-l">Revenue</div>
+              <div class="pub-preview-kpi-v green">₺284k</div>
+              <div style="font-size:10px;color:rgba(255,255,255,.25);margin-top:3px;">this month</div>
+            </div>
+            <div class="pub-preview-kpi">
+              <div class="pub-preview-kpi-l">Open Orders</div>
+              <div class="pub-preview-kpi-v amber">6</div>
+              <div style="font-size:10px;color:rgba(255,255,255,.25);margin-top:3px;">purchasing</div>
+            </div>
+            <div class="pub-preview-kpi">
+              <div class="pub-preview-kpi-l">Employees</div>
+              <div class="pub-preview-kpi-v">23</div>
+              <div style="font-size:10px;color:rgba(255,255,255,.25);margin-top:3px;">active</div>
+            </div>
+          </div>
+          <div class="pub-preview-row" style="grid-template-columns: repeat(3,1fr);">
+            <div class="pub-preview-kpi">
+              <div class="pub-preview-kpi-l">Production</div>
+              <div class="pub-preview-kpi-v">12</div>
+              <div style="font-size:10px;color:rgba(255,255,255,.25);margin-top:3px;">roast batches</div>
+            </div>
+            <div class="pub-preview-kpi">
+              <div class="pub-preview-kpi-l">CRM</div>
+              <div class="pub-preview-kpi-v">8</div>
+              <div style="font-size:10px;color:rgba(255,255,255,.25);margin-top:3px;">active opportunities</div>
+            </div>
+            <div class="pub-preview-kpi">
+              <div class="pub-preview-kpi-l">Net Profit</div>
+              <div class="pub-preview-kpi-v green">₺47k</div>
+              <div style="font-size:10px;color:rgba(255,255,255,.25);margin-top:3px;">this month</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Inventory Preview -->
+    <div class="pub-preview-panel" id="preview-inventory">
+      <div class="pub-preview-mockup">
+        <div class="pub-preview-topbar">
+          <div class="pub-preview-dot r"></div>
+          <div class="pub-preview-dot y"></div>
+          <div class="pub-preview-dot g"></div>
+          <span class="pub-preview-topbar-title">Inventory — Stock Lots</span>
+        </div>
+        <div class="pub-preview-content">
+          <div class="pub-preview-table-mock">
+            <div class="pub-preview-th" style="grid-template-columns: 2fr 1fr 1fr 1fr 1fr;">
+              <span>Lot / Product</span><span>Qty</span><span>Warehouse</span><span>Roast Date</span><span>Status</span>
+            </div>
+            <div class="pub-preview-td-row" style="grid-template-columns: 2fr 1fr 1fr 1fr 1fr;">
+              <span class="n">LOT-2024-001 · Ethiopia</span><span>120 kg</span><span>WH-01</span><span>2024-11-15</span>
+              <span><div class="pub-preview-badge g">Fresh</div></span>
+            </div>
+            <div class="pub-preview-td-row" style="grid-template-columns: 2fr 1fr 1fr 1fr 1fr;">
+              <span class="n">LOT-2024-002 · Colombia</span><span>85 kg</span><span>WH-01</span><span>2024-11-08</span>
+              <span><div class="pub-preview-badge a">Priority Sale</div></span>
+            </div>
+            <div class="pub-preview-td-row" style="grid-template-columns: 2fr 1fr 1fr 1fr 1fr;">
+              <span class="n">LOT-2024-003 · Brazil</span><span>200 kg</span><span>WH-02</span><span>2024-11-18</span>
+              <span><div class="pub-preview-badge g">Fresh</div></span>
+            </div>
+            <div class="pub-preview-td-row" style="grid-template-columns: 2fr 1fr 1fr 1fr 1fr;">
+              <span class="n">LOT-2024-004 · Guatemala</span><span>50 kg</span><span>WH-01</span><span>2024-11-20</span>
+              <span><div class="pub-preview-badge b">In Production</div></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Production Preview -->
+    <div class="pub-preview-panel" id="preview-production">
+      <div class="pub-preview-mockup">
+        <div class="pub-preview-topbar">
+          <div class="pub-preview-dot r"></div>
+          <div class="pub-preview-dot y"></div>
+          <div class="pub-preview-dot g"></div>
+          <span class="pub-preview-topbar-title">Production — Roast Batches</span>
+        </div>
+        <div class="pub-preview-content">
+          <div class="pub-preview-table-mock">
+            <div class="pub-preview-th" style="grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr;">
+              <span>Batch / Recipe</span><span>Input Material</span><span>Output</span><span>Quality</span><span>Status</span>
+            </div>
+            <div class="pub-preview-td-row" style="grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr;">
+              <span class="n">BATCH-024 · Sunrise Blend</span><span>Ethiopia + Colombia</span><span>95 kg</span><span>88/100</span>
+              <span><div class="pub-preview-badge g">Passed</div></span>
+            </div>
+            <div class="pub-preview-td-row" style="grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr;">
+              <span class="n">BATCH-023 · Dark Roast</span><span>Brazil Santos</span><span>180 kg</span><span>92/100</span>
+              <span><div class="pub-preview-badge g">Passed</div></span>
+            </div>
+            <div class="pub-preview-td-row" style="grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr;">
+              <span class="n">BATCH-022 · Single Origin</span><span>Ethiopia Yirg.</span><span>60 kg</span><span>—</span>
+              <span><div class="pub-preview-badge b">In Progress</div></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sales Preview -->
+    <div class="pub-preview-panel" id="preview-sales">
+      <div class="pub-preview-mockup">
+        <div class="pub-preview-topbar">
+          <div class="pub-preview-dot r"></div>
+          <div class="pub-preview-dot y"></div>
+          <div class="pub-preview-dot g"></div>
+          <span class="pub-preview-topbar-title">Sales — Orders</span>
+        </div>
+        <div class="pub-preview-content">
+          <div class="pub-preview-table-mock">
+            <div class="pub-preview-th" style="grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr;">
+              <span>Customer</span><span>Products</span><span>Total</span><span>Date</span><span>Status</span>
+            </div>
+            <div class="pub-preview-td-row" style="grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr;">
+              <span class="n">Café Nero Istanbul</span><span>3 items</span><span>₺12,400</span><span>Nov 20</span>
+              <span><div class="pub-preview-badge g">Fulfilled</div></span>
+            </div>
+            <div class="pub-preview-td-row" style="grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr;">
+              <span class="n">Starbucks Levent</span><span>5 items</span><span>₺28,750</span><span>Nov 19</span>
+              <span><div class="pub-preview-badge b">Pending</div></span>
+            </div>
+            <div class="pub-preview-td-row" style="grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr;">
+              <span class="n">Brew Lab Kadıköy</span><span>2 items</span><span>₺6,200</span><span>Nov 18</span>
+              <span><div class="pub-preview-badge g">Fulfilled</div></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Preview -->
+    <div class="pub-preview-panel" id="preview-ai">
+      <div class="pub-preview-mockup">
+        <div class="pub-preview-topbar">
+          <div class="pub-preview-dot r"></div>
+          <div class="pub-preview-dot y"></div>
+          <div class="pub-preview-dot g"></div>
+          <span class="pub-preview-topbar-title">AI Assistant</span>
+        </div>
+        <div class="pub-preview-content" style="gap:14px;">
+          <!-- AI conversation preview -->
+          <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:12px 14px;align-self:flex-end;max-width:80%;margin-left:auto;">
+            <div style="font-size:11px;color:rgba(255,255,255,.35);margin-bottom:4px;">You</div>
+            <div style="font-size:13px;color:#E8E4DE;">Which lots are approaching their freshness window?</div>
+          </div>
+          <div style="background:rgba(27,58,92,0.25);border:1px solid rgba(107,155,200,.15);border-radius:8px;padding:14px;max-width:85%;">
+            <div style="font-size:11px;color:rgba(107,155,200,.7);margin-bottom:6px;display:flex;align-items:center;gap:5px;"><span>⬡</span> AI Assistant</div>
+            <div style="font-size:12.5px;color:#C8C2B8;line-height:1.65;">
+              Based on current lot data, <strong style="color:#E8E4DE;">2 lots require immediate attention:</strong><br><br>
+              • <strong style="color:#FBB23A;">LOT-2024-002 (Colombia Supremo)</strong> — 85 kg, roasted Nov 8. Entering priority sale window. Recommend immediate wholesale allocation.<br>
+              • <strong style="color:#FBB23A;">LOT-2024-001 (Ethiopia)</strong> — 120 kg, roasted Nov 15. Approaching optimal window end in 3 days.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ────────────────────────────────────────────────────────
+     COFFEE DEMO
+──────────────────────────────────────────────────────── -->
+<section class="pub-section pub-section-alt reveal">
+  <div class="pub-section-inner">
+    <div class="pub-label">Live Demo Scenario</div>
+    <h2 class="pub-title">One platform.<br><em>Different businesses.</em></h2>
+    <p class="pub-sub">
+      The platform is designed to be adapted to different industry contexts. The current demo runs through a <strong>specialty coffee roasting and distribution operation</strong> — from green coffee purchasing through wholesale delivery.
+    </p>
+
+    <div style="background:var(--g-brand-light);border:1px solid rgba(27,58,92,0.15);border-radius:var(--g-r-lg);padding:16px 20px;margin-bottom:32px;font-size:14px;color:var(--g-brand);display:flex;align-items:center;gap:10px;">
+      <i class="bi bi-info-circle-fill"></i>
+      <strong>The coffee operation is the demo scenario. The ERP platform is the product.</strong>
+    </div>
+
+    <div class="pub-coffee-flow">
+      <div class="pub-coffee-step">
+        <div class="pub-coffee-icon">🌱</div>
+        <div class="pub-coffee-name">Green Coffee Purchasing</div>
+      </div>
+      <div class="pub-coffee-step">
+        <div class="pub-coffee-icon">📦</div>
+        <div class="pub-coffee-name">Lot Creation & Storage</div>
+      </div>
+      <div class="pub-coffee-step">
+        <div class="pub-coffee-icon">📋</div>
+        <div class="pub-coffee-name">Recipe / Blend</div>
+      </div>
+      <div class="pub-coffee-step">
+        <div class="pub-coffee-icon">🔥</div>
+        <div class="pub-coffee-name">Roasting & Quality</div>
+      </div>
+      <div class="pub-coffee-step">
+        <div class="pub-coffee-icon">✅</div>
+        <div class="pub-coffee-name">Finished Inventory</div>
+      </div>
+      <div class="pub-coffee-step">
+        <div class="pub-coffee-icon">🚚</div>
+        <div class="pub-coffee-name">Wholesale Delivery</div>
+      </div>
+      <div class="pub-coffee-step">
+        <div class="pub-coffee-icon">💳</div>
+        <div class="pub-coffee-name">Invoice & Payment</div>
+      </div>
+      <div class="pub-coffee-step">
+        <div class="pub-coffee-icon">🤖</div>
+        <div class="pub-coffee-name">AI Insights</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ────────────────────────────────────────────────────────
+     TECHNOLOGY
+──────────────────────────────────────────────────────── -->
+<section class="pub-section pub-section-dark reveal" id="technology">
+  <div class="pub-section-inner">
+    <div class="pub-label">Technology</div>
+    <h2 class="pub-title">Built on a <em>real engineering</em> foundation.</h2>
+    <p class="pub-sub">
+      Not a no-code tool or a low-code prototype. The platform is built on a production-grade technology stack with proper containerization, background processing, and vector search.
+    </p>
+
+    <div class="arch-diagram">
+      <!-- Layer 1: Application -->
+      <div class="arch-layer">
+        <div class="arch-layer-title">Application Layer</div>
+        <div class="arch-item">
+          <div class="arch-item-dot"></div>
+          <div>
+            <strong>Python + Django</strong>
+            <span style="display:block;font-size:11px;color:var(--g-n-500);margin-top:1px;">Modular monolith, Django 5.1</span>
+          </div>
+        </div>
+        <div class="arch-item">
+          <div class="arch-item-dot"></div>
+          <div>
+            <strong>NGINX + Gunicorn</strong>
+            <span style="display:block;font-size:11px;color:var(--g-n-500);margin-top:1px;">Production web server</span>
+          </div>
+        </div>
+        <div class="arch-item">
+          <div class="arch-item-dot"></div>
+          <div>
+            <strong>Docker + docker-compose</strong>
+            <span style="display:block;font-size:11px;color:var(--g-n-500);margin-top:1px;">Containerized, reproducible deployment</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Layer 2: Data & Queue -->
+      <div class="arch-layer">
+        <div class="arch-layer-title">Data & Processing</div>
+        <div class="arch-item">
+          <div class="arch-item-dot"></div>
+          <div>
+            <strong>PostgreSQL</strong>
+            <span style="display:block;font-size:11px;color:var(--g-n-500);margin-top:1px;">Transactional ERP data, full ACID compliance</span>
+          </div>
+        </div>
+        <div class="arch-item">
+          <div class="arch-item-dot"></div>
+          <div>
+            <strong>pgvector</strong>
+            <span style="display:block;font-size:11px;color:var(--g-n-500);margin-top:1px;">Embeddings for semantic AI retrieval</span>
+          </div>
+        </div>
+        <div class="arch-item">
+          <div class="arch-item-dot"></div>
+          <div>
+            <strong>Redis + Celery</strong>
+            <span style="display:block;font-size:11px;color:var(--g-n-500);margin-top:1px;">Async tasks + Celery Beat scheduling</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Layer 3: AI & Monitoring -->
+      <div class="arch-layer">
+        <div class="arch-layer-title">Intelligence & Monitoring</div>
+        <div class="arch-item">
+          <div class="arch-item-dot"></div>
+          <div>
+            <strong>OpenAI API</strong>
+            <span style="display:block;font-size:11px;color:var(--g-n-500);margin-top:1px;">Embeddings + chat completions + function calling</span>
+          </div>
+        </div>
+        <div class="arch-item">
+          <div class="arch-item-dot"></div>
+          <div>
+            <strong>RAG Pipeline</strong>
+            <span style="display:block;font-size:11px;color:var(--g-n-500);margin-top:1px;">pgvector + semantic context retrieval</span>
+          </div>
+        </div>
+        <div class="arch-item">
+          <div class="arch-item-dot"></div>
+          <div>
+            <strong>Sentry</strong>
+            <span style="display:block;font-size:11px;color:var(--g-n-500);margin-top:1px;">Error monitoring and performance tracking</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ────────────────────────────────────────────────────────
+     FAQ
+──────────────────────────────────────────────────────── -->
+<section class="pub-section reveal">
+  <div class="pub-section-inner">
+    <div class="pub-label">FAQ</div>
+    <h2 class="pub-title">Common questions.</h2>
+
+    <div style="max-width:760px;">
+      <div class="pub-faq">
+
+        <div class="pub-faq-item">
+          <button class="pub-faq-q" onclick="toggleFaq(this)">
+            What is this ERP platform?
+            <span class="pub-faq-icon">+</span>
+          </button>
+          <div class="pub-faq-a">
+            This is an AI-assisted Enterprise Resource Planning (ERP) platform that connects business operations — inventory, purchasing, production, sales, CRM, finance, and HR — into a single operational system. It is designed as a modular monolith with a structured AI intelligence layer built on top.
+          </div>
+        </div>
+
+        <div class="pub-faq-item">
+          <button class="pub-faq-q" onclick="toggleFaq(this)">
+            Is this only for coffee businesses?
+            <span class="pub-faq-icon">+</span>
+          </button>
+          <div class="pub-faq-a">
+            No. The coffee roasting operation is the live demonstration scenario — it is used to show realistic data flowing through all the modules. The platform itself is a general-purpose ERP and can be adapted to other business contexts.
+          </div>
+        </div>
+
+        <div class="pub-faq-item">
+          <button class="pub-faq-q" onclick="toggleFaq(this)">
+            How does the AI work?
+            <span class="pub-faq-icon">+</span>
+          </button>
+          <div class="pub-faq-a">
+            The AI layer uses RAG (Retrieval-Augmented Generation) with pgvector for semantic context retrieval, combined with OpenAI function calling for controlled ERP interactions. When you ask a question, it retrieves relevant operational context from the database, then uses an OpenAI model to generate a structured, grounded response.
+          </div>
+        </div>
+
+        <div class="pub-faq-item">
+          <button class="pub-faq-q" onclick="toggleFaq(this)">
+            Can the AI directly modify the database?
+            <span class="pub-faq-icon">+</span>
+          </button>
+          <div class="pub-faq-a">
+            No. This is an intentional architectural decision. The AI operates through explicitly defined and authorized function-calling tools. It can read operational data and provide decision support, but every write operation must go through the standard application workflow with proper authorization. The AI never has direct or unrestricted database access.
+          </div>
+        </div>
+
+        <div class="pub-faq-item">
+          <button class="pub-faq-q" onclick="toggleFaq(this)">
+            What modules are available?
+            <span class="pub-faq-icon">+</span>
+          </button>
+          <div class="pub-faq-a">
+            The platform currently includes: Inventory (stock, lots, warehouses), Purchasing (suppliers, purchase orders, goods receipt), Production (recipes/BOM, roast batches, quality checks), Sales (customers, orders, returns, forecasting), CRM (opportunities, pipeline), Finance (invoices, payments, reports), HR (employees, leave, recruitment), Meetings (calendar), AI Assistant, Notifications, and Audit Log.
+          </div>
+        </div>
+
+        <div class="pub-faq-item">
+          <button class="pub-faq-q" onclick="toggleFaq(this)">
+            Is there a live demo?
+            <span class="pub-faq-icon">+</span>
+          </button>
+          <div class="pub-faq-a">
+            Yes. Click "Explore the Demo" to access the live system with demo credentials. The demo environment runs real data from the specialty coffee operation scenario. You can navigate all modules, explore real workflows, and test the AI assistant.
+          </div>
+        </div>
+
+        <div class="pub-faq-item">
+          <button class="pub-faq-q" onclick="toggleFaq(this)">
+            What is the technology stack?
+            <span class="pub-faq-icon">+</span>
+          </button>
+          <div class="pub-faq-a">
+            Backend: Python + Django 5.1. Database: PostgreSQL + pgvector. Cache & Queue: Redis + Celery + Celery Beat. Web server: NGINX + Gunicorn. AI: OpenAI API (embeddings + chat completions + function calling). Deployment: Docker + docker-compose. Monitoring: Sentry.
+          </div>
+        </div>
+
+        <div class="pub-faq-item">
+          <button class="pub-faq-q" onclick="toggleFaq(this)">
+            How does stock management work?
+            <span class="pub-faq-icon">+</span>
+          </button>
+          <div class="pub-faq-a">
+            Stock is never directly updated. Every change is recorded as a StockMovement — an immutable ledger entry. This provides complete traceability: you can see exactly when stock arrived, what production consumed it, and what sale it fulfilled. The current stock level is always derived from the movement ledger.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ────────────────────────────────────────────────────────
+     FINAL CTA
+──────────────────────────────────────────────────────── -->
+<section class="pub-cta reveal">
+  <div class="pub-cta-inner">
+    <h2 class="pub-cta-title" data-en="See the system in action." data-tr="Sistemi canlı görün.">See the system in action.</h2>
+    <p class="pub-cta-sub" data-en="The demo runs live operational data. Every module is accessible. The AI is connected." data-tr="Demo, gerçek operasyonel veriyle çalışır. Tüm modüller erişilebilir. AI bağlı.">
+      The demo runs live operational data. Every module is accessible. The AI is connected.
+    </p>
+    <a href="/accounts/login/" class="g-btn-white" data-en="Enter the Platform" data-tr="Platforma Gir">
+      <i class="bi bi-box-arrow-in-right"></i> Enter the Platform
+    </a>
+    <p style="margin-top:16px;font-size:13px;color:rgba(255,255,255,.45);">
+      <span data-en="Demo credentials:" data-tr="Demo bilgileri:">Demo credentials:</span> <code style="background:rgba(255,255,255,.1);padding:2px 7px;border-radius:4px;font-size:12px;">root / root</code>
+    </p>
+  </div>
+</section>
+
+
+<!-- ────────────────────────────────────────────────────────
+     FOOTER
+──────────────────────────────────────────────────────── -->
+<footer class="pub-footer">
+  <div class="pub-footer-inner">
+    <div class="pub-footer-brand">
+      <div class="pub-footer-logo">E</div>
+      <span class="pub-footer-name">ERP Platform</span>
+    </div>
+    <span class="pub-footer-copy">v0.1.0 · MVP · Demo environment</span>
+  </div>
+</footer>
+
+
+<!-- ────────────────────────────────────────────────────────
+     SCRIPTS
+──────────────────────────────────────────────────────── -->
+<script>
+// Nav scroll behavior
+const nav = document.getElementById('pubNav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 20);
+});
+
+// Mobile menu
+const toggle = document.getElementById('mobileNavToggle');
+const menu   = document.getElementById('mobileMenu');
+
+toggle.addEventListener('click', () => {
+  menu.classList.toggle('open');
+  toggle.innerHTML = menu.classList.contains('open')
+    ? '<i class="bi bi-x-lg"></i>'
+    : '<i class="bi bi-list"></i>';
+});
+
+function closeMobileMenu() {
+  menu.classList.remove('open');
+  toggle.innerHTML = '<i class="bi bi-list"></i>';
+}
+
+// Module tabs
+function selectModule(btn, moduleId) {
+  document.querySelectorAll('.pub-module-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.pub-module-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  const panel = document.querySelector(`.pub-module-panel[data-module="${moduleId}"]`);
+  if (panel) panel.classList.add('active');
+}
+
+// Preview tabs
+function selectPreview(btn, id) {
+  document.querySelectorAll('.pub-preview-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.pub-preview-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  const panel = document.getElementById('preview-' + id);
+  if (panel) panel.classList.add('active');
+}
+
+// FAQ accordion
+function toggleFaq(btn) {
+  const item = btn.closest('.pub-faq-item');
+  const wasOpen = item.classList.contains('open');
+  document.querySelectorAll('.pub-faq-item').forEach(i => i.classList.remove('open'));
+  if (!wasOpen) item.classList.add('open');
+}
+
+// Scroll reveal
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      revealObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+// Smooth anchor scroll offset for fixed nav
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (!target) return;
+    e.preventDefault();
+    const offset = target.getBoundingClientRect().top + window.scrollY - 72;
+    window.scrollTo({ top: offset, behavior: 'smooth' });
+    closeMobileMenu();
+  });
+});
+
+/* ── Theme ── */
+function applyTheme(theme) {
+  const isDark = theme === 'dark';
+  document.documentElement.classList.toggle('dark-mode', isDark);
+  const icon = document.getElementById('pubThemeIcon');
+  if (icon) icon.className = isDark ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+  try { localStorage.setItem('reflow-theme', theme); } catch(e) {}
+}
+
+document.getElementById('pubThemeBtn')?.addEventListener('click', function() {
+  applyTheme(document.documentElement.classList.contains('dark-mode') ? 'light' : 'dark');
+});
+
+// Init theme from storage (also handles flash-prevention state)
+(function() {
+  const t = localStorage.getItem('reflow-theme') || 'light';
+  applyTheme(t);
+})();
+
+/* ── i18n ── */
+const TR_DICT = {
+  // Nav
+  'Product': 'Ürün',
+  'Modules': 'Modüller',
+  'How it works': 'Nasıl Çalışır',
+  'Technology': 'Teknoloji',
+  'Explore Demo': 'Demo\'yu Keşfet',
+  'Explore Demo →': 'Demo\'yu Keşfet →',
+  'Explore the Demo': 'Demo\'yu Keşfet',
+  'See how it works': 'Nasıl çalışır',
+  'Enter the Platform': 'Platforma Gir',
+  'Demo credentials:': 'Demo bilgileri:',
+  'Demo access —': 'Demo erişimi —',
+  'No registration required': 'Kayıt gerekmez',
+
+  // Problem section
+  'Without a connected ERP': 'Bağlı bir ERP olmadan',
+  'With one connected system': 'Tek bağlı sistemle',
+  'Separate tools for inventory, sales, and finance — no shared context': 'Stok, satış ve finans için ayrı araçlar — ortak bağlam yok',
+  'Manual data transfers between spreadsheets and isolated apps': 'Elektronik tablolar ve izole uygulamalar arasında manuel veri aktarımı',
+  'Stockouts and overstock discovered too late — no automated detection': 'Stok tükenmesi ve fazlası çok geç fark ediliyor — otomatik tespit yok',
+  'Finance team reconciling data from 5 different sources every month': 'Finans ekibi her ay 5 farklı kaynaktan veriyi bağdaştırıyor',
+  'No traceability — where did that stock go? who placed that order?': 'İzlenebilirlik yok — o stok nereye gitti? o siparişi kim verdi?',
+  'Decisions made from partial, stale information': 'Eksik ve eski bilgilerle alınan kararlar',
+  'Every module shares a single operational context and data layer': 'Her modül tek bir operasyonel bağlamı ve veri katmanını paylaşır',
+  'Events propagate automatically — a sale updates inventory in real time': 'Olaylar otomatik yayılır — bir satış gerçek zamanlı olarak stoğu günceller',
+  'Background automation detects critical stock and triggers purchasing': 'Arka plan otomasyonu kritik stoğu tespit edip satın almayı tetikler',
+  'Finance data is generated from operational events — no reconciliation': 'Finans verileri operasyonel olaylardan üretilir — bağdaştırma gerekmez',
+  'Full traceability — every lot, movement, order, and payment is logged': 'Tam izlenebilirlik — her lot, hareket, sipariş ve ödeme kaydedilir',
+  'AI layer provides context-aware decision support on real ERP data': 'AI katmanı gerçek ERP verisi üzerinde bağlam temelli karar desteği sağlar',
+
+  // Module section group labels
+  'OPERATIONS': 'OPERASYONLAR',
+  'COMMERCE': 'TİCARET',
+  'FINANCE · PEOPLE · INTEL': 'FİNANS · İK · ZEKÂ',
+
+  // Module tab titles & subs
+  'Inventory': 'Stok',
+  'Stock, lots, warehouses': 'Stok, lot, depo',
+  'Purchasing': 'Satın Alma',
+  'Suppliers, purchase orders': 'Tedarikçiler, satın alma siparişleri',
+  'Production': 'Üretim',
+  'Recipes, batches, quality': 'Reçeteler, partiler, kalite',
+  'Sales': 'Satış',
+  'Orders, customers, returns': 'Siparişler, müşteriler, iadeler',
+  'CRM': 'CRM',
+  'Opportunities, pipeline': 'Fırsatlar, satış hattı',
+  'Finance': 'Finans',
+  'Invoices, payments, reports': 'Faturalar, ödemeler, raporlar',
+  'HR': 'İK',
+  'Employees, leave, recruitment': 'Çalışanlar, izin, işe alım',
+  'AI Assistant': 'AI Asistan',
+  'Context-aware intelligence': 'Bağlam temelli zekâ',
+
+  // Module detail tags
+  'Operations / Inventory': 'Operasyonlar / Stok',
+  'Operations / Purchasing': 'Operasyonlar / Satın Alma',
+  'Operations / Production': 'Operasyonlar / Üretim',
+  'Commerce / Sales': 'Ticaret / Satış',
+  'Commerce / CRM': 'Ticaret / CRM',
+  'People / HR': 'İnsanlar / İK',
+  'Intelligence / AI Assistant': 'Zekâ / AI Asistan',
+
+  // Module detail titles
+  'Complete stock visibility, lot by lot.': 'Lot bazında tam stok görünürlüğü.',
+  'From supplier to stock — fully tracked.': 'Tedarikçiden stoğa — tam takip.',
+  'Recipe-driven, BOM-based production control.': 'Reçete tabanlı, BOM temelli üretim kontrolü.',
+  'From order to fulfillment — with full traceability.': 'Siparişten teslimatа — tam izlenebilirlik.',
+  'Pipeline visibility from prospect to payment.': 'Potansiyelden ödemeye kadar satış hattı görünürlüğü.',
+  'Financial clarity from operational data.': 'Operasyonel veriden finansal netlik.',
+  'Workforce management in the same system.': 'Aynı sistemde iş gücü yönetimi.',
+  'Intelligence connected to operational context.': 'Operasyonel bağlama bağlı zekâ.',
+
+  // Module detail descriptions
+  'Manage products, lots, warehouses, and stock movements through a ledger-based approach. Every movement is a recorded event — nothing is simply "changed." This gives full traceability from arrival to consumption.': 'Ürünleri, lotları, depoları ve stok hareketlerini muhasebe defteri tabanlı bir yaklaşımla yönetin. Her hareket kayıtlı bir olaydır — hiçbir şey doğrudan "değiştirilmez." Bu, varıştan tüketime tam izlenebilirlik sağlar.',
+  'Freshness windows are tracked per lot. Automated alerts detect lots approaching expiry before they become a problem. Critical stock levels trigger purchasing workflows.': 'Tazelik pencereleri lot bazında takip edilir. Otomatik uyarılar, sorun olmadan önce sona erme tarihine yaklaşan lotları tespit eder. Kritik stok seviyeleri satın alma iş akışlarını tetikler.',
+  'Manage suppliers and their product catalogs. Create, track, and advance purchase orders through the full lifecycle: Draft → Sent → Confirmed → Received. Goods receipt creates new inventory lots automatically through StockMovement records.': 'Tedarikçileri ve ürün kataloglarını yönetin. Satın alma siparişlerini tam yaşam döngüsü boyunca oluşturun, takip edin ve ilerletin: Taslak → Gönderildi → Onaylandı → Alındı. Mal alımı, StockMovement kayıtları aracılığıyla otomatik olarak yeni envanter lotları oluşturur.',
+  'Low stock detection can trigger draft purchase orders automatically via background tasks — reducing manual monitoring.': 'Düşük stok tespiti, arka plan görevleri aracılığıyla otomatik olarak taslak satın alma siparişleri oluşturabilir — manuel izlemeyi azaltır.',
+  'Define recipes (bills of materials) that specify which raw materials are consumed and in what ratios. Create production batches that automatically record material consumption as stock OUT movements and finished goods as stock IN.': 'Hangi ham maddelerin ne oranlarda tüketileceğini belirten reçeteler (malzeme listeleri) tanımlayın. Malzeme tüketimini otomatik olarak stok ÇIKIŞ hareketi, bitmiş ürünleri stok GİRİŞ olarak kaydeden üretim partileri oluşturun.',
+  'Quality checks are attached to each batch. Passed lots enter regular inventory. Failed lots are handled separately. The entire production chain is traceable.': 'Kalite kontrolleri her partiye eklenir. Geçen lotlar normal envantere girer. Başarısız lotlar ayrı olarak yönetilir. Tüm üretim zinciri izlenebilirdir.',
+  'Manage wholesale and retail customers, their orders, and order items. Fulfillment creates stock OUT movements automatically. Return requests flow through an approval workflow. Demand forecasting provides visibility into future needs.': 'Toptan ve perakende müşterileri, siparişlerini ve sipariş kalemlerini yönetin. Teslimat otomatik olarak stok ÇIKIŞ hareketi oluşturur. İade talepleri onay iş akışından geçer. Talep tahmini gelecekteki ihtiyaçlara görünürlük sağlar.',
+  'Every sales event connects back to inventory, finance, and CRM — no isolated records.': 'Her satış olayı envanter, finans ve CRM\'e bağlanır — izole kayıt yok.',
+  'Track sales opportunities through configurable pipeline stages: New → In Discussion → Proposal → Negotiation → Won / Lost. Won opportunities connect directly to order creation, preserving the full customer journey in one system.': 'Satış fırsatlarını yapılandırılabilir satış hattı aşamaları boyunca takip edin: Yeni → Görüşmede → Teklif → Müzakere → Kazanıldı / Kaybedildi. Kazanılan fırsatlar doğrudan sipariş oluşturmaya bağlanır, tam müşteri yolculuğunu tek sistemde korur.',
+  'Customer activity logs, meetings, and communication history stay attached to the customer record — not scattered across emails.': 'Müşteri aktivite günlükleri, toplantılar ve iletişim geçmişi müşteri kaydına bağlı kalır — e-postalara dağılmaz.',
+  'Invoices, payments, revenue tracking, and profitability reports are generated directly from operational events — not from separate accounting data entry. Revenue comes from fulfilled orders. Costs come from purchase orders.': 'Faturalar, ödemeler, gelir takibi ve karlılık raporları doğrudan operasyonel olaylardan üretilir — ayrı muhasebe veri girişinden değil. Gelir karşılanan siparişlerden, maliyetler satın alma siparişlerinden gelir.',
+  'Partial payments, payment methods, and invoice status are tracked. Financial summaries are always derived from source operational records.': 'Kısmi ödemeler, ödeme yöntemleri ve fatura durumu takip edilir. Finansal özetler her zaman kaynak operasyonel kayıtlardan türetilir.',
+  'Departments, positions, employees, leave requests, and recruitment pipelines — all managed within the ERP rather than in a separate HR tool. Leave requests flow through approval workflows. Job openings manage applications from applied to hired.': 'Departmanlar, pozisyonlar, çalışanlar, izin talepleri ve işe alım hatları — ayrı bir İK aracı yerine ERP içinde yönetilir. İzin talepleri onay iş akışlarından geçer. İş ilanları başvuruları işe alıma kadar yönetir.',
+  'HR data is connected to meetings, operational activities, and AI insights — your people data lives alongside your operational data.': 'İK verileri toplantılar, operasyonel aktiviteler ve AI içgörüleriyle bağlantılıdır — insan verileriniz operasyonel verilerinizin yanında yaşar.',
+  'The AI layer isn\'t a generic chatbot attached to the side of the system. It\'s connected to ERP data through RAG (semantic retrieval) and controlled function calling. Ask it about inventory levels, sales trends, supplier performance, or freshness windows — it reads from the actual operational database.': 'AI katmanı sistemin kenarına eklenmiş genel bir chatbot değildir. RAG (anlamsal arama) ve kontrollü function calling aracılığıyla ERP verisine bağlıdır. Stok seviyeleri, satış trendleri, tedarikçi performansı veya tazelik pencereleri hakkında sorun — gerçek operasyonel veritabanından okur.',
+  'The AI cannot directly modify data. It operates through explicitly defined and authorized tools. This is enterprise-grade AI access — not an open endpoint to your database.': 'AI verileri doğrudan değiştiremez. Açıkça tanımlanmış ve yetkilendirilmiş araçlar aracılığıyla çalışır. Bu kurumsal düzeyde AI erişimidir — veritabanınıza açık bir uç nokta değil.',
+
+  // Module connects
+  'Connects with': 'Şunlarla bağlı',
+
+  // Operational Flows
+  'Operational Flows': 'Operasyonel Akışlar',
+  'Sales → Revenue': 'Satış → Gelir',
+  'Customer & Opportunity': 'Müşteri & Fırsat',
+  'CRM opportunity enters negotiation': 'CRM fırsatı müzakereye giriyor',
+  'Sales Order': 'Satış Siparişi',
+  'Order created, line items assigned': 'Sipariş oluşturuldu, satır kalemleri atandı',
+  'Inventory Update': 'Stok Güncelleme',
+  'Fulfillment creates StockMovement OUT': 'Teslimat StockMovement ÇIKIŞ oluşturur',
+  'Invoice & Payment': 'Fatura & Ödeme',
+  'Finance records updated from order data': 'Finans kayıtları sipariş verisinden güncellendi',
+  'Low Stock → Restock': 'Düşük Stok → Yenileme',
+  'Critical Level Detected': 'Kritik Seviye Tespit Edildi',
+  'Background task scans stock nightly': 'Arka plan görevi stoğu her gece tarar',
+  'Draft Purchase Order': 'Taslak Satın Alma Siparişi',
+  'Auto-created for the affected product': 'Etkilenen ürün için otomatik oluşturuldu',
+  'Order Confirmed & Received': 'Sipariş Onaylandı & Alındı',
+  'PO advances through workflow': 'Satın alma siparişi iş akışında ilerliyor',
+  'New Lot + Stock IN': 'Yeni Lot + Stok GİRİŞ',
+  'Goods receipt creates new inventory lot': 'Mal alımı yeni envanter lotu oluşturur',
+  'Recipe → Finished Lot': 'Reçete → Bitmiş Lot',
+  'Recipe / BOM Defined': 'Reçete / BOM Tanımlandı',
+  'Components and ratios configured': 'Bileşenler ve oranlar ayarlandı',
+  'Production Batch': 'Üretim Partisi',
+  'Raw material lots consumed (StockMovement OUT)': 'Ham madde lotları tüketildi (StockMovement ÇIKIŞ)',
+  'Quality Check': 'Kalite Kontrolü',
+  'Batch inspected, score recorded': 'Parti incelendi, puan kaydedildi',
+  'Finished Lot → Sales': 'Bitmiş Lot → Satış',
+  'New lot enters inventory, available to sell': 'Yeni lot envantere giriyor, satışa hazır',
+
+  // AI Section
+  'AI Intelligence Layer': 'AI Zekâ Katmanı',
+  'Not a chatbot.': 'Bir chatbot değil.',
+  'An operational intelligence layer.': 'Operasyonel bir zekâ katmanı.',
+  'The AI layer is connected to the ERP\'s data through RAG-based semantic retrieval and controlled function calling. It understands your business context — not just keywords.': 'AI katmanı, ERP\'nin verisine RAG tabanlı anlamsal arama ve kontrollü function calling aracılığıyla bağlıdır. İşletme bağlamınızı anlar — sadece anahtar kelimeleri değil.',
+  'Business question asked': 'İş sorusu soruldu',
+  '"Which lots are approaching their freshness window?"': '"Hangi lotlar tazelik penceresine yaklaşıyor?"',
+  'Semantic retrieval (RAG)': 'Anlamsal arama (RAG)',
+  'pgvector finds relevant business context from ERP data': 'pgvector, ERP verisinden ilgili iş bağlamını bulur',
+  'Authorized function selection': 'Yetkili fonksiyon seçimi',
+  'AI selects from explicitly permitted tools — no raw DB access': 'AI yalnızca açıkça izin verilen araçlardan seçim yapar — ham DB erişimi yok',
+  'AI reasoning with context': 'Bağlamla AI muhakemesi',
+  'OpenAI model processes query + retrieved operational data': 'OpenAI modeli sorgu + alınan operasyonel veriyi işler',
+  'Decision-support response': 'Karar destek yanıtı',
+  'Structured, actionable answer grounded in real ERP data': 'Gerçek ERP verisine dayalı yapılandırılmış, uygulanabilir yanıt',
+  'Controlled AI Access': 'Kontrollü AI Erişimi',
+  'The AI does not have unrestricted access to the database. It operates through a defined set of authorized functions — it can read operational data and provide insights, but every action is permission-gated. This is an enterprise architectural choice, not a limitation.': 'AI\'nın veritabanına sınırsız erişimi yoktur. Tanımlı bir yetkili fonksiyon kümesi aracılığıyla çalışır — operasyonel veriyi okuyabilir ve içgörüler sağlayabilir, ancak her eylem izin kapılıdır. Bu kurumsal bir mimari tercihidir, bir kısıtlama değil.',
+  'What you can ask': 'Sorabilecekleriniz',
+  '"Which products are currently below their reorder level?"': '"Hangi ürünler şu an yeniden sipariş seviyesinin altında?"',
+  '"Which lots are approaching the end of their freshness window?"': '"Hangi lotlar tazelik pencerelerinin sonuna yaklaşıyor?"',
+  '"What are our sales trends for the last 30 days?"': '"Son 30 günün satış trendleri neler?"',
+  '"Which supplier has the highest average cost per unit?"': '"Hangi tedarikçinin birim başına ortalama maliyeti en yüksek?"',
+  '"How many leave requests are pending approval this month?"': '"Bu ay kaç izin talebi onay bekliyor?"',
+  '"Summarize production output for the last 7 batches."': '"Son 7 partinin üretim çıktısını özetle."',
+  '"What is our current net profit margin this quarter?"': '"Bu çeyrekte mevcut net kar marjımız nedir?"',
+
+  // Automation
+  'Automation': 'Otomasyon',
+  'The system monitors': 'Sistem izler',
+  'so': 'böylece',
+  'you don\'t have to.': 'siz izlemek zorunda kalmazsınız.',
+  'Background tasks run continuously on the operational data — detecting critical states, generating notifications, and triggering workflows automatically.': 'Arka plan görevleri operasyonel veri üzerinde sürekli çalışır — kritik durumları tespit eder, bildirimler üretir ve iş akışlarını otomatik olarak tetikler.',
+  'Critical Stock Detection': 'Kritik Stok Tespiti',
+  'Nightly scan compares stock levels against reorder thresholds. Products below the minimum automatically generate draft purchase orders.': 'Gece taraması stok seviyelerini yeniden sipariş eşiğiyle karşılaştırır. Minimum altındaki ürünler otomatik olarak taslak satın alma siparişi oluşturur.',
+  'Freshness Monitoring': 'Tazelik Takibi',
+  'Lot freshness status is evaluated continuously. Aging lots are flagged as priority sale or waste, with notifications generated automatically.': 'Lot tazelik durumu sürekli değerlendirilir. Eskiyen lotlar öncelikli satış veya fire olarak işaretlenir, bildirimler otomatik oluşturulur.',
+  'Defective Return Scanning': 'Hatalı İade Taraması',
+  'Pending return requests with quality issues are scanned on schedule. Approved returns update inventory through proper StockMovement records.': 'Bekleyen kalite sorunlu iade talepleri zamanlanmış olarak taranır. Onaylanan iadeler uygun StockMovement kayıtlarıyla stoğu günceller.',
+  'Automated Notifications': 'Otomatik Bildirimler',
+  'Operational events generate targeted notifications. Leave approvals, stock alerts, order updates — delivered to the right users in real time.': 'Operasyonel olaylar hedefli bildirimler oluşturur. İzin onayları, stok uyarıları, sipariş güncellemeleri — gerçek zamanlı olarak doğru kullanıcılara iletilir.',
+  'Scheduled Background Tasks': 'Zamanlanmış Arka Plan Görevleri',
+  'Celery Beat runs recurring tasks on a schedule — no manual triggers required. Tasks are asynchronous and do not block the application.': 'Celery Beat tekrarlayan görevleri zamanlanmış olarak çalıştırır — manuel tetikleme gerekmez. Görevler asenkrondur ve uygulamayı engellemez.',
+  'Audit Trail': 'Denetim İzi',
+  'Every significant action is logged — who changed what and when. Full traceability for every inventory movement, order status change, and workflow transition.': 'Her önemli eylem kaydedilir — kim, neyi, ne zaman değiştirdi. Her stok hareketi, sipariş durum değişikliği ve iş akışı geçişi için tam izlenebilirlik.',
+
+  // Real Product
+  'Real Product': 'Gerçek Ürün',
+  'This is what the actual': 'Bu gerçek sistemin',
+  'system looks like.': 'görünümüdür.',
+  'Every screen below is the real application — not a mockup. The demo environment runs live data from a specialty coffee operation.': 'Aşağıdaki her ekran gerçek uygulamadır — bir mockup değil. Demo ortamı özel kahve operasyonundan canlı veri çalıştırır.',
+  'Dashboard': 'Dashboard',
+
+  // Preview mockup texts
+  'Total Revenue': 'Toplam Gelir',
+  'Active Lots': 'Aktif Lot',
+  'Open Orders': 'Açık Sipariş',
+  'Net Profit': 'Net Kâr',
+  'Recent Stock Movements': 'Son Stok Hareketleri',
+
+  // Coffee Demo / Live Demo
+  'Live Demo Scenario': 'Canlı Demo Senaryosu',
+  'One platform.': 'Tek platform.',
+  'Different businesses.': 'Farklı işletmeler.',
+  'The platform is built around a specialty coffee roastery — but the operational model applies to any business with inventory, production, and sales.': 'Platform özel kahve kavurma işletmesi etrafında inşa edilmiştir — ancak operasyonel model, envanter, üretim ve satışı olan herhangi bir işletmeye uygulanabilir.',
+
+  // Technology
+  'Built on a real engineering foundation.': 'Gerçek bir mühendislik temeli üzerine inşa edildi.',
+  'Not a prototype. Production-ready architecture — containerized, observable, and built to scale.': 'Prototip değil. Üretime hazır mimari — konteynerize, gözlemlenebilir ve ölçeklenmeye hazır.',
+  'Application': 'Uygulama',
+  'Data': 'Veri',
+  'Infrastructure': 'Altyapı',
+
+  // FAQ
+  'Common questions.': 'Sık sorulan sorular.',
+  'Is this production-ready software?': 'Bu yazılım üretime hazır mı?',
+  'Yes — this is a real, deployed application. It\'s built as a commercial-grade internship project, with production architecture (Docker, Gunicorn, NGINX, PostgreSQL), real background automation, and a live demo environment. It\'s not a prototype or a tutorial project.': 'Evet — bu gerçek, dağıtılmış bir uygulamadır. Ticari düzeyde bir staj projesi olarak üretim mimarisiyle (Docker, Gunicorn, NGINX, PostgreSQL), gerçek arka plan otomasyonu ve canlı demo ortamıyla inşa edilmiştir. Prototip veya eğitim projesi değildir.',
+  'What is the AI layer actually doing?': 'AI katmanı gerçekte ne yapıyor?',
+  'The AI uses OpenAI\'s API with two mechanisms: RAG (retrieval-augmented generation) pulls relevant operational data using pgvector semantic search, and function calling allows the AI to invoke specific, authorized ERP functions. The AI cannot directly write to or read arbitrary data from the database — all access is permission-gated.': 'AI, OpenAI\'nın API\'sini iki mekanizmayla kullanır: RAG (erişim artırımlı üretim), pgvector anlamsal arama kullanarak ilgili operasyonel veriyi çeker; function calling ise AI\'nın belirli, yetkilendirilmiş ERP fonksiyonlarını çağırmasına izin verir. AI doğrudan veritabanına yazamaz veya keyfi veri okuyamaz — tüm erişim izin kapılıdır.',
+  'What is the tech stack?': 'Teknoloji yığını nedir?',
+  'Django 5.1 (Python), PostgreSQL with pgvector extension, Redis, Celery + Celery Beat, Docker + docker-compose, NGINX + Gunicorn, OpenAI API. Monitored with Sentry. The frontend uses Bootstrap 5 with a custom design system — no JavaScript framework.': 'Django 5.1 (Python), pgvector eklentili PostgreSQL, Redis, Celery + Celery Beat, Docker + docker-compose, NGINX + Gunicorn, OpenAI API. Sentry ile izlenir. Frontend, özel bir tasarım sistemiyle Bootstrap 5 kullanır — JavaScript framework yok.',
+  'Can this be adapted for businesses other than coffee roasting?': 'Bu kahve kavurma dışındaki işletmeler için uyarlanabilir mi?',
+  'Yes. The coffee scenario is the demo context, but the underlying modules — inventory with lot tracking, BOM-based production, sales order management, CRM pipeline, finance, HR — are generic enough to apply to any product-based business with similar operational complexity.': 'Evet. Kahve senaryosu demo bağlamıdır, ancak temel modüller — lot takipli envanter, BOM tabanlı üretim, satış sipariş yönetimi, CRM hattı, finans, İK — benzer operasyonel karmaşıklığa sahip herhangi bir ürün tabanlı işletme için uygulanabilecek kadar geneldir.',
+  'Why build a full ERP as an internship project?': 'Neden staj projesi olarak tam bir ERP inşa ediliyor?',
+  'Because isolated CRUD apps don\'t demonstrate systems thinking. A real ERP forces you to design for data consistency across modules, event-driven side effects, background automation, ledger-based accounting, and AI integration — all simultaneously. That\'s the challenge.': 'Çünkü izole CRUD uygulamalar sistem düşüncesini göstermez. Gerçek bir ERP, modüller arası veri tutarlılığı, olay güdümlü yan etkiler, arka plan otomasyonu, muhasebe defteri tabanlı muhasebe ve AI entegrasyonu için tasarım yapmayı zorlar — hepsini aynı anda. Bu meydan okuma.',
+  'Where is the source code?': 'Kaynak kod nerede?',
+  'The project is under active development and not yet publicly available. If you\'re interested in the architecture, reach out directly.': 'Proje aktif geliştirme aşamasındadır ve henüz kamuya açık değildir. Mimariyle ilgileniyorsanız doğrudan iletişime geçin.',
+
+  // Footer
+  'Coffee roasting & distribution ERP': 'Kahve kavurma & dağıtım ERP',
+  'Built with Django, PostgreSQL, Redis, Celery, OpenAI': 'Django, PostgreSQL, Redis, Celery, OpenAI ile inşa edildi',
+  'Built for specialty coffee operations': 'Özel kahve operasyonları için inşa edildi',
+
+  // CTA
+  'See the system in action.': 'Sistemi canlı görün.',
+  'The demo runs live operational data. Every module is accessible. The AI is connected.': 'Demo, gerçek operasyonel veriyle çalışır. Tüm modüller erişilebilir. AI bağlı.',
+};
+
+var _pubLang = 'en';
+try { _pubLang = localStorage.getItem('reflow-lang') || 'en'; } catch(e) {}
+
+var _textNodeStore = null;
+
+function collectTextNodes() {
+  _textNodeStore = [];
+  function walk(node) {
+    if (node.nodeType === 1) {
+      const tag = node.tagName;
+      if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'CODE' || tag === 'PRE') return;
+      // Skip elements handled by data-en/data-tr innerHTML swap — don't double-process their children
+      if (node.hasAttribute && (node.hasAttribute('data-en') || node.hasAttribute('data-tr'))) {
+        return;
+      }
+    }
+    if (node.nodeType === 3) {
+      const trimmed = node.nodeValue.trim();
+      if (trimmed.length > 1) {
+        _textNodeStore.push({ node, original: node.nodeValue, trimmed });
+      }
+      return;
+    }
+    node.childNodes.forEach(walk);
+  }
+  walk(document.body);
+}
+
+function applyLang(lang) {
+  _pubLang = lang;
+  document.documentElement.lang = lang;
+  const label = document.getElementById('pubLangLabel');
+  if (label) label.textContent = lang === 'en' ? 'TR' : 'EN';
+
+  // Handle data-en/data-tr innerHTML elements
+  document.querySelectorAll('[data-' + lang + ']').forEach(el => {
+    const val = el.getAttribute('data-' + lang);
+    if (val !== null) el.innerHTML = val;
+  });
+
+  // Handle text nodes via dictionary
+  if (!_textNodeStore) collectTextNodes();
+  _textNodeStore.forEach(({ node, original, trimmed }) => {
+    if (lang === 'en') {
+      node.nodeValue = original;
+    } else {
+      const tr = TR_DICT[trimmed];
+      if (tr) node.nodeValue = original.replace(trimmed, tr);
+    }
+  });
+
+  try { localStorage.setItem('reflow-lang', lang); } catch(e) {}
+}
+
+document.getElementById('pubLangBtn')?.addEventListener('click', function() {
+  applyLang(_pubLang === 'en' ? 'tr' : 'en');
+});
+
+applyLang(_pubLang);
+</script>
+
+</body>
+</html>
