@@ -67,22 +67,13 @@ class PurchasingViewsTests(TestCase):
     def test_order_can_be_created_with_item_and_advanced(self):
         response = self.client.post(reverse('purchase-order-create'), {
             'supplier': self.supplier.pk,
-            'expected_delivery_date': timezone.localdate() + timedelta(days=4),
-            'notes': 'Haftalık tedarik siparişi',
+            'product': self.product.pk,
+            'quantity': '25.000',
+            'unit_price': '42.50',
         })
         order = PurchaseOrder.objects.exclude(pk=self.po.pk).get()
         self.assertRedirects(response, reverse('purchase-order-detail', args=[order.pk]))
         self.assertEqual(order.status, PurchaseOrder.Status.DRAFT)
-
-        response = self.client.post(
-            reverse('purchase-order-item-create', args=[order.pk]),
-            {
-                'product': self.product.pk,
-                'quantity_ordered': '25.000',
-                'unit_price': '42.50',
-            },
-        )
-        self.assertRedirects(response, reverse('purchase-order-detail', args=[order.pk]))
         self.assertEqual(order.items.count(), 1)
 
         response = self.client.post(reverse('purchase-order-advance', args=[order.pk]))

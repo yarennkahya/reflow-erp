@@ -115,21 +115,57 @@ def order_list(request):
 
 @login_required
 def order_create(request):
-    initial = {}
-    supplier_id = request.GET.get('supplier')
-    if supplier_id and supplier_id.isdigit() and Business.objects.filter(
-        pk=supplier_id,
+    selected_supplier_id = request.GET.get('supplier', '')
+    suppliers = Business.objects.filter(
         business_type=Business.BusinessType.SUPPLIER,
         is_active=True,
-    ).exists():
-        initial['supplier'] = supplier_id
+    ).order_by('name')
 
-    form = PurchaseOrderForm(request.POST or None, initial=initial)
-    if request.method == 'POST' and form.is_valid():
-        order = form.save()
-        messages.success(request, 'Taslak satın alma siparişi oluşturuldu. Şimdi sipariş kalemlerini ekleyin.')
+    if request.method == 'POST':
+        supplier = get_object_or_404(
+            suppliers,
+            pk=request.POST['supplier'],
+        )
+        order = PurchaseOrder.objects.create(supplier=supplier)
+
+        products = request.POST.getlist('product')
+        quantities = request.POST.getlist('quantity')
+        prices = request.POST.getlist('unit_price')
+
+        for product_id, qty, price in zip(products, quantities, prices):
+            if not (product_id and qty and price):
+                continue
+            if not Product.objects.filter(pk=product_id, business=supplier).exists():
+                continue
+            PurchaseOrderItem.objects.create(
+                purchase_order=order,
+                product_id=product_id,
+                quantity_ordered=qty,
+                unit_price=price,
+            )
+
+        if not order.items.exists():
+            order.delete()
+            messages.error(request, 'En az bir geçerli kalem eklemelisiniz.')
+            return redirect('purchasing-list')
+
+        if request.POST.get('send_now'):
+            order.status = PurchaseOrder.Status.SENT
+            order.save(update_fields=['status', 'updated_at'])
+            messages.success(request, 'Satın alma siparişi oluşturuldu ve tedarikçiye gönderildi.')
+        else:
+            messages.success(request, 'Satın alma siparişi taslak olarak oluşturuldu.')
+
         return redirect('purchase-order-detail', pk=order.pk)
-    return render(request, 'purchasing/order_form.html', {'form': form, 'order': None})
+
+    return render(request, 'purchasing/order_create_form.html', {
+        'suppliers': suppliers,
+        'products': Product.objects.filter(
+            business__business_type=Business.BusinessType.SUPPLIER,
+            business__is_active=True,
+        ).select_related('business').order_by('name'),
+        'selected_supplier_id': selected_supplier_id,
+    })
 
 
 @login_required
