@@ -1,3 +1,4 @@
+import importlib
 import json
 
 from openai import OpenAI
@@ -7,6 +8,7 @@ from inventory.services import get_stock_summary
 from sales.services import get_demand_forecast
 
 from .models import Document
+from .query_registry import QUERY_REGISTRY
 
 EMBEDDING_MODEL = 'text-embedding-3-small'
 
@@ -95,6 +97,57 @@ def _search_documents_tool(query):
     }
 
 
+def query_module(module_key, filters=None, limit=10):
+    """
+    QUERY_REGISTRY'de tanimli modeller uzerinde GUVENLI, SALT OKUMA sorgusu
+    yapar. LLM asla ham SQL veya serbest model adi veremez -- sadece
+    registry'de onceden listelenmis module_key'lerden birini secebilir,
+    sadece o modul icin izin verilen alanlarla filtreleyebilir. Yazma/
+    silme islemi bu fonksiyonda YOKTUR.
+    """
+    if module_key not in QUERY_REGISTRY:
+        return {
+            'error': f'"{module_key}" gecerli bir modul degil. '
+                     f'Gecerli secenekler: {list(QUERY_REGISTRY.keys())}'
+        }
+
+    config = QUERY_REGISTRY[module_key]
+    app_label, model_name = config['model'].split('.')
+    model = importlib.import_module(f'{app_label}.models').__dict__[model_name]
+
+    queryset = model.objects.all()
+    filters = filters or {}
+    applied = {}
+    for key, value in filters.items():
+        if key not in config['filterable_fields']:
+            continue  # izin verilmeyen alan sessizce atlanir, hata vermez
+        applied[key] = value
+
+    if applied:
+        queryset = queryset.filter(**applied)
+
+    queryset = queryset[:min(limit, 20)]  # LLM ne isterse istesin, 20 ust siniri asilmaz
+
+    results = []
+    for obj in queryset:
+        row = {}
+        for field in config['display_fields']:
+            value = obj
+            for part in field.split('__'):
+                value = getattr(value, part, None)
+                if value is None:
+                    break
+            row[field] = str(value) if value is not None else None
+        results.append(row)
+
+    return {
+        'module': module_key,
+        'applied_filters': applied,
+        'result_count': len(results),
+        'results': results,
+    }
+
+
 TOOLS = [
     {
         'type': 'function',
@@ -160,12 +213,55 @@ TOOLS = [
             },
         },
     },
+    {
+        'type': 'function',
+        'function': {
+            'name': 'query_module',
+            'description': (
+                'Sistemdeki herhangi bir modulu (stok, satin alma, uretim, '
+                'satis, musteri, iade, CRM firsati, fatura, personel, izin '
+                'talebi, toplanti) filtreli olarak sorgular. Hangi modullerin '
+                've hangi filtrelerin gecerli oldugunu bilmiyorsan, once bos '
+                'filtreyle dene, hata mesaji sana gecerli secenekleri '
+                'gosterecektir.'
+            ),
+            'parameters': {
+                'type': 'object',
+                'properties': {
+                    'module_key': {
+                        'type': 'string',
+                        'description': (
+                            'Sorgulanacak modul anahtari. Secenekler: '
+                            'inventory_products, inventory_lots, '
+                            'purchasing_orders, production_batches, '
+                            'sales_orders, sales_customers, sales_returns, '
+                            'crm_opportunities, finance_invoices, '
+                            'hr_employees, hr_leave_requests, meetings'
+                        ),
+                    },
+                    'filters': {
+                        'type': 'object',
+                        'description': (
+                            'Anahtar-deger filtre ciftleri, orn. '
+                            '{"status": "pending"}. Bos birakilabilir.'
+                        ),
+                    },
+                    'limit': {
+                        'type': 'integer',
+                        'description': 'Kac sonuc donsun, en fazla 20, varsayilan 10',
+                    },
+                },
+                'required': ['module_key'],
+            },
+        },
+    },
 ]
 
 AVAILABLE_FUNCTIONS = {
     'get_stock_summary': get_stock_summary,
     'search_documents': _search_documents_tool,
     'get_demand_forecast': get_demand_forecast,
+    'query_module': query_module,
 }
 
 
@@ -231,13 +327,19 @@ def ask_assistant(message, conversation_history=None):
         conversation_history = [
             {
                 'role': 'system',
-                'content': (
+                                'content': (
                     'Sen bir kahve kavurma isletmesinin ic bilgi asistanisin. '
                     'Stok sorularinda ve dokuman aramalarinda elindeki '
                     'araclari kullan, tahmin yurutme. Urun adlari '
                     'veritabaninda Ingilizce kayitlidir (orn. Ethiopia, '
                     'Brazil, Colombia). Turkce soru sorulsa bile, arac '
-                    'cagirirken urun adini Ingilizceye cevirerek kullan.'
+                    'cagirirken urun adini Ingilizceye cevirerek kullan. '
+                    'search_documents aracindan bir sonuc geldiginde, SADECE '
+                    'o sonuctaki bilgiyi kullan; kendi genel bilgini ekleme '
+                    'veya tamamlama yapma. Genel/spesifik olmayan sorularda '
+                    '(orn. "kac tane X var", "hangi Y durumda") '
+                    'query_module aracini kullan, hangi module_key ve '
+                    'filtrenin uygun oldugunu sen belirle.'
                 ),
             }
         ]
