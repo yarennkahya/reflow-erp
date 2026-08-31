@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect ,get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import update_session_auth_hash
@@ -12,17 +12,33 @@ from sales.models import Customer, Order
 from crm.models import Opportunity
 from hr.models import Employee, LeaveRequest
 from finance.services import get_profitability_report
-
-
+import json
+from ai_layer.models import Conversation
 def landing_view(request):
     if request.user.is_authenticated:
         return redirect('dashboard-home')
     return render(request, 'public/landing.html')
 
 
-def chat_page_view(request):
-    return render(request, 'ai_layer/chat.html')
+@login_required
+def chat_page_view(request, conversation_id=None):
+    conversations = Conversation.objects.filter(user=request.user)[:20]
 
+    active_conversation = None
+    initial_messages = []
+    if conversation_id:
+        active_conversation = get_object_or_404(
+            Conversation, pk=conversation_id, user=request.user
+        )
+        for m in active_conversation.messages.all():
+            if m.role in ('user', 'assistant') and m.raw_data.get('content'):
+                initial_messages.append({'role': m.role, 'content': m.raw_data['content']})
+
+    return render(request, 'ai_layer/chat.html', {
+        'conversations': conversations,
+        'active_conversation': active_conversation,
+        'initial_messages_json': json.dumps(initial_messages),
+    })
 
 def dashboard_view(request):
     profitability = get_profitability_report()

@@ -236,7 +236,25 @@
 {% endblock %}
 
 {% block content %}
-<div id="chat-shell">
+<div style="display: flex; height: calc(100vh - 56px);">
+
+  <div id="chat-sidebar" style="width: 220px; border-right: 1px solid var(--g-border); overflow-y: auto; flex-shrink: 0; background: var(--g-surface);">
+    <div style="padding: 14px;">
+      <a href="/chat/" class="btn btn-primary btn-sm w-100 mb-3">+ Yeni Sohbet</a>
+      {% for conv in conversations %}
+      <a href="/chat/{{ conv.pk }}/" class="d-block text-truncate mb-2 p-2 rounded"
+         style="font-size: 12.5px; text-decoration: none; color: var(--g-text);
+         {% if active_conversation.pk == conv.pk %}background: #eff6ff; color: #1d4ed8;{% endif %}">
+        {{ conv.title|default:"Yeni sohbet" }}
+      </a>
+      {% empty %}
+      <p class="text-muted" style="font-size: 12px;">Henüz sohbet yok.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div id="chat-shell" style="flex: 1;">
+
 
   <!-- Header -->
   <div id="chat-head">
@@ -273,10 +291,14 @@
   </div>
 
 </div>
+
+</div>
 {% endblock %}
 
 {% block extra_scripts %}
 <script>
+  let currentConversationId = {{ active_conversation.pk|default:"null" }};
+  const initialMessages = JSON.parse('{{ initial_messages_json|escapejs }}');
   const messagesEl  = document.getElementById('messages');
   const welcomeEl   = document.getElementById('welcome');
   const inputEl     = document.getElementById('user-input');
@@ -342,7 +364,6 @@
     if (!text) return;
 
     appendMessage('user', text);
-    conversationHistory.push({ role: 'user', content: text });
     inputEl.value = '';
     inputEl.style.height = 'auto';
     sendBtnEl.disabled = true;
@@ -352,9 +373,9 @@
       const res = await fetch('/api/ai/chat/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+                body: JSON.stringify({
           message: text,
-          conversation_history: conversationHistory,
+          conversation_id: currentConversationId,
         }),
       });
 
@@ -366,10 +387,9 @@
       }
 
       const data = await res.json();
-            const reply = data.answer || 'Cevap alınamadı.';
+      const reply = data.answer || 'Cevap alınamadı.';
       appendMessage('assistant', reply);
-      conversationHistory.push({ role: 'assistant', content: reply });
-
+      currentConversationId = data.conversation_id;
     } catch (err) {
       removeTyping();
       appendMessage('assistant', 'Bağlantı hatası: ' + err.message);
@@ -383,7 +403,7 @@
     inputEl.value = chipEl.textContent.trim();
     inputEl.focus();
   }
-
+  initialMessages.forEach(m => appendMessage(m.role, m.content));
   sendBtnEl.addEventListener('click', sendMessage);
 
   inputEl.addEventListener('keydown', (e) => {

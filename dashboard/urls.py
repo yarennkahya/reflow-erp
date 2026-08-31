@@ -8,4 +8,5 @@ urlpatterns = [
     path('dashboard/', login_required(views.dashboard_view), name='dashboard-home'),
     path('chat/', login_required(views.chat_page_view), name='chat-page'),
     path('profile/', views.account_settings_view, name='account-settings'),
+    path('chat/<int:conversation_id>/', views.chat_page_view, name='chat-page-conversation'),
 ]
