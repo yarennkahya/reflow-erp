@@ -1,6 +1,7 @@
 import calendar as pycal
 from datetime import date
 
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
@@ -8,6 +9,7 @@ from django.utils import timezone
 from hr.models import Employee
 
 from .models import Meeting
+from .services import check_leave_conflicts, parse_meeting_datetime
 from .tasks import send_meeting_invites_task
 
 
@@ -87,14 +89,29 @@ def meeting_create_view(request):
         meeting = Meeting.objects.create(
             title=request.POST['title'],
             description=request.POST.get('description', ''),
-            start_time=request.POST['start_time'],
-            end_time=request.POST['end_time'],
+            start_time=parse_meeting_datetime(request.POST['start_time']),
+            end_time=parse_meeting_datetime(request.POST['end_time']),
             organizer_id=request.POST['organizer'],
             location=request.POST.get('location', ''),
             customer_id=request.POST.get('customer') or None,
             opportunity_id=request.POST.get('opportunity') or None,
         )
         meeting.attendees.set(attendee_ids)
+        all_employee_ids = list(attendee_ids) + [str(meeting.organizer_id)]
+        conflicts = check_leave_conflicts(
+            meeting.start_time, meeting.end_time, all_employee_ids
+        )
+        if conflicts.exists():
+            names = ', '.join(
+                f'{conflict.employee.name} '
+                f'({conflict.start_date}-{conflict.end_date})'
+                for conflict in conflicts
+            )
+            messages.warning(
+                request,
+                f'Şu katılımcılar bu tarihlerde izinli görünüyor: {names}. '
+                f'Toplantı yine de oluşturuldu.'
+            )
         send_meeting_invites_task.delay(meeting.pk)
         return redirect('meeting-detail', pk=meeting.pk)
 
@@ -114,8 +131,8 @@ def meeting_edit_view(request, pk):
     if request.method == 'POST':
         meeting.title = request.POST['title']
         meeting.description = request.POST.get('description', '')
-        meeting.start_time = request.POST['start_time']
-        meeting.end_time = request.POST['end_time']
+        meeting.start_time = parse_meeting_datetime(request.POST['start_time'])
+        meeting.end_time = parse_meeting_datetime(request.POST['end_time'])
         meeting.organizer_id = request.POST['organizer']
         meeting.location = request.POST.get('location', '')
         meeting.customer_id = request.POST.get('customer') or None
@@ -123,6 +140,21 @@ def meeting_edit_view(request, pk):
         meeting.save()
         attendee_ids = request.POST.getlist('attendees')
         meeting.attendees.set(attendee_ids)
+        all_employee_ids = list(attendee_ids) + [str(meeting.organizer_id)]
+        conflicts = check_leave_conflicts(
+            meeting.start_time, meeting.end_time, all_employee_ids
+        )
+        if conflicts.exists():
+            names = ', '.join(
+                f'{conflict.employee.name} '
+                f'({conflict.start_date}-{conflict.end_date})'
+                for conflict in conflicts
+            )
+            messages.warning(
+                request,
+                f'Şu katılımcılar bu tarihlerde izinli görünüyor: {names}. '
+                f'Toplantı yine de oluşturuldu.'
+            )
         return redirect('meeting-detail', pk=meeting.pk)
 
     from crm.models import Opportunity
