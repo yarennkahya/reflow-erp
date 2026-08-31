@@ -1,15 +1,17 @@
 import calendar as pycal
-from datetime import date
+import json
+from datetime import date, datetime as dt
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
 from hr.models import Employee
 
 from .models import Meeting
-from .services import check_leave_conflicts, parse_meeting_datetime
+from .services import check_leave_conflicts
 from .tasks import send_meeting_invites_task
 
 
@@ -86,11 +88,16 @@ def meeting_detail_view(request, pk):
 def meeting_create_view(request):
     if request.method == 'POST':
         attendee_ids = request.POST.getlist('attendees')
+        date_str = request.POST['meeting_date']
+        start_str = request.POST['start_time_only']
+        end_str = request.POST['end_time_only']
+        start_time = dt.fromisoformat(f'{date_str}T{start_str}')
+        end_time = dt.fromisoformat(f'{date_str}T{end_str}')
         meeting = Meeting.objects.create(
             title=request.POST['title'],
             description=request.POST.get('description', ''),
-            start_time=parse_meeting_datetime(request.POST['start_time']),
-            end_time=parse_meeting_datetime(request.POST['end_time']),
+            start_time=start_time,
+            end_time=end_time,
             organizer_id=request.POST['organizer'],
             location=request.POST.get('location', ''),
             customer_id=request.POST.get('customer') or None,
@@ -129,10 +136,15 @@ def meeting_create_view(request):
 def meeting_edit_view(request, pk):
     meeting = get_object_or_404(Meeting, pk=pk)
     if request.method == 'POST':
+        date_str = request.POST['meeting_date']
+        start_str = request.POST['start_time_only']
+        end_str = request.POST['end_time_only']
+        start_time = dt.fromisoformat(f'{date_str}T{start_str}')
+        end_time = dt.fromisoformat(f'{date_str}T{end_str}')
         meeting.title = request.POST['title']
         meeting.description = request.POST.get('description', '')
-        meeting.start_time = parse_meeting_datetime(request.POST['start_time'])
-        meeting.end_time = parse_meeting_datetime(request.POST['end_time'])
+        meeting.start_time = start_time
+        meeting.end_time = end_time
         meeting.organizer_id = request.POST['organizer']
         meeting.location = request.POST.get('location', '')
         meeting.customer_id = request.POST.get('customer') or None
@@ -165,6 +177,32 @@ def meeting_edit_view(request, pk):
         'employees': Employee.objects.all(),
         'customers': Customer.objects.all(),
         'opportunities': Opportunity.objects.exclude(stage__in=['won', 'lost']),
+    })
+
+
+@login_required
+def check_conflicts_api(request):
+    date_str = request.GET.get('date')
+    start_str = request.GET.get('start_time')
+    end_str = request.GET.get('end_time')
+    employee_ids = request.GET.getlist('employee_ids')
+
+    if not (date_str and start_str and end_str and employee_ids):
+        return JsonResponse({'conflicts': []})
+
+    try:
+        start_time = dt.fromisoformat(f'{date_str}T{start_str}')
+        end_time = dt.fromisoformat(f'{date_str}T{end_str}')
+    except ValueError:
+        return JsonResponse({'conflicts': []})
+
+    conflicts = check_leave_conflicts(start_time, end_time, employee_ids)
+    return JsonResponse({
+        'conflicts': [
+            f'{conflict.employee.name} '
+            f'({conflict.start_date}-{conflict.end_date})'
+            for conflict in conflicts
+        ]
     })
 
 
