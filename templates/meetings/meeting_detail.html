@@ -33,7 +33,18 @@
       <div class="text-muted mt-1" style="font-size:13px;"><i class="bi bi-clock me-1"></i>{{ meeting.start_time|date:"d M Y, H:i" }} — {{ meeting.end_time|date:"H:i" }}</div>
     </div>
   </div>
-  <a href="{% url 'meeting-create' %}" class="btn btn-outline-primary"><i class="bi bi-plus-lg me-1"></i>Yeni Toplantı</a>
+  <div class="d-flex flex-wrap align-items-center gap-2">
+    {% if meeting.status == 'scheduled' %}
+    <a href="{% url 'meeting-edit' meeting.pk %}" class="btn btn-outline-primary"><i class="bi bi-pencil me-1"></i>Düzenle</a>
+    <form method="post" action="{% url 'meeting-cancel' meeting.pk %}" onsubmit="return confirm('Bu toplantıyı iptal etmek istediğinize emin misiniz?');">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-outline-danger"><i class="bi bi-x-circle me-1"></i>İptal Et</button>
+    </form>
+    {% elif meeting.status == 'cancelled' %}
+    <span class="text-muted" style="font-size:13px;"><i class="bi bi-info-circle me-1"></i>Bu toplantı iptal edildi</span>
+    {% endif %}
+    <a href="{% url 'meeting-create' %}" class="btn btn-outline-primary"><i class="bi bi-plus-lg me-1"></i>Yeni Toplantı</a>
+  </div>
 </div>
 
 <div class="row g-4">

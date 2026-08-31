@@ -106,3 +106,40 @@ def meeting_create_view(request):
         'customers': Customer.objects.all(),
         'opportunities': Opportunity.objects.exclude(stage__in=['won', 'lost']),
     })
+
+
+@login_required
+def meeting_edit_view(request, pk):
+    meeting = get_object_or_404(Meeting, pk=pk)
+    if request.method == 'POST':
+        meeting.title = request.POST['title']
+        meeting.description = request.POST.get('description', '')
+        meeting.start_time = request.POST['start_time']
+        meeting.end_time = request.POST['end_time']
+        meeting.organizer_id = request.POST['organizer']
+        meeting.location = request.POST.get('location', '')
+        meeting.customer_id = request.POST.get('customer') or None
+        meeting.opportunity_id = request.POST.get('opportunity') or None
+        meeting.save()
+        attendee_ids = request.POST.getlist('attendees')
+        meeting.attendees.set(attendee_ids)
+        return redirect('meeting-detail', pk=meeting.pk)
+
+    from crm.models import Opportunity
+    from sales.models import Customer
+
+    return render(request, 'meetings/meeting_form.html', {
+        'meeting': meeting,
+        'employees': Employee.objects.all(),
+        'customers': Customer.objects.all(),
+        'opportunities': Opportunity.objects.exclude(stage__in=['won', 'lost']),
+    })
+
+
+@login_required
+def meeting_cancel_view(request, pk):
+    meeting = get_object_or_404(Meeting, pk=pk)
+    if request.method == 'POST':
+        meeting.status = Meeting.Status.CANCELLED
+        meeting.save(update_fields=['status'])
+    return redirect('meeting-detail', pk=meeting.pk)
