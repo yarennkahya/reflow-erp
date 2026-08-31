@@ -44,7 +44,10 @@ class LeaveRequestAdmin(admin.ModelAdmin):
 
 @admin.register(JobOpening)
 class JobOpeningAdmin(admin.ModelAdmin):
-    list_display = ('title', 'department', 'position', 'status', 'opened_at')
+    list_display = (
+        'title', 'department', 'position', 'headcount', 'closing_date',
+        'status', 'opened_at',
+    )
     list_filter = ('status', 'department')
 
 

@@ -1,8 +1,9 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import ApplicationForm, CandidateForm, LeaveRequestForm
+from .forms import ApplicationForm, CandidateForm, JobOpeningForm, LeaveRequestForm
 from .models import Application, Candidate, Department, Employee, JobOpening, LeaveRequest
 from .services import approve_leave_request, check_meeting_conflicts, reject_leave_request
 
@@ -200,9 +201,17 @@ def leave_reject_view(request, pk):
 
 @login_required
 def recruitment_view(request):
-    openings = JobOpening.objects.select_related('department', 'position').prefetch_related(
-        'applications__candidate'
-    ).order_by('-opened_at')
+    openings = (
+        JobOpening.objects.select_related('department', 'position')
+        .annotate(
+            hired_count=Count(
+                'applications',
+                filter=Q(applications__stage=Application.Stage.HIRED),
+            )
+        )
+        .prefetch_related('applications__candidate')
+        .order_by('-opened_at')
+    )
     openings_data = []
     for opening in openings:
         apps = [
@@ -212,8 +221,40 @@ def recruitment_view(request):
             }
             for app in opening.applications.all()
         ]
-        openings_data.append({'opening': opening, 'applications': apps})
-    return render(request, 'hr/recruitment.html', {'openings': openings_data})
+        openings_data.append({
+            'opening': opening,
+            'applications': apps,
+            'occupancy_percent': round(opening.hired_count * 100 / opening.headcount),
+        })
+
+    pipeline_counts = dict(
+        Application.objects.filter(job_opening__status=JobOpening.Status.OPEN)
+        .values('stage')
+        .annotate(count=Count('pk'))
+        .values_list('stage', 'count')
+    )
+    pipeline_summary = [
+        {
+            'label': label,
+            'count': pipeline_counts.get(stage, 0),
+            'badge_cls': _APP_STAGE.get(stage, 'bg-secondary-subtle text-secondary'),
+        }
+        for stage, label in Application.Stage.choices
+    ]
+    return render(request, 'hr/recruitment.html', {
+        'openings': openings_data,
+        'pipeline_summary': pipeline_summary,
+    })
+
+
+@login_required
+def job_opening_create_view(request):
+    form = JobOpeningForm(request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        opening = form.save()
+        messages.success(request, f'{opening.title} pozisyonu açık olarak oluşturuldu.')
+        return redirect('hr-recruitment')
+    return render(request, 'hr/job_opening_form.html', {'form': form})
 
 
 @login_required

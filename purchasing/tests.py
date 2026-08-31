@@ -8,7 +8,7 @@ from django.utils import timezone
 
 from inventory.models import Business, Product
 
-from .models import PurchaseOrder, PurchaseOrderItem
+from .models import GoodsReceipt, PurchaseOrder, PurchaseOrderItem
 from .services import advance_order_status, receive_goods
 
 
@@ -80,6 +80,38 @@ class PurchasingViewsTests(TestCase):
         self.assertRedirects(response, reverse('purchase-order-detail', args=[order.pk]))
         order.refresh_from_db()
         self.assertEqual(order.status, PurchaseOrder.Status.SENT)
+
+    def test_order_item_can_be_received_from_inline_detail_form(self):
+        self.po.status = PurchaseOrder.Status.SENT
+        self.po.save(update_fields=['status'])
+        item = PurchaseOrderItem.objects.create(
+            purchase_order=self.po,
+            product=self.product,
+            quantity_ordered=Decimal('5.000'),
+            unit_price=Decimal('42.50'),
+        )
+
+        detail_response = self.client.get(
+            reverse('purchase-order-detail', args=[self.po.pk])
+        )
+        self.assertContains(detail_response, f'name="receipt-{item.pk}-quantity_received"')
+
+        response = self.client.post(
+            reverse('purchase-order-item-receive', args=[self.po.pk, item.pk]),
+            {
+                f'receipt-{item.pk}-quantity_received': '5.000',
+                f'receipt-{item.pk}-lot_code': 'INLINE-RECEIPT-001',
+                f'receipt-{item.pk}-expiry_date': (
+                    timezone.localdate() + timedelta(days=90)
+                ).isoformat(),
+                f'receipt-{item.pk}-warehouse': '',
+            },
+        )
+
+        self.assertRedirects(
+            response, reverse('purchase-order-detail', args=[self.po.pk])
+        )
+        self.assertTrue(GoodsReceipt.objects.filter(purchase_order_item=item).exists())
 
 
 class PurchasingServiceTests(TestCase):

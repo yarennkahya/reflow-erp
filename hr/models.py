@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator
 from django.db import models
 
 
@@ -115,6 +116,16 @@ class JobOpening(models.Model):
     )
     status = models.CharField(
         max_length=20, choices=Status.choices, default=Status.OPEN
+    )
+    headcount = models.PositiveIntegerField(
+        default=1,
+        verbose_name='Kontenjan',
+        validators=[MinValueValidator(1)],
+    )
+    closing_date = models.DateField(
+        null=True,
+        blank=True,
+        verbose_name='Son Başvuru Tarihi',
     )
     opened_at = models.DateTimeField(auto_now_add=True)
 

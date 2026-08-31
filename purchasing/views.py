@@ -189,6 +189,14 @@ def order_detail_view(request, pk):
             'remaining': remaining,
             'progress': min(progress, 100),
             'receipts': receipts,
+            'receive_form': (
+                GoodsReceiptForm(
+                    prefix=f'receipt-{item.pk}',
+                    initial={'quantity_received': remaining},
+                )
+                if order.is_receivable and remaining > 0
+                else None
+            ),
         })
 
     receipts = GoodsReceipt.objects.filter(
@@ -329,6 +337,7 @@ def order_item_delete(request, pk, item_pk):
 
 
 @login_required
+@require_POST
 def order_item_receive(request, pk, item_pk):
     order = get_object_or_404(PurchaseOrder, pk=pk)
     item = get_object_or_404(
@@ -345,27 +354,29 @@ def order_item_receive(request, pk, item_pk):
         messages.info(request, 'Bu sipariş kalemi zaten tamamen teslim alındı.')
         return redirect('purchase-order-detail', pk=order.pk)
 
-    form = GoodsReceiptForm(request.POST or None, initial={'quantity_received': remaining})
-    if request.method == 'POST' and form.is_valid():
-        try:
-            receive_goods(
-                item,
-                quantity_received=form.cleaned_data['quantity_received'],
-                lot_code=form.cleaned_data['lot_code'],
-                expiry_date=form.cleaned_data['expiry_date'],
-                warehouse=form.cleaned_data['warehouse'],
-            )
-            messages.success(request, 'Teslim alma kaydedildi ve stok lotu oluşturuldu.')
-            return redirect('purchase-order-detail', pk=order.pk)
-        except (ValueError, IntegrityError) as error:
-            form.add_error(None, str(error))
+    form = GoodsReceiptForm(request.POST, prefix=f'receipt-{item.pk}')
+    if not form.is_valid():
+        errors = '; '.join(
+            f'{field}: {", ".join(error_list)}'
+            for field, error_list in form.errors.items()
+        )
+        messages.error(request, f'Teslim alma kaydedilemedi. {errors}')
+        return redirect('purchase-order-detail', pk=order.pk)
 
-    return render(request, 'purchasing/receipt_form.html', {
-        'form': form,
-        'order': order,
-        'item': item,
-        'remaining': remaining,
-    })
+    try:
+        receive_goods(
+            item,
+            quantity_received=form.cleaned_data['quantity_received'],
+            lot_code=form.cleaned_data['lot_code'],
+            expiry_date=form.cleaned_data['expiry_date'],
+            warehouse=form.cleaned_data['warehouse'],
+            user=request.user,
+        )
+    except (ValueError, IntegrityError) as error:
+        messages.error(request, f'Teslim alma kaydedilemedi. {error}')
+    else:
+        messages.success(request, 'Teslim alma kaydedildi ve stok lotu oluşturuldu.')
+    return redirect('purchase-order-detail', pk=order.pk)
 
 
 @login_required

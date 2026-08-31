@@ -134,21 +134,32 @@ def batch_create_view(request):
             output_quantity = Decimal(request.POST['output_quantity'])
             output_lot_code = request.POST['output_lot_code'].strip()
             expiry_str = request.POST['output_expiry_date']
+            output_expiry_date = parse_date(expiry_str)
             if not output_lot_code:
                 raise ValueError('Çıktı lot kodu zorunludur.')
+            if output_expiry_date is None:
+                raise ValueError('Geçerli bir çıktı son kullanma tarihi girin.')
             input_lots = {}
             for cd in component_data:
                 comp = cd['component']
                 lot_id = request.POST.get(f'lot_{comp.input_product_id}')
                 if not lot_id:
                     raise ValueError(f'{comp.input_product.name} için lot seçin.')
-                input_lots[comp.input_product_id] = Lot.objects.get(pk=lot_id)
+                try:
+                    input_lots[comp.input_product_id] = Lot.objects.get(
+                        pk=lot_id,
+                        product=comp.input_product,
+                    )
+                except Lot.DoesNotExist:
+                    raise ValueError(
+                        f'{comp.input_product.name} için geçerli bir lot seçin.'
+                    )
             batch = create_roast_batch(
                 recipe=selected_recipe,
                 input_lots=input_lots,
                 output_quantity=output_quantity,
                 output_lot_code=output_lot_code,
-                output_expiry_date=parse_date(expiry_str),
+                output_expiry_date=output_expiry_date,
             )
             messages.success(request, f'Üretim emri #{batch.pk} oluşturuldu.')
             return redirect('production-batch-detail', pk=batch.pk)

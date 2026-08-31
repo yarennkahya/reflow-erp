@@ -42,6 +42,14 @@ def hire_candidate(application, hire_date, salary=None, manager=None):
     candidate = application.candidate
 
     with transaction.atomic():
+        job_opening = JobOpening.objects.select_for_update().get(pk=job_opening.pk)
+        hired_count = Application.objects.filter(
+            job_opening=job_opening,
+            stage=Application.Stage.HIRED,
+        ).count()
+        if hired_count >= job_opening.headcount:
+            raise ValueError('Bu pozisyonun kontenjanı zaten dolu.')
+
         employee = Employee.objects.create(
             name=candidate.name,
             department=job_opening.department,
@@ -56,8 +64,9 @@ def hire_candidate(application, hire_date, salary=None, manager=None):
         application.stage = Application.Stage.HIRED
         application.save(update_fields=['stage'])
 
-        job_opening.status = JobOpening.Status.FILLED
-        job_opening.save(update_fields=['status'])
+        if hired_count + 1 == job_opening.headcount:
+            job_opening.status = JobOpening.Status.FILLED
+            job_opening.save(update_fields=['status'])
 
     return employee
 

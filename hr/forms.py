@@ -74,3 +74,36 @@ class ApplicationForm(forms.ModelForm):
         self.fields['job_opening'].queryset = JobOpening.objects.filter(status='open')
         for field in self.fields.values():
             field.widget.attrs.setdefault('class', 'form-select')
+
+
+class JobOpeningForm(forms.ModelForm):
+    class Meta:
+        model = JobOpening
+        fields = ('title', 'department', 'position', 'headcount', 'closing_date')
+        labels = {
+            'title': 'İlan başlığı',
+            'department': 'Departman',
+            'position': 'Pozisyon',
+            'headcount': 'Kontenjan',
+            'closing_date': 'Son başvuru tarihi',
+        }
+        widgets = {
+            'title': forms.TextInput(attrs={'placeholder': 'Örn. Kıdemli Kavurma Uzmanı'}),
+            'headcount': forms.NumberInput(attrs={'min': '1'}),
+            'closing_date': forms.DateInput(attrs={'type': 'date'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.setdefault('class', 'form-control')
+        self.fields['department'].widget.attrs['class'] = 'form-select'
+        self.fields['position'].widget.attrs['class'] = 'form-select'
+
+    def clean(self):
+        cleaned_data = super().clean()
+        department = cleaned_data.get('department')
+        position = cleaned_data.get('position')
+        if department and position and position.department_id != department.pk:
+            self.add_error('position', 'Pozisyon seçili departmana ait olmalıdır.')
+        return cleaned_data

@@ -41,7 +41,7 @@
   <form method="get" class="d-flex gap-3 align-items-end flex-wrap">
     <div style="flex:1; min-width:220px;">
       <label class="form-label fw-medium" style="font-size:13px;">Reçete</label>
-      <select name="recipe" class="form-select">
+      <select name="recipe" class="form-select" onchange="this.form.submit()">
         <option value="">Reçete seçin...</option>
         {% for r in recipes %}
         <option value="{{ r.pk }}" {% if selected_recipe and selected_recipe.pk == r.pk %}selected{% endif %}>

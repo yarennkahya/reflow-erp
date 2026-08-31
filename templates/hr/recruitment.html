@@ -21,6 +21,11 @@
   .opening-head { padding:14px 16px; background:var(--g-n-50); border-bottom:1px solid var(--g-border); display:flex; align-items:center; gap:10px; }
   .opening-title { font-size:14px; font-weight:700; color:var(--g-text); }
   .opening-meta { font-size:12px; color:var(--g-text-2); }
+  .pipeline-card { background:var(--g-surface); border:1px solid var(--g-border); border-radius:10px; height:100%; padding:13px; }
+  .pipeline-label { color:var(--g-text-2); font-size:11px; font-weight:600; text-transform:uppercase; }
+  .pipeline-value { color:var(--g-text); font-size:21px; font-weight:700; margin-top:2px; }
+  .occupancy { min-width:130px; }
+  .occupancy .progress { height:6px; }
 </style>
 {% endblock %}
 
@@ -38,6 +43,9 @@
     <span class="text-muted" style="font-size:13px;">{{ openings|length }} ilan</span>
   </div>
   <div class="d-flex gap-2">
+    <a href="{% url 'job-opening-create' %}" class="btn btn-sm btn-outline-primary" style="color:#9333ea; border-color:#9333ea;">
+      <i class="bi bi-briefcase-fill me-1"></i>+ Yeni Pozisyon
+    </a>
     <a href="{% url 'candidate-create' %}" class="btn btn-sm btn-outline-secondary">
       <i class="bi bi-person-plus me-1"></i>+ Yeni Aday
     </a>
@@ -47,13 +55,30 @@
   </div>
 </div>
 
+<div class="mb-4">
+  <div class="d-flex align-items-center gap-2 mb-2">
+    <h6 class="fw-bold mb-0">Pipeline Özeti</h6>
+    <span class="text-muted" style="font-size:12px;">Açık pozisyonlardaki başvurular</span>
+  </div>
+  <div class="row g-2">
+    {% for stage in pipeline_summary %}
+    <div class="col-xl-2 col-md-4 col-sm-6">
+      <div class="pipeline-card">
+        <span class="badge {{ stage.badge_cls }} fw-medium" style="font-size:11px;">{{ stage.label }}</span>
+        <div class="pipeline-value">{{ stage.count }}</div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
 {% for item in openings %}
 <div class="data-card">
   <div class="opening-head">
     <i class="bi bi-briefcase" style="color:#9333ea;"></i>
     <div>
       <div class="opening-title">{{ item.opening.title }}</div>
-      <div class="opening-meta">{{ item.opening.department.name }} · {{ item.opening.position.title }} · {{ item.opening.opened_at|date:"d M Y" }}</div>
+      <div class="opening-meta">{{ item.opening.department.name }} · {{ item.opening.position.title }} · {{ item.opening.opened_at|date:"d M Y" }}{% if item.opening.closing_date %} · Son başvuru: {{ item.opening.closing_date|date:"d M Y" }}{% endif %}</div>
     </div>
     <span class="badge ms-auto
       {% if item.opening.status == 'open' %}bg-success-subtle text-success
@@ -62,6 +87,10 @@
       fw-medium" style="font-size:11.5px; padding:4px 9px;">
       {{ item.opening.get_status_display }}
     </span>
+    <div class="occupancy ms-2">
+      <div class="d-flex justify-content-between text-muted" style="font-size:11px;"><span>Kontenjan</span><span>{{ item.opening.hired_count }}/{{ item.opening.headcount }} · %{{ item.occupancy_percent }}</span></div>
+      <div class="progress mt-1"><div class="progress-bar bg-success" style="width:{% if item.occupancy_percent > 100 %}100{% else %}{{ item.occupancy_percent }}{% endif %}%"></div></div>
+    </div>
     <span class="text-muted" style="font-size:12px;">{{ item.applications|length }} aday</span>
   </div>
   {% if item.applications %}
