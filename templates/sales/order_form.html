@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% block title %}Yeni Sipariş — Reflow Coffee ERP{% endblock %}
+{% block nav_sales %}active{% endblock %}
+{% block nav_sales_orders %}active{% endblock %}
+{% block page_title %}Satış / Yeni Sipariş{% endblock %}
+
+{% block extra_head %}
+<style>
+  .order-form-card { background:var(--g-surface); border:1px solid var(--g-border); border-radius:12px; max-width:1040px; overflow:hidden; }
+  .order-form-head { background:var(--g-n-50); border-bottom:1px solid var(--g-border); padding:18px 22px; }
+  .order-form-body { padding:22px; }.form-label { color:var(--g-text); font-size:13px; font-weight:600; }
+  .order-item-row { background:var(--g-n-50); border:1px solid var(--g-border-sub); border-radius:9px; margin-bottom:10px; padding:12px; }
+  .order-item-title { color:var(--g-text-2); font-size:11px; font-weight:700; letter-spacing:.55px; text-transform:uppercase; }
+  .order-note { background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; color:#1e40af; font-size:12.5px; padding:12px 13px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mb-3"><a href="{% url 'sales-list' %}" class="text-decoration-none" style="font-size:13px;"><i class="bi bi-arrow-left me-1"></i>Siparişlere dön</a></div>
+
+<div class="order-form-card">
+  <div class="order-form-head">
+    <h5 class="mb-1 fw-bold">Yeni Sipariş Oluştur</h5>
+    <p class="mb-0 text-muted" style="font-size:13px;">Müşteriyi ve sipariş kalemlerini seçin; isterseniz siparişi hemen karşılayın.</p>
+  </div>
+
+  <form method="post" class="order-form-body">
+    {% csrf_token %}
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label for="customer" class="form-label">Müşteri</label>
+        <select id="customer" name="customer" class="form-select" required>
+          <option value="">Müşteri seçin</option>
+          {% for customer in customers %}
+          <option value="{{ customer.pk }}">{{ customer.name }} · {{ customer.get_customer_type_display }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div class="d-flex align-items-center justify-content-between gap-3 mt-4 mb-2">
+      <div>
+        <h6 class="fw-bold mb-0">Sipariş Kalemleri</h6>
+        <div class="text-muted mt-1" style="font-size:12px;">Her kalem için ürün, stok lotu, miktar ve birim fiyat seçin.</div>
+      </div>
+      <button id="add-order-item" type="button" class="btn btn-outline-primary btn-sm text-nowrap"><i class="bi bi-plus-lg me-1"></i>Kalem Ekle</button>
+    </div>
+
+    <div id="order-items">
+      <div class="order-item-row">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <span class="order-item-title">Kalem</span>
+          <button type="button" class="btn btn-sm btn-outline-danger remove-order-item"><i class="bi bi-trash"></i><span class="visually-hidden">Kalemi sil</span></button>
+        </div>
+        <div class="row g-2 align-items-end">
+          <div class="col-lg-4">
+            <label class="form-label">Ürün</label>
+            <select name="product" class="form-select" required>
+              <option value="">Ürün seçin</option>
+              {% for product in products %}
+              <option value="{{ product.pk }}">{{ product.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-lg-4">
+            <label class="form-label">Lot</label>
+            <select name="lot" class="form-select" required>
+              <option value="">Lot seçin</option>
+              {% for lot in lots %}
+              <option value="{{ lot.pk }}">{{ lot.product.name }} · {{ lot.lot_code }} ({{ lot.remaining_quantity }} {{ lot.product.unit }})</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-sm-6 col-lg-2">
+            <label class="form-label">Miktar</label>
+            <input name="quantity" type="number" class="form-control" min="0.001" step="0.001" required>
+          </div>
+          <div class="col-sm-6 col-lg-2">
+            <label class="form-label">Birim Fiyat</label>
+            <div class="input-group"><span class="input-group-text">₺</span><input name="unit_price" type="number" class="form-control" min="0" step="0.01" required></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-check mt-4">
+      <input class="form-check-input" type="checkbox" id="fulfill_now" name="fulfill_now">
+      <label class="form-check-label" for="fulfill_now">Şimdi karşıla</label>
+      <div class="text-muted ms-4" style="font-size:12px;">Seçildiğinde sipariş oluşturulur oluşturulmaz seçili lot stoklarından düşülür.</div>
+    </div>
+
+    <div class="order-note mt-4"><i class="bi bi-info-circle-fill me-1"></i>Stok yetersizse sipariş kaydedilir, ancak karşılanmamış taslak olarak kalır.</div>
+    <div class="d-flex justify-content-end gap-2 border-top mt-4 pt-3">
+      <a href="{% url 'sales-list' %}" class="btn btn-light">Vazgeç</a>
+      <button class="btn btn-primary" type="submit"><i class="bi bi-cart-check me-1"></i>Oluştur</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  const orderItems = document.getElementById('order-items');
+  const addOrderItemButton = document.getElementById('add-order-item');
+
+  function updateRemoveButtons() {
+    const rows = orderItems.querySelectorAll('.order-item-row');
+    rows.forEach((row) => {
+      row.querySelector('.remove-order-item').disabled = rows.length === 1;
+    });
+  }
+
+  addOrderItemButton.addEventListener('click', () => {
+    const firstRow = orderItems.querySelector('.order-item-row');
+    const newRow = firstRow.cloneNode(true);
+    newRow.querySelectorAll('select, input').forEach((input) => {
+      input.value = '';
+    });
+    orderItems.appendChild(newRow);
+    updateRemoveButtons();
+  });
+
+  orderItems.addEventListener('click', (event) => {
+    const removeButton = event.target.closest('.remove-order-item');
+    if (!removeButton || orderItems.querySelectorAll('.order-item-row').length === 1) {
+      return;
+    }
+    removeButton.closest('.order-item-row').remove();
+    updateRemoveButtons();
+  });
+
+  updateRemoveButtons();
+</script>
+{% endblock %}

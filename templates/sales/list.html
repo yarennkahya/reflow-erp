@@ -29,6 +29,7 @@
 <div class="d-flex align-items-baseline gap-3 mb-4">
   <h4 class="fw-bold mb-0 text-dark"><i class="bi bi-cart3 me-2" style="color:#2563eb;"></i><span data-i18n="orders">Siparişler</span></h4>
   <span class="text-muted" style="font-size:13px;">{{ orders|length }} kayıt</span>
+  <a href="{% url 'order-create' %}" class="btn btn-primary btn-sm ms-auto"><i class="bi bi-plus-lg me-1"></i>Yeni Sipariş</a>
 </div>
 
 <div class="data-card">

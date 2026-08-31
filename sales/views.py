@@ -1,10 +1,11 @@
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
-from inventory.models import Product
+from inventory.models import Lot, Product
 from .models import Customer, Order, OrderItem, ReturnRequest
-from .services import approve_return, get_demand_forecast, reject_return
+from .services import approve_return, fulfill_order, get_demand_forecast, reject_return
 
 _STATUS = {
     'pending':   'bg-warning-subtle text-warning',
@@ -97,3 +98,54 @@ def return_reject_view(request, pk):
     except ValueError:
         pass
     return redirect('return-list')
+
+
+@login_required
+def order_create_view(request):
+    if request.method == 'POST':
+        customer = get_object_or_404(Customer, pk=request.POST['customer'])
+        order = Order.objects.create(customer=customer)
+
+        products = request.POST.getlist('product')
+        lots = request.POST.getlist('lot')
+        quantities = request.POST.getlist('quantity')
+        prices = request.POST.getlist('unit_price')
+
+        for product_id, lot_id, qty, price in zip(products, lots, quantities, prices):
+            if not (product_id and lot_id and qty and price):
+                continue
+            OrderItem.objects.create(
+                order=order,
+                product_id=product_id,
+                lot_id=lot_id,
+                quantity=qty,
+                unit_price=price,
+            )
+
+        if not order.items.exists():
+            order.delete()
+            messages.error(request, 'En az bir kalem eklemelisiniz.')
+            return redirect('sales-list')
+
+        if request.POST.get('fulfill_now'):
+            try:
+                fulfill_order(order)
+                messages.success(request, 'Sipariş oluşturuldu ve karşılandı.')
+            except ValueError as exc:
+                messages.warning(
+                    request,
+                    f'Sipariş oluşturuldu ama karşılanamadı: {exc}',
+                )
+        else:
+            messages.success(
+                request,
+                'Sipariş taslak olarak oluşturuldu (henüz karşılanmadı).',
+            )
+
+        return redirect('order-detail', pk=order.pk)
+
+    return render(request, 'sales/order_form.html', {
+        'customers': Customer.objects.all(),
+        'products': Product.objects.all(),
+        'lots': Lot.objects.select_related('product').all(),
+    })
