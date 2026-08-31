@@ -1,17 +1,18 @@
 {% extends 'base.html' %}
 {% block title %}Satış — Reflow Coffee ERP{% endblock %}
 {% block nav_sales %}active{% endblock %}
+{% block nav_sales_orders %}active{% endblock %}
 {% block page_title %}Satış{% endblock %}
 
 {% block extra_head %}
 <style>
-  .data-card { background:#fff; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden; }
+  .data-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:10px; overflow:hidden; }
   .data-card .table { margin-bottom:0; font-size:13.5px; }
-  .data-card .table thead th { background:#f8fafc; color:#64748b; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.7px; border-bottom:1px solid #e2e8f0; padding:10px 16px; white-space:nowrap; }
-  .data-card .table tbody td { padding:11px 16px; vertical-align:middle; color:#334155; border-color:#f1f5f9; }
+  .data-card .table thead th { background:var(--g-n-50); color:var(--g-text-2); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.7px; border-bottom:1px solid var(--g-border); padding:10px 16px; white-space:nowrap; }
+  .data-card .table tbody td { padding:11px 16px; vertical-align:middle; color:var(--g-text); border-color:var(--g-border-sub); }
   .data-card .table tbody tr:last-child td { border-bottom:none; }
-  .data-card .table tbody tr:hover { background:#f8fafc; }
-  .empty-state { padding:48px 24px; text-align:center; color:#94a3b8; }
+  .data-card .table tbody tr:hover { background:var(--g-n-50); }
+  .empty-state { padding:48px 24px; text-align:center; color:var(--g-text-3); }
   .empty-state i { font-size:36px; display:block; margin-bottom:8px; }
 </style>
 {% endblock %}
@@ -52,8 +53,8 @@
             {{ row.order.get_status_display }}
           </span>
         </td>
-        <td style="font-size:12.5px; color:#64748b;">{{ row.order.created_at|date:"d M Y" }}</td>
-        <td style="font-size:12.5px; color:#64748b;">{{ row.order.fulfilled_at|date:"d M Y"|default:"—" }}</td>
+        <td style="font-size:12.5px; color:var(--g-text-2);">{{ row.order.created_at|date:"d M Y" }}</td>
+        <td style="font-size:12.5px; color:var(--g-text-2);">{{ row.order.fulfilled_at|date:"d M Y"|default:"—" }}</td>
         <td class="text-end fw-semibold">₺{{ row.total|floatformat:2 }}</td>
       </tr>
       {% empty %}

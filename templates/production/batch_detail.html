@@ -1,36 +1,37 @@
 {% extends 'base.html' %}
 {% block title %}Parti #{{ batch.pk }} — Reflow Coffee ERP{% endblock %}
 {% block nav_production %}active{% endblock %}
+{% block nav_production_batches %}active{% endblock %}
 {% block page_title %}Üretim{% endblock %}
 
 {% block extra_head %}
 <style>
-  .prod-subnav { display:flex; gap:4px; margin-bottom:20px; border-bottom:1px solid #e2e8f0; padding-bottom:0; }
-  .prod-subnav a { padding:8px 14px; font-size:13px; font-weight:500; color:#64748b; text-decoration:none; border-bottom:2px solid transparent; margin-bottom:-1px; white-space:nowrap; }
-  .prod-subnav a:hover { color:#0f172a; }
+  .prod-subnav { display:flex; gap:4px; margin-bottom:20px; border-bottom:1px solid var(--g-border); padding-bottom:0; }
+  .prod-subnav a { padding:8px 14px; font-size:13px; font-weight:500; color:var(--g-text-2); text-decoration:none; border-bottom:2px solid transparent; margin-bottom:-1px; white-space:nowrap; }
+  .prod-subnav a:hover { color:var(--g-text); }
   .prod-subnav a.active { color:#ca8a04; border-bottom-color:#ca8a04; font-weight:600; }
-  .info-card { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:20px 24px; }
-  .info-row { display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid #f1f5f9; font-size:13.5px; }
+  .info-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:10px; padding:20px 24px; }
+  .info-row { display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--g-border-sub); font-size:13.5px; }
   .info-row:last-child { border-bottom:none; }
-  .info-label { color:#64748b; font-weight:500; }
-  .info-value { color:#1e293b; font-weight:600; }
-  .lot-code { font-family:monospace; font-size:13px; color:#475569; background:#f1f5f9; padding:2px 7px; border-radius:4px; }
-  .data-card { background:#fff; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden; }
+  .info-label { color:var(--g-text-2); font-weight:500; }
+  .info-value { color:var(--g-text); font-weight:600; }
+  .lot-code { font-family:monospace; font-size:13px; color:var(--g-text-2); background:var(--g-border-sub); padding:2px 7px; border-radius:4px; }
+  .data-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:10px; overflow:hidden; }
   .data-card .table { margin-bottom:0; font-size:13.5px; }
-  .data-card .table thead th { background:#f8fafc; color:#64748b; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.7px; border-bottom:1px solid #e2e8f0; padding:10px 16px; white-space:nowrap; }
-  .data-card .table tbody td { padding:11px 16px; vertical-align:middle; color:#334155; border-color:#f1f5f9; }
+  .data-card .table thead th { background:var(--g-n-50); color:var(--g-text-2); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.7px; border-bottom:1px solid var(--g-border); padding:10px 16px; white-space:nowrap; }
+  .data-card .table tbody td { padding:11px 16px; vertical-align:middle; color:var(--g-text); border-color:var(--g-border-sub); }
   .data-card .table tbody tr:last-child td { border-bottom:none; }
-  .section-head { font-size:13px; font-weight:600; color:#475569; padding:10px 16px; background:#f8fafc; border-bottom:1px solid #e2e8f0; display:flex; align-items:center; gap:8px; }
+  .section-head { font-size:13px; font-weight:600; color:var(--g-text-2); padding:10px 16px; background:var(--g-n-50); border-bottom:1px solid var(--g-border); display:flex; align-items:center; gap:8px; }
   .quality-body { padding:18px 20px; }
   .quality-badge { display:inline-flex; align-items:center; gap:5px; border-radius:20px; font-size:12px; font-weight:700; padding:5px 10px; }
   .quality-pass { background:#f0fdf4; color:#15803d; }
   .quality-fail { background:#fef2f2; color:#b91c1c; }
-  .quality-meta { color:#64748b; font-size:12px; }
-  .quality-score { background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; color:#334155; display:inline-flex; flex-direction:column; min-width:86px; padding:9px 11px; }
-  .quality-score strong { color:#0f172a; font-size:18px; line-height:1.1; }
-  .form-label { color:#334155; font-size:12.5px; font-weight:600; }
-  .form-help { color:#64748b; font-size:11.5px; }
-  .quality-note { background:#f8fafc; border-radius:8px; color:#475569; font-size:13px; padding:11px 12px; white-space:pre-line; }
+  .quality-meta { color:var(--g-text-2); font-size:12px; }
+  .quality-score { background:var(--g-n-50); border:1px solid var(--g-border); border-radius:8px; color:var(--g-text); display:inline-flex; flex-direction:column; min-width:86px; padding:9px 11px; }
+  .quality-score strong { color:var(--g-text); font-size:18px; line-height:1.1; }
+  .form-label { color:var(--g-text); font-size:12.5px; font-weight:600; }
+  .form-help { color:var(--g-text-2); font-size:11.5px; }
+  .quality-note { background:var(--g-n-50); border-radius:8px; color:var(--g-text-2); font-size:13px; padding:11px 12px; white-space:pre-line; }
 </style>
 {% endblock %}
 
@@ -52,8 +53,8 @@
           <i class="bi bi-fire"></i>
         </div>
         <div>
-          <div style="font-size:17px; font-weight:700; color:#0f172a;">Kavurma Partisi #{{ batch.pk }}</div>
-          <div style="font-size:13px; color:#64748b;">{{ batch.roasted_at|date:"d M Y H:i" }}</div>
+          <div style="font-size:17px; font-weight:700; color:var(--g-text);">Kavurma Partisi #{{ batch.pk }}</div>
+          <div style="font-size:13px; color:var(--g-text-2);">{{ batch.roasted_at|date:"d M Y H:i" }}</div>
         </div>
       </div>
       <div class="info-row"><span class="info-label" data-i18n="recipe">Reçete</span><span class="info-value">{{ batch.recipe.name }}</span></div>
@@ -85,7 +86,7 @@
             <td class="text-end">%{{ comp.ratio_percent|floatformat:2 }}</td>
           </tr>
           {% empty %}
-          <tr><td colspan="2" style="padding:24px; text-align:center; color:#94a3b8;" data-i18n="no-components">Bileşen tanımlanmamış.</td></tr>
+          <tr><td colspan="2" style="padding:24px; text-align:center; color:var(--g-text-3);" data-i18n="no-components">Bileşen tanımlanmamış.</td></tr>
           {% endfor %}
         </tbody>
       </table>

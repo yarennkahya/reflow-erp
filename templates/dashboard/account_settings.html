@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% block title %}Hesap Ayarları — ERP Platform{% endblock %}
+{% block page_title %}Hesap Ayarları{% endblock %}
+
+{% block content %}
+<div class="g-page-header">
+    <div>
+        <h1 class="g-page-title">Hesap Ayarları</h1>
+        <p class="g-page-sub">Profil bilgilerini ve şifreni yönet.</p>
+    </div>
+</div>
+
+<div class="row g-4" style="max-width:760px;">
+
+    <!-- Profile info -->
+    <div class="col-12">
+        <div class="g-settings-section">
+            <div class="g-settings-section-head">
+                <p class="g-settings-section-title"><i class="bi bi-person me-2"></i>Profil</p>
+                <p class="g-settings-section-sub">Temel hesap bilgilerin.</p>
+            </div>
+            <div class="g-settings-body">
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <label class="g-label">Kullanıcı Adı</label>
+                        <input type="text" class="g-input" value="{{ request.user.username }}" readonly style="background: var(--g-n-50); cursor: not-allowed;">
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="g-label">Gruplar</label>
+                        <input type="text" class="g-input" value="{% if groups %}{{ groups|join:', ' }}{% else %}—{% endif %}" readonly style="background: var(--g-n-50); cursor: not-allowed;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email update -->
+    <div class="col-12">
+        <div class="g-settings-section">
+            <div class="g-settings-section-head">
+                <p class="g-settings-section-title"><i class="bi bi-envelope me-2"></i>E-posta</p>
+                <p class="g-settings-section-sub">Bildirimler ve hesap kurtarma için kullanılır.</p>
+            </div>
+            <div class="g-settings-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="email">
+                    <div class="g-field mb-3">
+                        <label class="g-label" for="id_email">E-posta adresi</label>
+                        <input type="email" name="email" id="id_email" class="g-input"
+                               value="{{ request.user.email }}" placeholder="ornek@sirket.com">
+                    </div>
+                    <button type="submit" class="g-btn g-btn-primary">
+                        <i class="bi bi-check2"></i> Kaydet
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Password change -->
+    <div class="col-12">
+        <div class="g-settings-section">
+            <div class="g-settings-section-head">
+                <p class="g-settings-section-title"><i class="bi bi-lock me-2"></i>Şifre Değiştir</p>
+                <p class="g-settings-section-sub">Güçlü bir şifre seç, düzenli olarak değiştir.</p>
+            </div>
+            <div class="g-settings-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="password">
+                    <div class="g-field mb-3">
+                        <label class="g-label" for="{{ password_form.old_password.id_for_label }}">Mevcut Şifre</label>
+                        <div class="g-input-wrap">
+                            <i class="bi bi-lock g-input-icon"></i>
+                            <input type="password" name="old_password" id="{{ password_form.old_password.id_for_label }}"
+                                   class="g-input g-input-icon-left" autocomplete="current-password">
+                        </div>
+                        {% if password_form.old_password.errors %}
+                        <div class="g-login-error mt-2" style="font-size:12px;">{{ password_form.old_password.errors|join:', ' }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="g-field mb-3">
+                        <label class="g-label" for="{{ password_form.new_password1.id_for_label }}">Yeni Şifre</label>
+                        <div class="g-input-wrap">
+                            <i class="bi bi-lock g-input-icon"></i>
+                            <input type="password" name="new_password1" id="{{ password_form.new_password1.id_for_label }}"
+                                   class="g-input g-input-icon-left" autocomplete="new-password">
+                        </div>
+                        {% if password_form.new_password1.errors %}
+                        <div class="g-login-error mt-2" style="font-size:12px;">{{ password_form.new_password1.errors|join:', ' }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="g-field mb-3">
+                        <label class="g-label" for="{{ password_form.new_password2.id_for_label }}">Yeni Şifre (Tekrar)</label>
+                        <div class="g-input-wrap">
+                            <i class="bi bi-lock g-input-icon"></i>
+                            <input type="password" name="new_password2" id="{{ password_form.new_password2.id_for_label }}"
+                                   class="g-input g-input-icon-left" autocomplete="new-password">
+                        </div>
+                        {% if password_form.new_password2.errors %}
+                        <div class="g-login-error mt-2" style="font-size:12px;">{{ password_form.new_password2.errors|join:', ' }}</div>
+                        {% endif %}
+                    </div>
+                    {% if password_form.non_field_errors %}
+                    <div class="g-login-error mb-3" style="font-size:12px;">{{ password_form.non_field_errors|join:', ' }}</div>
+                    {% endif %}
+                    <button type="submit" class="g-btn g-btn-primary">
+                        <i class="bi bi-shield-check"></i> Şifreyi Güncelle
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,5 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
+from django.contrib import messages
 
 from inventory.models import Lot, Warehouse
 from inventory.services import get_freshness_status
@@ -62,3 +65,28 @@ def dashboard_view(request):
     }
 
     return render(request, 'dashboard/home.html', context)
+
+
+@login_required
+def account_settings_view(request):
+    password_form = PasswordChangeForm(request.user)
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'email':
+            email = request.POST.get('email', '').strip()
+            request.user.email = email
+            request.user.save(update_fields=['email'])
+            messages.success(request, 'E-posta güncellendi.')
+        elif action == 'password':
+            password_form = PasswordChangeForm(request.user, request.POST)
+            if password_form.is_valid():
+                user = password_form.save()
+                update_session_auth_hash(request, user)
+                messages.success(request, 'Şifre başarıyla değiştirildi.')
+
+    groups = list(request.user.groups.values_list('name', flat=True))
+    return render(request, 'dashboard/account_settings.html', {
+        'password_form': password_form,
+        'groups': groups,
+    })

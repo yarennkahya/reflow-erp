@@ -1,17 +1,18 @@
 {% extends 'base.html' %}
 {% block title %}Yeni Üretim Emri — Reflow Coffee ERP{% endblock %}
 {% block nav_production %}active{% endblock %}
+{% block nav_production_batches %}active{% endblock %}
 {% block page_title %}Üretim{% endblock %}
 
 {% block extra_head %}
 <style>
-  .prod-subnav { display:flex; gap:4px; margin-bottom:20px; border-bottom:1px solid #e2e8f0; padding-bottom:0; }
-  .prod-subnav a { padding:8px 14px; font-size:13px; font-weight:500; color:#64748b; text-decoration:none; border-bottom:2px solid transparent; margin-bottom:-1px; white-space:nowrap; }
-  .prod-subnav a:hover { color:#0f172a; }
+  .prod-subnav { display:flex; gap:4px; margin-bottom:20px; border-bottom:1px solid var(--g-border); padding-bottom:0; }
+  .prod-subnav a { padding:8px 14px; font-size:13px; font-weight:500; color:var(--g-text-2); text-decoration:none; border-bottom:2px solid transparent; margin-bottom:-1px; white-space:nowrap; }
+  .prod-subnav a:hover { color:var(--g-text); }
   .prod-subnav a.active { color:#ca8a04; border-bottom-color:#ca8a04; font-weight:600; }
-  .form-card { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:24px; margin-bottom:20px; }
-  .section-title { font-size:13px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:14px; }
-  .lot-badge { font-size:11.5px; color:#64748b; font-family:monospace; }
+  .form-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:10px; padding:24px; margin-bottom:20px; }
+  .section-title { font-size:13px; font-weight:700; color:var(--g-text-2); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:14px; }
+  .lot-badge { font-size:11.5px; color:var(--g-text-2); font-family:monospace; }
 </style>
 {% endblock %}
 

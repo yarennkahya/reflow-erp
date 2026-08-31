@@ -1,16 +1,17 @@
 {% extends 'base.html' %}
 {% block title %}Yeni Reçete — Reflow Coffee ERP{% endblock %}
 {% block nav_production %}active{% endblock %}
+{% block nav_production_recipes %}active{% endblock %}
 {% block page_title %}Üretim{% endblock %}
 
 {% block extra_head %}
 <style>
-  .prod-subnav { display:flex; gap:4px; margin-bottom:20px; border-bottom:1px solid #e2e8f0; padding-bottom:0; }
-  .prod-subnav a { padding:8px 14px; font-size:13px; font-weight:500; color:#64748b; text-decoration:none; border-bottom:2px solid transparent; margin-bottom:-1px; white-space:nowrap; }
-  .prod-subnav a:hover { color:#0f172a; }
+  .prod-subnav { display:flex; gap:4px; margin-bottom:20px; border-bottom:1px solid var(--g-border); padding-bottom:0; }
+  .prod-subnav a { padding:8px 14px; font-size:13px; font-weight:500; color:var(--g-text-2); text-decoration:none; border-bottom:2px solid transparent; margin-bottom:-1px; white-space:nowrap; }
+  .prod-subnav a:hover { color:var(--g-text); }
   .prod-subnav a.active { color:#ca8a04; border-bottom-color:#ca8a04; font-weight:600; }
-  .form-card { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:24px; margin-bottom:20px; }
-  .section-title { font-size:13px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.6px; margin-bottom:14px; }
+  .form-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:10px; padding:24px; margin-bottom:20px; }
+  .section-title { font-size:13px; font-weight:700; color:var(--g-text-2); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:14px; }
   .comp-row td { vertical-align:middle; padding:6px 4px; }
   .comp-row td:first-child { padding-left:0; }
   .comp-row td:last-child { padding-right:0; }
@@ -69,7 +70,7 @@
   <p class="text-muted" style="font-size:12.5px; margin-bottom:12px;">Oranların toplamı tam olarak 100 olmalıdır.</p>
   <table class="table table-borderless" style="font-size:13.5px;">
     <thead>
-      <tr style="font-size:11px; color:#64748b; font-weight:600; text-transform:uppercase; letter-spacing:0.7px;">
+      <tr style="font-size:11px; color:var(--g-text-2); font-weight:600; text-transform:uppercase; letter-spacing:0.7px;">
         <th style="width:55%;" data-i18n="input-product">Girdi Ürünü</th>
         <th style="width:30%;" data-i18n="ratio-percent">Oran (%)</th>
         <th style="width:15%;"></th>

@@ -1,28 +1,29 @@
 {% extends 'base.html' %}
 {% block title %}{{ emp.name }} — Reflow Coffee ERP{% endblock %}
 {% block nav_hr %}active{% endblock %}
+{% block nav_hr_employees %}active{% endblock %}
 {% block page_title %}İnsan Kaynakları{% endblock %}
 
 {% block extra_head %}
 <style>
-  .hr-subnav { display:flex; gap:4px; margin-bottom:20px; border-bottom:1px solid #e2e8f0; padding-bottom:0; }
-  .hr-subnav a { padding:8px 14px; font-size:13px; font-weight:500; color:#64748b; text-decoration:none; border-bottom:2px solid transparent; margin-bottom:-1px; white-space:nowrap; }
-  .hr-subnav a:hover { color:#0f172a; }
+  .hr-subnav { display:flex; gap:4px; margin-bottom:20px; border-bottom:1px solid var(--g-border); padding-bottom:0; }
+  .hr-subnav a { padding:8px 14px; font-size:13px; font-weight:500; color:var(--g-text-2); text-decoration:none; border-bottom:2px solid transparent; margin-bottom:-1px; white-space:nowrap; }
+  .hr-subnav a:hover { color:var(--g-text); }
   .hr-subnav a.active { color:#9333ea; border-bottom-color:#9333ea; font-weight:600; }
-  .data-card { background:#fff; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden; }
+  .data-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:10px; overflow:hidden; }
   .data-card .table { margin-bottom:0; font-size:13.5px; }
-  .data-card .table thead th { background:#f8fafc; color:#64748b; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.7px; border-bottom:1px solid #e2e8f0; padding:10px 16px; white-space:nowrap; }
-  .data-card .table tbody td { padding:11px 16px; vertical-align:middle; color:#334155; border-color:#f1f5f9; }
+  .data-card .table thead th { background:var(--g-n-50); color:var(--g-text-2); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.7px; border-bottom:1px solid var(--g-border); padding:10px 16px; white-space:nowrap; }
+  .data-card .table tbody td { padding:11px 16px; vertical-align:middle; color:var(--g-text); border-color:var(--g-border-sub); }
   .data-card .table tbody tr:last-child td { border-bottom:none; }
-  .data-card .table tbody tr:hover { background:#f8fafc; }
-  .empty-state { padding:32px 24px; text-align:center; color:#94a3b8; }
+  .data-card .table tbody tr:hover { background:var(--g-n-50); }
+  .empty-state { padding:32px 24px; text-align:center; color:var(--g-text-3); }
   .empty-state i { font-size:28px; display:block; margin-bottom:6px; }
-  .info-card { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:20px 24px; }
-  .info-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #f1f5f9; font-size:13.5px; }
+  .info-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:10px; padding:20px 24px; }
+  .info-row { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--g-border-sub); font-size:13.5px; }
   .info-row:last-child { border-bottom:none; }
-  .info-label { color:#64748b; font-weight:500; }
-  .info-value { color:#1e293b; font-weight:600; }
-  .section-head { font-size:13px; font-weight:600; color:#475569; padding:10px 16px; background:#f8fafc; border-bottom:1px solid #e2e8f0; display:flex; align-items:center; gap:8px; }
+  .info-label { color:var(--g-text-2); font-weight:500; }
+  .info-value { color:var(--g-text); font-weight:600; }
+  .section-head { font-size:13px; font-weight:600; color:var(--g-text-2); padding:10px 16px; background:var(--g-n-50); border-bottom:1px solid var(--g-border); display:flex; align-items:center; gap:8px; }
 </style>
 {% endblock %}
 
@@ -46,8 +47,8 @@
           <i class="bi bi-person"></i>
         </div>
         <div>
-          <div style="font-size:18px; font-weight:700; color:#0f172a;">{{ emp.name }}</div>
-          <div style="font-size:13px; color:#64748b;">{{ emp.position.title }}</div>
+          <div style="font-size:18px; font-weight:700; color:var(--g-text);">{{ emp.name }}</div>
+          <div style="font-size:13px; color:var(--g-text-2);">{{ emp.position.title }}</div>
         </div>
         <span class="badge {{ badge_cls }} fw-medium ms-auto" style="font-size:12px; padding:5px 10px;">{{ emp.get_employment_status_display }}</span>
       </div>
@@ -71,7 +72,7 @@
         <tbody>
           {% for r in reports %}
           <tr>
-            <td class="fw-medium"><a href="{% url 'hr-employee-detail' r.pk %}" style="color:#0f172a; text-decoration:none;">{{ r.name }}</a></td>
+            <td class="fw-medium"><a href="{% url 'hr-employee-detail' r.pk %}" style="color:var(--g-text); text-decoration:none;">{{ r.name }}</a></td>
             <td>{{ r.department.name }}</td>
             <td>{{ r.position.title }}</td>
           </tr>
@@ -96,7 +97,7 @@
         <td class="fw-medium">{{ row.leave.leave_type.name }}</td>
         <td>{{ row.leave.start_date }}</td>
         <td>{{ row.leave.end_date }}</td>
-        <td style="font-size:12.5px; color:#64748b;">{{ row.leave.requested_at|date:"d M Y" }}</td>
+        <td style="font-size:12.5px; color:var(--g-text-2);">{{ row.leave.requested_at|date:"d M Y" }}</td>
         <td><span class="badge {{ row.badge_cls }} fw-medium" style="font-size:11.5px; padding:4px 9px;">{{ row.leave.get_status_display }}</span></td>
       </tr>
       {% empty %}

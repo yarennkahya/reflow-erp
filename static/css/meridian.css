@@ -1406,7 +1406,23 @@ body.erp-layout { background: var(--g-bg); }
 }
 
 .g-sb-divider { margin: 4px 10px; border: none; border-top: 1px solid var(--g-sb-border); }
-.g-sb-footer  { margin-top: auto; padding: 12px 14px; border-top: 1px solid var(--g-sb-border); font-size: 11px; color: #2E2A38; flex-shrink: 0; }
+.g-sb-footer  { margin-top: auto; padding: 12px 14px; border-top: 1px solid var(--g-sb-border); font-size: 11px; flex-shrink: 0; }
+
+.g-sb-user-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 8px;
+  margin-bottom: 4px;
+  border-radius: var(--g-r-sm);
+}
+.g-sb-user-icon { font-size: 20px; color: var(--g-sb-text); flex-shrink: 0; }
+.g-sb-user-info { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.g-sb-user-name { font-size: 12px; font-weight: 600; color: var(--g-sb-text-h); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.g-sb-user-meta { font-size: 10px; color: var(--g-sb-text); }
+
+.g-sb-logout { width: 100%; background: none; border: none; cursor: pointer; text-align: left; color: var(--g-danger); }
+.g-sb-logout:hover { background: rgba(170,30,37,0.12); color: var(--g-danger); }
 
 .g-sb-nav { display: flex; flex-direction: column; gap: 1px; }
 
@@ -2468,3 +2484,250 @@ html.dark-mode .g-login-error {
   .g-login-form-panel { padding: 32px 16px; }
   .g-login-form-title { font-size: 22px; }
 }
+
+/* ============================================================
+   11. ERP — STANDARDIZED COMPONENTS (Mercek 4)
+   ============================================================ */
+
+/* ── Spacing tokens (semantic aliases) ── */
+:root {
+  --g-card-pad:       var(--g-sp-4);   /* 16px  — standard card body padding */
+  --g-card-pad-lg:    var(--g-sp-6);   /* 24px  — large card / modal padding  */
+  --g-table-pad-x:    var(--g-sp-4);   /* 16px  — table cell horizontal       */
+  --g-table-pad-y:    11px;            /* table cell vertical                  */
+  --g-th-pad-y:       10px;            /* table header vertical                */
+}
+
+/* ── Canonical data-card ── */
+.g-data-card {
+  background: var(--g-surface);
+  border: 1px solid var(--g-border);
+  border-radius: var(--g-r-lg);
+  overflow: hidden;
+}
+
+.g-data-card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: var(--g-th-pad-y) var(--g-table-pad-x);
+  background: var(--g-n-50);
+  border-bottom: 1px solid var(--g-border);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--g-text-3);
+}
+
+/* ── Canonical table inside data-card ── */
+.g-data-card .table { margin: 0; font-size: 13px; color: var(--g-text); }
+.g-data-card .table thead th {
+  background: var(--g-n-50);
+  border-bottom: 1px solid var(--g-border);
+  color: var(--g-text-3);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  padding: var(--g-th-pad-y) var(--g-table-pad-x);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.g-data-card .table tbody td {
+  border-color: var(--g-border-sub);
+  color: var(--g-text-2);
+  padding: var(--g-table-pad-y) var(--g-table-pad-x);
+  vertical-align: middle;
+}
+.g-data-card .table tbody tr:hover td { background: var(--g-n-50); }
+
+/* ── Module sub-navigation ── */
+.g-subnav {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--g-border);
+  padding-bottom: 0;
+}
+.g-subnav a {
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--g-text-2);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  white-space: nowrap;
+  transition: color var(--g-tr), border-color var(--g-tr);
+}
+.g-subnav a:hover { color: var(--g-text); }
+.g-subnav a.active { color: var(--g-brand); border-bottom-color: var(--g-brand); font-weight: 600; }
+
+/* ── Empty state ── */
+.g-empty-state {
+  padding: 52px var(--g-sp-6);
+  text-align: center;
+  color: var(--g-text-3);
+}
+.g-empty-state i { display: block; font-size: 34px; margin-bottom: 8px; }
+.g-empty-state p { font-size: 13.5px; margin: 0; }
+
+/* ── Section head (inside cards) ── */
+.g-section-head {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--g-text-2);
+  padding: var(--g-table-pad-y) var(--g-table-pad-x);
+  background: var(--g-n-50);
+  border-bottom: 1px solid var(--g-border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── KPI stat card (canonical) ── */
+.g-kpi-card {
+  background: var(--g-surface);
+  border: 1px solid var(--g-border);
+  border-radius: var(--g-r-lg);
+  padding: var(--g-card-pad);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 100%;
+}
+.g-kpi-icon {
+  width: 40px; height: 40px;
+  border-radius: var(--g-r);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  flex: 0 0 auto;
+}
+.g-kpi-value { font-size: 22px; font-weight: 700; line-height: 1.1; color: var(--g-text); }
+.g-kpi-label { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--g-text-2); margin-top: 3px; }
+
+/* Dark mode for standardized components */
+html.dark-mode .g-data-card       { background: var(--g-surface); border-color: var(--g-border); }
+html.dark-mode .g-data-card-head  { background: var(--g-n-100); border-color: var(--g-border); color: var(--g-text-3); }
+html.dark-mode .g-data-card .table thead th { background: var(--g-n-100); border-color: var(--g-border); color: var(--g-text-3); }
+html.dark-mode .g-data-card .table tbody td { border-color: var(--g-border); color: var(--g-text-2); }
+html.dark-mode .g-data-card .table tbody tr:hover td { background: var(--g-n-100); }
+html.dark-mode .g-subnav          { border-color: var(--g-border); }
+html.dark-mode .g-subnav a        { color: var(--g-text-3); }
+html.dark-mode .g-subnav a:hover  { color: var(--g-text); }
+html.dark-mode .g-section-head    { background: var(--g-n-100); border-color: var(--g-border); color: var(--g-text-2); }
+html.dark-mode .g-kpi-card        { background: var(--g-surface); border-color: var(--g-border); }
+
+/* ============================================================
+   12. TOPBAR USER ACCOUNT DROPDOWN (Mercek 5)
+   ============================================================ */
+
+.g-user-btn {
+  padding: 0 6px;
+  gap: 6px;
+  border-radius: var(--g-r-sm);
+}
+
+.g-user-avatar {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--g-brand);
+  color: var(--g-text-invert);
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+.g-user-menu {
+  min-width: 220px;
+  padding: 0;
+  border: 1px solid var(--g-border);
+  border-radius: var(--g-r-lg);
+  box-shadow: var(--g-sh-lg);
+  overflow: hidden;
+  background: var(--g-surface);
+}
+
+.g-user-menu-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 14px 12px;
+  border-bottom: 1px solid var(--g-border-sub);
+}
+
+.g-user-menu-avatar {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--g-brand);
+  color: var(--g-text-invert);
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+.g-user-menu-name  { font-size: 13px; font-weight: 600; color: var(--g-text); line-height: 1.3; }
+.g-user-menu-email { font-size: 11.5px; color: var(--g-text-3); line-height: 1.3; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px; }
+
+.g-user-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 14px;
+  font-size: 13px;
+  color: var(--g-text-2);
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--g-font);
+  text-align: left;
+  transition: background var(--g-tr), color var(--g-tr);
+}
+.g-user-menu-item:hover { background: var(--g-n-50); color: var(--g-text); }
+.g-user-menu-item .bi { font-size: 14px; flex-shrink: 0; }
+
+.g-user-menu-logout { color: var(--g-danger); }
+.g-user-menu-logout:hover { background: var(--g-danger-lt); color: var(--g-danger); }
+
+.g-user-menu-divider { height: 1px; background: var(--g-border-sub); margin: 4px 0; }
+
+/* Dark mode user dropdown */
+html.dark-mode .g-user-menu          { background: var(--g-surface); border-color: var(--g-border); }
+html.dark-mode .g-user-menu-header   { border-color: var(--g-border); }
+html.dark-mode .g-user-menu-name     { color: var(--g-text); }
+html.dark-mode .g-user-menu-email    { color: var(--g-text-3); }
+html.dark-mode .g-user-menu-item     { color: var(--g-text-2); }
+html.dark-mode .g-user-menu-item:hover { background: var(--g-n-100); color: var(--g-text); }
+html.dark-mode .g-user-menu-logout:hover { background: var(--g-danger-lt); color: var(--g-danger); }
+html.dark-mode .g-user-menu-divider  { background: var(--g-border); }
+
+/* ── Account settings page ── */
+.g-settings-section {
+  background: var(--g-surface);
+  border: 1px solid var(--g-border);
+  border-radius: var(--g-r-lg);
+  overflow: hidden;
+  margin-bottom: var(--g-sp-6);
+}
+.g-settings-section-head {
+  padding: 14px var(--g-card-pad-lg);
+  border-bottom: 1px solid var(--g-border-sub);
+  background: var(--g-n-50);
+}
+.g-settings-section-title { font-size: 13.5px; font-weight: 700; color: var(--g-text); margin: 0; }
+.g-settings-section-sub   { font-size: 12px; color: var(--g-text-3); margin: 2px 0 0; }
+.g-settings-body { padding: var(--g-card-pad-lg); }
+
+html.dark-mode .g-settings-section      { background: var(--g-surface); border-color: var(--g-border); }
+html.dark-mode .g-settings-section-head { background: var(--g-n-100); border-color: var(--g-border); }
+html.dark-mode .g-settings-section-title { color: var(--g-text); }

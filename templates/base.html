@@ -183,8 +183,33 @@
                     {% include 'notifications/_dropdown_items.html' %}
                 </div>
             </div>
-            <div class="g-status-pill">
-                <i class="bi bi-circle-fill"></i> <span data-i18n="system-active">Sistem Aktif</span>
+            <div class="dropdown g-user-dropdown">
+                <button class="g-topbar-btn g-user-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Kullanıcı menüsü">
+                    <span class="g-user-avatar">{{ request.user.username|slice:":1" }}</span>
+                    <span style="font-size:12px; font-weight:600; color:var(--g-text);">{{ request.user.username }}</span>
+                </button>
+                <div class="dropdown-menu dropdown-menu-end g-user-menu">
+                    <div class="g-user-menu-header">
+                        <div class="g-user-menu-avatar">{{ request.user.username|slice:":1" }}</div>
+                        <div style="min-width:0;">
+                            <div class="g-user-menu-name">{{ request.user.username }}</div>
+                            <div class="g-user-menu-email">{{ request.user.email|default:"—" }}</div>
+                        </div>
+                    </div>
+                    <div class="g-user-menu-divider"></div>
+                    <a href="/profile/" class="g-user-menu-item">
+                        <i class="bi bi-gear"></i>
+                        <span data-i18n="user-settings">Hesap Ayarları</span>
+                    </a>
+                    <div class="g-user-menu-divider"></div>
+                    <form method="post" action="/accounts/logout/" style="margin:0;">
+                        {% csrf_token %}
+                        <button type="submit" class="g-user-menu-item g-user-menu-logout">
+                            <i class="bi bi-box-arrow-left"></i>
+                            <span data-i18n="nav-logout">Çıkış Yap</span>
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </header>
@@ -597,61 +622,365 @@
 (function () {
     'use strict';
 
+    /* ── Sidebar data-i18n keys ── */
     var TRANS = {
         tr: {
-            'general': 'Genel',
-            'modules': 'Modüller',
-            'system': 'Sistem',
-            'nav-dashboard': 'Dashboard',
-            'nav-ai': 'AI Asistan',
-            'nav-calendar': 'Takvim',
-            'nav-inventory': 'Stok',
-            'nav-inventory-lots': 'Stoklar',
-            'nav-inventory-warehouses': 'Depolar',
-            'nav-purchasing': 'Satın Alma',
-            'nav-purchasing-orders': 'Siparişler',
-            'nav-purchasing-suppliers': 'Tedarikçiler',
-            'nav-production': 'Üretim',
-            'nav-sales': 'Satış',
-            'nav-finance': 'Finans',
-            'nav-crm': 'CRM',
-            'nav-customers': 'Müşteriler',
-            'nav-sales-tracking': 'Satış Takibi',
-            'nav-hr': 'İnsan Kaynakları',
-            'nav-audit': 'Denetim Kaydı',
-            'system-active': 'Sistem Aktif'
+            'general': 'Genel', 'modules': 'Modüller', 'system': 'Sistem',
+            'nav-dashboard': 'Dashboard', 'nav-ai': 'AI Asistan', 'nav-calendar': 'Takvim',
+            'nav-inventory': 'Stok', 'nav-inventory-lots': 'Stoklar', 'nav-inventory-warehouses': 'Depolar',
+            'nav-purchasing': 'Satın Alma', 'nav-purchasing-orders': 'Siparişler', 'nav-purchasing-suppliers': 'Tedarikçiler',
+            'nav-production': 'Üretim', 'nav-production-batches': 'Üretim Emirleri', 'nav-production-recipes': 'Reçeteler',
+            'nav-sales': 'Satış', 'nav-sales-orders': 'Siparişler', 'nav-sales-customers': 'Müşteriler',
+            'nav-sales-forecast': 'Talep Tahmini', 'nav-sales-returns': 'İadeler',
+            'nav-finance': 'Finans', 'nav-finance-overview': 'Genel Bakış', 'nav-finance-invoices': 'Faturalar',
+            'nav-crm': 'CRM', 'nav-customers': 'Müşteriler', 'nav-sales-tracking': 'Satış Takibi',
+            'nav-hr': 'İnsan Kaynakları', 'nav-hr-overview': 'Genel Bakış', 'nav-hr-employees': 'Çalışanlar',
+            'nav-hr-leave': 'İzinler', 'nav-hr-recruitment': 'İşe Alım',
+            'nav-audit': 'Denetim Kaydı', 'nav-logout': 'Çıkış Yap',
+            'user-settings': 'Hesap Ayarları', 'system-active': 'Sistem Aktif'
         },
         en: {
-            'general': 'General',
-            'modules': 'Modules',
-            'system': 'System',
-            'nav-dashboard': 'Dashboard',
-            'nav-ai': 'AI Assistant',
-            'nav-calendar': 'Calendar',
-            'nav-inventory': 'Inventory',
-            'nav-inventory-lots': 'Stock',
-            'nav-inventory-warehouses': 'Warehouses',
-            'nav-purchasing': 'Purchasing',
-            'nav-purchasing-orders': 'Orders',
-            'nav-purchasing-suppliers': 'Suppliers',
-            'nav-production': 'Production',
-            'nav-sales': 'Sales',
-            'nav-finance': 'Finance',
-            'nav-crm': 'CRM',
-            'nav-customers': 'Customers',
-            'nav-sales-tracking': 'Sales Pipeline',
-            'nav-hr': 'Human Resources',
-            'nav-audit': 'Audit Log',
-            'system-active': 'System Active'
+            'general': 'General', 'modules': 'Modules', 'system': 'System',
+            'nav-dashboard': 'Dashboard', 'nav-ai': 'AI Assistant', 'nav-calendar': 'Calendar',
+            'nav-inventory': 'Inventory', 'nav-inventory-lots': 'Stock', 'nav-inventory-warehouses': 'Warehouses',
+            'nav-purchasing': 'Purchasing', 'nav-purchasing-orders': 'Orders', 'nav-purchasing-suppliers': 'Suppliers',
+            'nav-production': 'Production', 'nav-production-batches': 'Production Batches', 'nav-production-recipes': 'Recipes',
+            'nav-sales': 'Sales', 'nav-sales-orders': 'Orders', 'nav-sales-customers': 'Customers',
+            'nav-sales-forecast': 'Demand Forecast', 'nav-sales-returns': 'Returns',
+            'nav-finance': 'Finance', 'nav-finance-overview': 'Overview', 'nav-finance-invoices': 'Invoices',
+            'nav-crm': 'CRM', 'nav-customers': 'Customers', 'nav-sales-tracking': 'Sales Pipeline',
+            'nav-hr': 'Human Resources', 'nav-hr-overview': 'Overview', 'nav-hr-employees': 'Employees',
+            'nav-hr-leave': 'Leave', 'nav-hr-recruitment': 'Recruitment',
+            'nav-audit': 'Audit Log', 'nav-logout': 'Sign Out',
+            'user-settings': 'Account Settings', 'system-active': 'System Active'
         }
     };
 
+    /* ── Page content text-node dictionary (TR → EN) ── */
+    var ERP_DICT = {
+        /* Genel / Shell */
+        'ERP Platform': 'ERP Platform',
+        'ERP Modülleri': 'ERP Modules',
+        'Operasyonel metriklere genel bakış': 'Operational metrics overview',
+        'Genel Bakış': 'Overview',
+        'Sistem Aktif': 'System Active',
+        /* Stok / Inventory */
+        'Stok Durumu': 'Stock Status',
+        'Stok Yönetimi': 'Inventory Management',
+        'Depoları Yönet': 'Manage Warehouses',
+        'Stoklar': 'Inventory',
+        'Depolar': 'Warehouses',
+        'Aktif Lot': 'Active Lots',
+        'Kritik stok': 'Critical Stock',
+        'Depo sayısı': 'Warehouses',
+        'Lot Kodu': 'Lot Code',
+        'Lot kodu': 'Lot Code',
+        'Lot bilgileri': 'Lot Information',
+        'İlk giriş miktarı': 'Initial Quantity',
+        'Kalan miktar': 'Remaining Quantity',
+        'Kalan': 'Remaining',
+        'Kalan Bakiye': 'Remaining Balance',
+        'Cupping skoru': 'Cupping Score',
+        'Giriş kaynağı': 'Entry Source',
+        'Lot bazında kalan miktarı, depo yerleşimini ve son kullanma takibini görün.': 'View lot quantities, warehouse locations, and expiry tracking.',
+        'Stok girişi, satın alma siparişinin teslim alma adımında otomatik oluşur.': 'Stock is automatically created at the purchase order receipt step.',
+        'Böylece maliyet ve lot geçmişi korunur.': 'This preserves cost and lot history.',
+        /* Üretim / Production */
+        'Üretim': 'Production',
+        'Üretim Emirleri': 'Production Batches',
+        'Yeni Üretim Emri': 'New Batch',
+        'Henüz hiç üretim emri yok.': 'No production batches yet.',
+        'Kavurma Partisi': 'Roast Batch',
+        'Kavurma Partileri': 'Roast Batches',
+        'Kavurma Tarihi': 'Roast Date',
+        'Reçete (BOM)': 'Recipe (BOM)',
+        'Reçeteler (BOM)': 'Recipes (BOM)',
+        'Reçete': 'Recipe',
+        'Reçeteler': 'Recipes',
+        'Tarif (Reçete)': 'Recipe',
+        'Çıktı Ürünü': 'Output Product',
+        'Çıktı Lot Kodu': 'Output Lot Code',
+        'Çıktı Miktarı': 'Output Quantity',
+        'Girdi Ürün': 'Input Product',
+        'Bileşen tanımlanmamış.': 'No components defined.',
+        'Parti Listesi': 'Batch List',
+        /* Satış / Sales */
+        'Satış': 'Sales',
+        'Satışlar': 'Sales',
+        'Siparişler': 'Orders',
+        'Sipariş': 'Order',
+        'Açık Sipariş': 'Open Orders',
+        'Açık sipariş': 'Open Orders',
+        'Tamamlanan': 'Completed',
+        'Tamamlanan sipariş': 'Completed Orders',
+        'Tamamlanan siparişler': 'Completed Orders',
+        'Henüz hiç sipariş yok.': 'No orders yet.',
+        'Toplam Sipariş': 'Total Orders',
+        'Toplam sipariş': 'Total Orders',
+        'Toplam Tutar': 'Total Amount',
+        'Yeni Sipariş': 'New Order',
+        'Sipariş geçmişi': 'Order History',
+        'Sipariş kalemi': 'Order Item',
+        'Sipariş kalemleri': 'Order Items',
+        'Sipariş Kalemleri': 'Order Items',
+        'Talep Tahmini': 'Demand Forecast',
+        'İadeler': 'Returns',
+        'Karşılanma': 'Fulfillment',
+        'Oluşturulma': 'Created',
+        /* Müşteri / CRM */
+        'Müşteri': 'Customer',
+        'Müşteriler': 'Customers',
+        'Müşteri Yönetimi': 'Customer Management',
+        'Müşteri kartlarını, iletişim bilgilerini ve satış ilişkilerini yönetin.': 'Manage customer cards, contact info, and sales relationships.',
+        'Satışları Görüntüle': 'View Sales',
+        'Yeni Müşteri': 'New Customer',
+        'Toplam Müşteri': 'Total Customers',
+        'Aktif Müşteri': 'Active Customers',
+        'Müşteri sayısı': 'Customers',
+        'Müşteri bilgileri': 'Customer Information',
+        'Müşteriye ait satışlar': "Customer's Sales",
+        'Müşterilere dön': 'Back to Customers',
+        'Bu müşteri için henüz CRM satış kaydı yok.': 'No CRM sales records for this customer yet.',
+        'CRM': 'CRM',
+        'Satış Takibi': 'Sales Pipeline',
+        'Aktif Satış': 'Active Deals',
+        'Aktif satış': 'Active Deals',
+        'Kazanılan satış': 'Won Deals',
+        'Kazanılan Satış': 'Won Deals',
+        'Pasif Satış': 'Inactive Deals',
+        'Fırsat': 'Opportunity',
+        'Aşama': 'Stage',
+        'İlerleme': 'Progress',
+        'Satış ekle': 'Add Deal',
+        'Satışın durumunu ve bulunduğu aşamayı buradan takip edin.': 'Track the status and current stage of the deal here.',
+        'İletişim ve notlar': 'Contact & Notes',
+        /* İK / HR */
+        'İnsan Kaynakları': 'Human Resources',
+        'Personel': 'Staff',
+        'Çalışanlar': 'Employees',
+        'İzin & Devamsızlık': 'Leave & Absence',
+        'İzinler': 'Leave',
+        'İşe Alım': 'Recruitment',
+        'Toplam Personel': 'Total Employees',
+        'Bekleyen izin': 'Pending Leave',
+        'Bekleyen İzin Talepleri': 'Pending Leave Requests',
+        'Bekleyen izin talebi yok': 'No pending leave requests',
+        'İzin kaydı yok.': 'No leave records.',
+        'İzin Türü': 'Leave Type',
+        'İsim': 'Name',
+        'Departman': 'Department',
+        'Pozisyon': 'Position',
+        'Yönetici': 'Manager',
+        'İşe Giriş': 'Start Date',
+        'Maaş': 'Salary',
+        'Henüz hiç personel kaydı yok': 'No staff records yet',
+        /* Finans / Finance */
+        'Finans': 'Finance',
+        'Kârlılık Raporu': 'Profitability Report',
+        'Faturalar': 'Invoices',
+        'Toplam Gelir': 'Total Revenue',
+        'Toplam Maliyet': 'Total Cost',
+        'Net Kâr': 'Net Profit',
+        'Kâr Marjı': 'Profit Margin',
+        'Kâr marjı': 'Profit Margin',
+        'Kâr': 'Profit',
+        'Gelir': 'Revenue',
+        'Maliyet': 'Cost',
+        'Ödeme': 'Payment',
+        'Ödeme Geçmişi': 'Payment History',
+        'Ödeme Kaydet': 'Record Payment',
+        'Ödeme Yöntemi': 'Payment Method',
+        'Ödendi': 'Paid',
+        'Ödenmedi': 'Unpaid',
+        'Kısmen Ödendi': 'Partially Paid',
+        'Henüz ödeme yok.': 'No payments yet.',
+        /* Satın Alma / Purchasing */
+        'Satın Alma': 'Purchasing',
+        'Satın Alma Siparişleri': 'Purchase Orders',
+        'Tedarikçiler': 'Suppliers',
+        'Tedarikçi Yönetimi': 'Supplier Management',
+        'Yeni Tedarikçi': 'New Supplier',
+        'Yeni tedarikçi ekle': 'Add Supplier',
+        'Toplam Tedarikçi': 'Total Suppliers',
+        'Aktif Tedarikçi': 'Active Suppliers',
+        'Listede yalnızca aktif dış tedarikçiler gösterilir.': 'Only active external suppliers are shown.',
+        'Taslak oluşturmadan teslim almaya kadar satın alma sürecinizi takip edin.': 'Track your purchasing process from draft to receipt.',
+        'Teslimat Bekleyen': 'Awaiting Delivery',
+        'Geciken Teslimat': 'Overdue Delivery',
+        'Beklenen teslimat': 'Expected Delivery',
+        'Henüz teslim alma kaydı yok.': 'No receipts yet.',
+        'İlk teslim alma': 'First Receipt',
+        'İlk teslim alma kaydından sonra henüz hareket oluşmadı.': 'No movements yet after first receipt.',
+        'Kalem ekle': 'Add Item',
+        'Kalem Ekle': 'Add Item',
+        'Kalem yok.': 'No items.',
+        'İlk kalemi ekle': 'Add First Item',
+        'İlk ürünü ekle': 'Add First Product',
+        /* Toplantı / Meetings */
+        'Toplantı Takvimi': 'Meeting Calendar',
+        'Toplantı Bilgileri': 'Meeting Details',
+        'Yeni Toplantı': 'New Meeting',
+        'Müşteri görüşmelerini ve ekip toplantılarını ay görünümünde takip edin': 'Track customer meetings and team meetings in monthly view',
+        'Katılımcılar': 'Participants',
+        'Organizatör': 'Organizer',
+        'Konum': 'Location',
+        'Bu toplantı için açıklama eklenmemiş.': 'No description added for this meeting.',
+        'Henüz katılımcı eklenmemiş.': 'No participants added yet.',
+        'Takvime dön': 'Back to Calendar',
+        'Takvim': 'Calendar',
+        /* Bildirimler / Notifications */
+        'Bildirimler': 'Notifications',
+        'Henüz bildirim yok.': 'No notifications yet.',
+        'Operasyon ekiplerine ait güncel uyarıları ve işlem bildirimlerini takip edin': 'Track current alerts and action notifications for operations teams',
+        'Okundu': 'Read',
+        'Mesaj': 'Message',
+        /* Denetim / Audit */
+        'Denetim Kaydı': 'Audit Log',
+        'Önemli operasyonlarda kimin, ne zaman ve hangi kayıtta işlem yaptığını takip edin': 'Track who acted on which record and when in important operations',
+        'Henüz denetim kaydı yok.': 'No audit records yet.',
+        'Kullanıcı': 'User',
+        'İşlem': 'Action',
+        'Hedef': 'Target',
+        'Silinmiş kayıt': 'Deleted Record',
+        /* Hesap / Account */
+        'Hesap Ayarları': 'Account Settings',
+        'Profil bilgilerini ve şifreni yönet.': 'Manage your profile information and password.',
+        'Profil': 'Profile',
+        'Temel hesap bilgilerin.': 'Your basic account information.',
+        'Kullanıcı Adı': 'Username',
+        'Gruplar': 'Groups',
+        'Bildirimler ve hesap kurtarma için kullanılır.': 'Used for notifications and account recovery.',
+        'E-posta adresi': 'Email Address',
+        'Kaydet': 'Save',
+        'Şifre Değiştir': 'Change Password',
+        'Güçlü bir şifre seç, düzenli olarak değiştir.': 'Choose a strong password and change it regularly.',
+        'Mevcut Şifre': 'Current Password',
+        'Yeni Şifre': 'New Password',
+        'Yeni Şifre (Tekrar)': 'Confirm New Password',
+        'Şifreyi Güncelle': 'Update Password',
+        /* Ortak / Common fields */
+        'Durum': 'Status',
+        'Tarih': 'Date',
+        'Miktar': 'Quantity',
+        'Birim': 'Unit',
+        'Birim Fiyat': 'Unit Price',
+        'Birim fiyat': 'Unit Price',
+        'Birim maliyet': 'Unit Cost',
+        'Ürün': 'Product',
+        'Depo': 'Warehouse',
+        'Açıklama': 'Description',
+        'Notlar': 'Notes',
+        'Referans': 'Reference',
+        'Kategori': 'Category',
+        'Kayıt tarihi': 'Record Date',
+        'Kaynak işletme': 'Source Business',
+        'E-posta': 'Email',
+        'Güncelleme': 'Update',
+        'Düzenle': 'Edit',
+        'İptal Et': 'Cancel',
+        'Vazgeç': 'Cancel',
+        'Geri dön': 'Go Back',
+        'Yeni': 'New',
+        'Bağlantılar': 'Links',
+        'Saat': 'Time',
+        'Başlangıç': 'Start',
+        'Bitiş': 'End',
+        'Atanmamış': 'Unassigned',
+        'Seçiniz…': 'Select…',
+        'Katalog ürünü': 'Catalog Product',
+        'Kalite Kontrolü': 'Quality Control',
+        'Kalite kontrolünü kaydet': 'Save Quality Control',
+        'Kontrol notları': 'Control Notes',
+        'Dış Ürün': 'External Product',
+        'Gönderildi': 'Sent',
+        'Sipariş geçmişi': 'Order History',
+        /* Statü değerleri / Status values */
+        'Aktif': 'Active',
+        'Pasif': 'Inactive',
+        'Taslak': 'Draft',
+        'Tamamlandı': 'Completed',
+        'İptal': 'Cancelled',
+        'Beklemede': 'Pending',
+        'Onaylandı': 'Approved',
+        'Reddedildi': 'Rejected',
+        'Kısmen Alındı': 'Partially Received',
+        /* Eylemler / Actions */
+        'Ara': 'Search',
+        'Filtrele': 'Filter',
+        'Temizle': 'Clear',
+        'Ekle': 'Add',
+        'Kaydet': 'Save',
+        'Sil': 'Delete',
+        'Onayla': 'Approve',
+        'Reddet': 'Reject',
+        'Gönder': 'Send',
+        'İndir': 'Download',
+        'Görüntüle': 'View',
+        'Detay': 'Details',
+        'Geri': 'Back',
+        /* AI */
+        'AI Asistan': 'AI Assistant',
+        'Function Calling Aktif': 'Function Calling Active',
+        'Sohbet Başlat': 'Start Chat',
+        /* Dashboard */
+        'Dashboard': 'Dashboard',
+        'Açık Sipariş': 'Open Orders',
+        'Tamamlanan': 'Completed',
+        'Bekleyen izin': 'Pending Leave',
+    };
+
+    /* ── Text-node walker state ── */
+    var _nodes = null;
+    var _applied = false;
+    var SKIP_TAGS = { SCRIPT: 1, STYLE: 1, TEXTAREA: 1, INPUT: 1, SELECT: 1, CODE: 1, PRE: 1 };
+    var _sidebar = null;
+
+    function collectAndApply() {
+        _sidebar = _sidebar || document.getElementById('sidebar');
+        _nodes = [];
+        var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+        var node;
+        while ((node = walker.nextNode())) {
+            if (SKIP_TAGS[node.parentNode.nodeName]) continue;
+            var el = node.parentNode;
+            while (el && el !== document.body) {
+                if (el === _sidebar) { el = null; break; }
+                el = el.parentNode;
+            }
+            if (!el) continue; /* inside sidebar — skip */
+            var txt = node.nodeValue.trim();
+            if (txt && ERP_DICT[txt] !== undefined) {
+                _nodes.push({ node: node, original: node.nodeValue, key: txt });
+                node.nodeValue = node.nodeValue.replace(txt, ERP_DICT[txt]);
+            }
+        }
+        _applied = true;
+    }
+
+    function restoreNodes() {
+        if (!_nodes) return;
+        _nodes.forEach(function (item) { item.node.nodeValue = item.original; });
+        _nodes = null;
+        _applied = false;
+    }
+
+    /* ── Core language function ── */
     function applyLang(lang) {
+        /* 1. Sidebar data-i18n elements */
         var t = TRANS[lang] || TRANS.tr;
         document.querySelectorAll('[data-i18n]').forEach(function (el) {
             var key = el.getAttribute('data-i18n');
             if (t[key] !== undefined) el.textContent = t[key];
         });
+
+        /* 2. Page content text nodes */
+        if (lang === 'en') {
+            if (!_applied) collectAndApply();
+        } else {
+            restoreNodes();
+        }
+
+        /* 3. UI chrome */
         var btn = document.getElementById('langToggleBtn');
         if (btn) btn.textContent = lang === 'tr' ? 'EN' : 'TR';
         document.documentElement.lang = lang;

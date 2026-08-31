@@ -4,16 +4,16 @@
 
 {% block extra_head %}
 <style>
-  .data-card { background:#fff; border:1px solid #e2e8f0; border-radius:12px; overflow:hidden; }
+  .data-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:12px; overflow:hidden; }
   .data-card .table { margin:0; font-size:13px; }
-  .data-card .table thead th { background:#f8fafc; border-bottom:1px solid #e2e8f0; color:#64748b; font-size:11px; font-weight:700; letter-spacing:.65px; padding:11px 16px; text-transform:uppercase; white-space:nowrap; }
-  .data-card .table tbody td { border-color:#f1f5f9; color:#334155; padding:13px 16px; vertical-align:middle; }
-  .data-card .table tbody tr:hover { background:#f8fafc; }
-  .notification-message { color:#0f172a; font-weight:600; text-decoration:none; }
+  .data-card .table thead th { background:var(--g-n-50); border-bottom:1px solid var(--g-border); color:var(--g-text-2); font-size:11px; font-weight:700; letter-spacing:.65px; padding:11px 16px; text-transform:uppercase; white-space:nowrap; }
+  .data-card .table tbody td { border-color:var(--g-border-sub); color:var(--g-text); padding:13px 16px; vertical-align:middle; }
+  .data-card .table tbody tr:hover { background:var(--g-n-50); }
+  .notification-message { color:var(--g-text); font-weight:600; text-decoration:none; }
   .notification-message:hover { color:#2563eb; }
   .unread-row { background:#f8fbff; }
   .unread-dot { background:#2563eb; border-radius:50%; display:inline-block; height:7px; margin-right:7px; width:7px; }
-  .empty-state { color:#94a3b8; padding:52px 24px; text-align:center; }
+  .empty-state { color:var(--g-text-3); padding:52px 24px; text-align:center; }
   .empty-state i { display:block; font-size:34px; margin-bottom:8px; }
 </style>
 {% endblock %}

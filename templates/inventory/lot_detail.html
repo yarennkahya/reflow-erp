@@ -6,15 +6,15 @@
 
 {% block extra_head %}
 <style>
-  .lot-card, .data-card, .stat-card, .notice-card { background:#fff; border:1px solid #e2e8f0; border-radius:12px; }
+  .lot-card, .data-card, .stat-card, .notice-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:12px; }
   .lot-card { padding:20px; }
   .lot-icon { width:52px; height:52px; border-radius:14px; background:#eff6ff; color:#2563eb; display:flex; align-items:center; justify-content:center; font-size:22px; }
-  .stat-card { height:100%; padding:15px; }.stat-label { color:#64748b; font-size:11px; font-weight:600; letter-spacing:.6px; text-transform:uppercase; }.stat-value { color:#0f172a; font-size:20px; font-weight:700; margin-top:3px; }
-  .data-card { overflow:hidden; }.data-card .table { margin:0; font-size:13px; }.data-card .table thead th { background:#f8fafc; border-bottom:1px solid #e2e8f0; color:#64748b; font-size:11px; font-weight:700; letter-spacing:.65px; padding:11px 16px; text-transform:uppercase; white-space:nowrap; }.data-card .table tbody td { border-color:#f1f5f9; color:#334155; padding:13px 16px; vertical-align:middle; }.data-card .table tbody tr:hover { background:#f8fafc; }
-  .freshness-pill, .movement-pill { border-radius:20px; display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:600; padding:4px 8px; white-space:nowrap; }.freshness-normal { background:#f0fdf4; color:#15803d; }.freshness-priority_sale { background:#fff7ed; color:#c2410c; }.freshness-waste { background:#fef2f2; color:#b91c1c; }.stock-empty { background:#f1f5f9; color:#475569; }
+  .stat-card { height:100%; padding:15px; }.stat-label { color:var(--g-text-2); font-size:11px; font-weight:600; letter-spacing:.6px; text-transform:uppercase; }.stat-value { color:var(--g-text); font-size:20px; font-weight:700; margin-top:3px; }
+  .data-card { overflow:hidden; }.data-card .table { margin:0; font-size:13px; }.data-card .table thead th { background:var(--g-n-50); border-bottom:1px solid var(--g-border); color:var(--g-text-2); font-size:11px; font-weight:700; letter-spacing:.65px; padding:11px 16px; text-transform:uppercase; white-space:nowrap; }.data-card .table tbody td { border-color:var(--g-border-sub); color:var(--g-text); padding:13px 16px; vertical-align:middle; }.data-card .table tbody tr:hover { background:var(--g-n-50); }
+  .freshness-pill, .movement-pill { border-radius:20px; display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:600; padding:4px 8px; white-space:nowrap; }.freshness-normal { background:#f0fdf4; color:#15803d; }.freshness-priority_sale { background:#fff7ed; color:#c2410c; }.freshness-waste { background:#fef2f2; color:#b91c1c; }.stock-empty { background:var(--g-border-sub); color:var(--g-text-2); }
   .movement-in { background:#f0fdf4; color:#15803d; }.movement-production { background:#fff7ed; color:#c2410c; }.movement-sale { background:#eff6ff; color:#1d4ed8; }.movement-waste { background:#fef2f2; color:#b91c1c; }
-  .info-row { display:flex; gap:10px; padding:11px 0; border-bottom:1px solid #f1f5f9; font-size:13px; }.info-row:last-child { border:0; padding-bottom:0; }.info-row i { color:#2563eb; width:16px; }.info-label { color:#64748b; min-width:104px; }.info-value { color:#334155; font-weight:500; overflow-wrap:anywhere; }
-  .lot-code { background:#f8fafc; border-radius:5px; color:#475569; font-family:monospace; font-size:12px; padding:3px 6px; }.qty-in { color:#15803d; font-weight:700; }.qty-out { color:#b91c1c; font-weight:700; }.notice-card { color:#475569; font-size:12.5px; padding:13px 14px; }.empty { color:#94a3b8; padding:38px; text-align:center; }
+  .info-row { display:flex; gap:10px; padding:11px 0; border-bottom:1px solid var(--g-border-sub); font-size:13px; }.info-row:last-child { border:0; padding-bottom:0; }.info-row i { color:#2563eb; width:16px; }.info-label { color:var(--g-text-2); min-width:104px; }.info-value { color:var(--g-text); font-weight:500; overflow-wrap:anywhere; }
+  .lot-code { background:var(--g-n-50); border-radius:5px; color:var(--g-text-2); font-family:monospace; font-size:12px; padding:3px 6px; }.qty-in { color:#15803d; font-weight:700; }.qty-out { color:#b91c1c; font-weight:700; }.notice-card { color:var(--g-text-2); font-size:12.5px; padding:13px 14px; }.empty { color:var(--g-text-3); padding:38px; text-align:center; }
 </style>
 {% endblock %}
 
@@ -34,7 +34,7 @@
 </div>
 
 {% if remaining <= 0 %}
-<div class="notice-card mb-4" style="background:#f8fafc;"><i class="bi bi-info-circle-fill text-secondary me-1"></i>Bu lotun kullanılabilir stoğu kalmadı. Hareket geçmişi kayıt amacıyla korunur.</div>
+<div class="notice-card mb-4" style="background:var(--g-n-50);"><i class="bi bi-info-circle-fill text-secondary me-1"></i>Bu lotun kullanılabilir stoğu kalmadı. Hareket geçmişi kayıt amacıyla korunur.</div>
 {% elif freshness == 'WASTE' %}
 <div class="notice-card mb-4" style="background:#fef2f2;color:#991b1b;border-color:#fecaca;"><i class="bi bi-exclamation-triangle-fill me-1"></i>Bu lotun son kullanma tarihi geçti. İmha veya kalite kontrol sürecini kayda alın.</div>
 {% elif freshness == 'PRIORITY_SALE' %}
