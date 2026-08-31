@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}İzin Talebi — Reflow Coffee ERP{% endblock %}
+{% block nav_hr %}active{% endblock %}
+{% block nav_hr_leave %}active{% endblock %}
+{% block page_title %}İnsan Kaynakları{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between gap-3 mb-4">
+  <div>
+    <h4 class="fw-bold mb-1 text-dark"><i class="bi bi-calendar-plus me-2" style="color:#f97316;"></i>Yeni İzin Talebi</h4>
+    <p class="mb-0 text-muted" style="font-size:13px;">Talep oluşturulduğunda onay bekleyen duruma alınır.</p>
+  </div>
+  <a href="{% url 'hr-leave' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>İzin Listesine Dön</a>
+</div>
+
+<div class="card border-0 shadow-sm" style="max-width:760px;">
+  <div class="card-body p-4">
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+      <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label for="{{ form.employee.id_for_label }}" class="form-label fw-medium">{{ form.employee.label }}</label>
+          {{ form.employee }}
+          {% for error in form.employee.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+        </div>
+        <div class="col-md-6">
+          <label for="{{ form.leave_type.id_for_label }}" class="form-label fw-medium">{{ form.leave_type.label }}</label>
+          {{ form.leave_type }}
+          {% for error in form.leave_type.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+        </div>
+        <div class="col-md-6">
+          <label for="{{ form.start_date.id_for_label }}" class="form-label fw-medium">{{ form.start_date.label }}</label>
+          {{ form.start_date }}
+          {% for error in form.start_date.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+        </div>
+        <div class="col-md-6">
+          <label for="{{ form.end_date.id_for_label }}" class="form-label fw-medium">{{ form.end_date.label }}</label>
+          {{ form.end_date }}
+          {% for error in form.end_date.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+        </div>
+        <div class="col-12">
+          <label for="{{ form.notes.id_for_label }}" class="form-label fw-medium">{{ form.notes.label }}</label>
+          {{ form.notes }}
+          {% for error in form.notes.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+        <a href="{% url 'hr-leave' %}" class="btn btn-outline-secondary">İptal</a>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-send me-1"></i>Talebi Gönder</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
+from .forms import LeaveRequestForm
 from .models import Department, Employee, JobOpening, LeaveRequest
 from .services import approve_leave_request, check_meeting_conflicts, reject_leave_request
 
@@ -144,6 +145,19 @@ def leave_list_view(request):
         if _is_ajax(request) else 'hr/leave_list.html'
     )
     return render(request, template_name, context)
+
+
+@login_required
+def leave_request_create_view(request):
+    form = LeaveRequestForm(request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        leave_request = form.save()
+        messages.success(
+            request,
+            f'{leave_request.employee.name} için izin talebi oluşturuldu.',
+        )
+        return redirect('hr-leave')
+    return render(request, 'hr/leave_request_form.html', {'form': form})
 
 
 @login_required

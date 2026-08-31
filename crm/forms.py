@@ -78,3 +78,39 @@ class SaleForm(forms.ModelForm):
             )
 
         return cleaned_data
+
+
+class OpportunityCreateForm(forms.ModelForm):
+    class Meta:
+        model = Opportunity
+        fields = ('customer', 'title', 'estimated_value', 'notes')
+        labels = {
+            'customer': 'Müşteri',
+            'title': 'Fırsat adı',
+            'estimated_value': 'Tahmini tutar (₺)',
+            'notes': 'Notlar',
+        }
+        widgets = {
+            'title': forms.TextInput(
+                attrs={'placeholder': 'Örn. Eylül aylık kahve tedariki'}
+            ),
+            'estimated_value': forms.NumberInput(
+                attrs={'min': '0', 'step': '0.01', 'placeholder': '0,00'}
+            ),
+            'notes': forms.Textarea(
+                attrs={
+                    'rows': 4,
+                    'placeholder': 'Görüşme notları, sonraki adım veya ihtiyaçlar',
+                }
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['customer'].queryset = Customer.objects.filter(
+            is_active=True
+        ).order_by('name')
+
+        for field in self.fields.values():
+            field.widget.attrs.setdefault('class', 'form-control')
+        self.fields['customer'].widget.attrs['class'] = 'form-select'

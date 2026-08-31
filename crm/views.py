@@ -7,7 +7,7 @@ from django.views.decorators.http import require_POST
 
 from sales.models import Customer
 
-from .forms import CustomerForm, SaleForm
+from .forms import CustomerForm, OpportunityCreateForm, SaleForm
 from .models import Opportunity
 from .services import advance_stage, mark_as_lost, set_sale_activity
 
@@ -168,6 +168,21 @@ def sale_create(request):
         messages.success(request, 'Satış kaydı oluşturuldu.')
         return redirect('crm-customer-detail', pk=sale.customer_id)
     return render(request, 'crm/sale_form.html', {'form': form, 'sale': None})
+
+
+@login_required
+def opportunity_create(request):
+    initial = {}
+    customer_id = request.GET.get('customer')
+    if customer_id and Customer.objects.filter(pk=customer_id, is_active=True).exists():
+        initial['customer'] = customer_id
+
+    form = OpportunityCreateForm(request.POST or None, initial=initial)
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        messages.success(request, 'Yeni fırsat oluşturuldu.')
+        return redirect('crm-sale-list')
+    return render(request, 'crm/opportunity_form.html', {'form': form})
 
 
 @login_required

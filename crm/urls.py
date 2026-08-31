@@ -11,6 +11,7 @@ urlpatterns = [
     path('customers/<int:pk>/delete/', views.customer_delete, name='crm-customer-delete'),
     path('sales/', views.sale_list, name='crm-sale-list'),
     path('sales/new/', views.sale_create, name='crm-sale-create'),
+    path('opportunities/new/', views.opportunity_create, name='opportunity-create'),
     path('sales/<int:pk>/edit/', views.sale_edit, name='crm-sale-edit'),
     path('sales/<int:pk>/delete/', views.sale_delete, name='crm-sale-delete'),
     path('sales/<int:pk>/advance/', views.opportunity_advance_view, name='opportunity-advance'),

@@ -24,7 +24,7 @@
 {% block content %}
 <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
   <div><h4 class="fw-bold mb-1 text-dark"><i class="bi bi-bar-chart-steps me-2" style="color:#2563eb;"></i>Satış Takibi</h4><p class="mb-0 text-muted" style="font-size:13px;">Her satışın durumunu, aşamasını ve tahmini değerini takip edin.</p></div>
-  <div class="d-flex gap-2"><a href="{% url 'crm-list' %}" class="btn btn-outline-primary"><i class="bi bi-people me-1"></i>Müşteriler</a><a href="{% url 'crm-sale-create' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Yeni Satış</a></div>
+  <div class="d-flex gap-2"><a href="{% url 'crm-list' %}" class="btn btn-outline-primary"><i class="bi bi-people me-1"></i>Müşteriler</a><a href="{% url 'opportunity-create' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Yeni Fırsat</a></div>
 </div>
 
 <div class="row g-3 mb-4"><div class="col-md-4"><div class="crm-stat"><div class="crm-stat-icon" style="background:#dcfce7;color:#16a34a;"><i class="bi bi-play-circle"></i></div><div><div class="crm-stat-value">{{ active_sales }}</div><div class="crm-stat-label">Aktif Satış</div></div></div></div><div class="col-md-4"><div class="crm-stat"><div class="crm-stat-icon" style="background:var(--g-border-sub);color:var(--g-text-2);"><i class="bi bi-pause-circle"></i></div><div><div class="crm-stat-value">{{ passive_sales }}</div><div class="crm-stat-label">Pasif Satış</div></div></div></div><div class="col-md-4"><div class="crm-stat"><div class="crm-stat-icon" style="background:#ecfdf5;color:#047857;"><i class="bi bi-trophy"></i></div><div><div class="crm-stat-value">{{ won_sales }}</div><div class="crm-stat-label">Kazanılan Satış</div></div></div></div></div>
