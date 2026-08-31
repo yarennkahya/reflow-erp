@@ -26,9 +26,18 @@ _APP_STAGE = {
     'rejected':   'bg-danger-subtle text-danger',
 }
 
+AVATAR_PALETTE = [
+    '#a855f7', '#b45309', '#65a30d', '#0d9488',
+    '#be185d', '#2563eb', '#c2410c', '#7c3aed',
+]
+
 
 def _is_ajax(request):
     return request.headers.get('x-requested-with') == 'XMLHttpRequest'
+
+
+def get_avatar_color(name):
+    return AVATAR_PALETTE[sum(ord(char) for char in name) % len(AVATAR_PALETTE)]
 
 
 @login_required
@@ -55,25 +64,38 @@ def employee_list_view(request):
     qs = Employee.objects.select_related('department', 'position', 'manager').order_by('name')
     departments = Department.objects.order_by('name')
     dept_id = request.GET.get('department')
+    manager_id = request.GET.get('manager')
+
+    if manager_id:
+        manager = Employee.objects.filter(pk=manager_id).first()
+        qs = (
+            manager.direct_reports.select_related('department', 'position', 'manager').order_by('name')
+            if manager else Employee.objects.none()
+        )
     if dept_id:
         qs = qs.filter(department_id=dept_id)
+
+    employees = list(qs)
     emp_data = [
         {
             'emp': emp,
             'badge_cls': _EMP_STATUS.get(emp.employment_status, 'bg-secondary-subtle text-secondary'),
         }
-        for emp in qs
+        for emp in employees
+    ]
+    employees_with_color = [
+        {'employee': employee, 'color': get_avatar_color(employee.name)}
+        for employee in employees
     ]
     context = {
         'employees': emp_data,
+        'employees_with_color': employees_with_color,
         'departments': departments,
+        'managers': Employee.objects.filter(direct_reports__isnull=False).distinct().order_by('name'),
         'selected_dept': dept_id,
+        'selected_manager': manager_id,
     }
-    template_name = (
-        'hr/partials/employee_results.html'
-        if _is_ajax(request) else 'hr/employee_list.html'
-    )
-    return render(request, template_name, context)
+    return render(request, 'hr/employee_list.html', context)
 
 
 @login_required

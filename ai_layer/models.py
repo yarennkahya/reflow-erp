@@ -47,3 +47,19 @@ class ChatMessage(models.Model):
 
     def __str__(self):
         return f'{self.conversation} - {self.role}'
+
+
+class DocumentChunk(models.Model):
+    document = models.ForeignKey(
+        Document, on_delete=models.CASCADE, related_name='chunks'
+    )
+    content = models.TextField()
+    embedding = VectorField(dimensions=1536, null=True, blank=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['document', 'order']
+        unique_together = ('document', 'order')
+
+    def __str__(self):
+        return f'{self.document.title} - parça {self.order}'

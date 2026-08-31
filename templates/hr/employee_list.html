@@ -10,14 +10,32 @@
   .hr-subnav a { padding:8px 14px; font-size:13px; font-weight:500; color:var(--g-text-2); text-decoration:none; border-bottom:2px solid transparent; margin-bottom:-1px; white-space:nowrap; }
   .hr-subnav a:hover { color:var(--g-text); }
   .hr-subnav a.active { color:#9333ea; border-bottom-color:#9333ea; font-weight:600; }
-  .data-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:10px; overflow:hidden; }
-  .data-card .table { margin-bottom:0; font-size:13.5px; }
-  .data-card .table thead th { background:var(--g-n-50); color:var(--g-text-2); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.7px; border-bottom:1px solid var(--g-border); padding:10px 16px; white-space:nowrap; }
-  .data-card .table tbody td { padding:11px 16px; vertical-align:middle; color:var(--g-text); border-color:var(--g-border-sub); }
-  .data-card .table tbody tr:last-child td { border-bottom:none; }
-  .data-card .table tbody tr:hover { background:var(--g-n-50); }
-  .empty-state { padding:48px 24px; text-align:center; color:var(--g-text-3); }
-  .empty-state i { font-size:36px; display:block; margin-bottom:8px; }
+  .employee-filter-bar { align-items:center; background:var(--g-surface); border:1px solid var(--g-border); border-radius:12px; display:flex; gap:16px; margin-bottom:18px; padding:14px 16px; }
+  .employee-filter-title { color:var(--g-text); font-size:15px; font-weight:700; }
+  .employee-filter-count { color:var(--g-text-2); font-size:12.5px; }
+  .employee-filter-form { margin-left:auto; }
+  .employee-card { background:var(--g-surface); border:1px solid var(--g-border); border-radius:12px; display:flex; flex-direction:column; height:100%; min-height:214px; padding:16px; position:relative; transition:box-shadow .18s ease, transform .18s ease, border-color .18s ease; }
+  .employee-card:hover { border-color:#bfdbfe; box-shadow:0 10px 24px rgba(15, 23, 42, .10); transform:translateY(-3px); }
+  .employee-card-top { align-items:flex-start; display:flex; gap:12px; min-width:0; }
+  .employee-avatar { align-items:center; border-radius:12px; color:#fff; display:flex; flex:0 0 auto; font-size:27px; font-weight:700; height:58px; justify-content:center; width:58px; }
+  .employee-main { min-width:0; padding-right:14px; }
+  .employee-name { color:var(--g-text); display:block; font-size:14px; font-weight:700; line-height:1.25; overflow:hidden; text-decoration:none; text-overflow:ellipsis; white-space:nowrap; }
+  .employee-name:hover { color:#2563eb; }
+  .employee-position { color:var(--g-text-2); font-size:12px; line-height:1.4; margin-top:4px; }
+  .employee-status-dot { border:2px solid var(--g-surface); border-radius:50%; height:12px; position:absolute; right:13px; top:13px; width:12px; }
+  .employee-status-dot.active { background:#16a34a; }.employee-status-dot.on_leave { background:#f59e0b; }.employee-status-dot.terminated { background:#94a3b8; }
+  .employee-contact-list { border-top:1px solid var(--g-border-sub); display:grid; gap:7px; margin:15px 0 12px; padding-top:12px; }
+  .employee-contact { align-items:center; color:var(--g-text-2); display:flex; font-size:12px; gap:7px; min-width:0; text-decoration:none; }
+  .employee-contact i { color:#64748b; font-size:13px; }.employee-contact span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  a.employee-contact:hover { color:#2563eb; }.employee-contact:hover i { color:#2563eb; }
+  .employee-footer { align-items:center; display:flex; gap:8px; margin-top:auto; min-width:0; }
+  .employee-department { color:var(--g-text-3); font-size:11.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .employee-department i { color:#64748b; margin-right:4px; }
+  .employee-detail-link { align-items:center; background:var(--g-n-50); border-radius:7px; color:var(--g-text-2); display:inline-flex; font-size:14px; height:28px; justify-content:center; margin-left:auto; text-decoration:none; transition:background .15s ease, color .15s ease; width:28px; }
+  .employee-detail-link:hover { background:#eff6ff; color:#2563eb; }
+  .employee-empty { background:var(--g-surface); border:1px dashed var(--g-border); border-radius:12px; color:var(--g-text-3); padding:52px 24px; text-align:center; }
+  .employee-empty i { display:block; font-size:36px; margin-bottom:8px; }
+  @media (max-width: 767.98px) { .employee-filter-bar { align-items:stretch; flex-direction:column; }.employee-filter-form { margin-left:0; } }
 </style>
 {% endblock %}
 
@@ -29,5 +47,60 @@
   <a href="{% url 'hr-recruitment' %}">İşe Alım</a>
 </div>
 
-{% include 'hr/partials/employee_results.html' %}
+<div id="hr-employee-results" data-ajax-region>
+  <div class="employee-filter-bar flex-wrap">
+    <div>
+      <div class="employee-filter-title"><i class="bi bi-people-fill me-2" style="color:#9333ea;"></i>Çalışanlar</div>
+      <div class="employee-filter-count mt-1">{{ employees_with_color|length }} kayıt</div>
+    </div>
+    <form method="get" class="employee-filter-form d-flex flex-wrap gap-2" data-ajax-filter data-ajax-target="#hr-employee-results" data-ajax-autosubmit>
+      <select name="department" class="form-select form-select-sm" style="min-width:170px;" aria-label="Departmana göre filtrele">
+        <option value="">Tüm Departmanlar</option>
+        {% for department in departments %}
+        <option value="{{ department.pk }}" {% if selected_dept == department.pk|stringformat:"s" %}selected{% endif %}>{{ department.name }}</option>
+        {% endfor %}
+      </select>
+      <select name="manager" class="form-select form-select-sm" style="min-width:170px;" aria-label="Yöneticiye göre filtrele">
+        <option value="">Tüm Yöneticiler</option>
+        {% for manager in managers %}
+        <option value="{{ manager.pk }}" {% if selected_manager == manager.pk|stringformat:"s" %}selected{% endif %}>{{ manager.name }}</option>
+        {% endfor %}
+      </select>
+      {% if selected_dept or selected_manager %}
+      <a href="{% url 'hr-employees' %}" class="btn btn-sm btn-outline-secondary" data-ajax-link data-ajax-target="#hr-employee-results">Temizle</a>
+      {% endif %}
+    </form>
+  </div>
+
+  <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 row-cols-xxl-4 g-3">
+    {% for row in employees_with_color %}
+    <div class="col">
+      <article class="employee-card">
+        <span class="employee-status-dot {{ row.employee.employment_status }}" title="{{ row.employee.get_employment_status_display }}"></span>
+        <div class="employee-card-top">
+          <div class="employee-avatar" style="background:{{ row.color }};">{{ row.employee.name|first|upper }}</div>
+          <div class="employee-main">
+            <a href="{% url 'hr-employee-detail' row.employee.pk %}" class="employee-name">{{ row.employee.name }}</a>
+            <div class="employee-position"><i class="bi bi-briefcase-fill me-1"></i>{{ row.employee.position.title }}</div>
+          </div>
+        </div>
+        <div class="employee-contact-list">
+          {% if row.employee.email %}
+          <a href="mailto:{{ row.employee.email }}" class="employee-contact"><i class="bi bi-envelope-fill"></i><span>{{ row.employee.email }}</span></a>
+          {% endif %}
+          {% if row.employee.phone %}
+          <a href="tel:{{ row.employee.phone }}" class="employee-contact"><i class="bi bi-telephone-fill"></i><span>{{ row.employee.phone }}</span></a>
+          {% endif %}
+        </div>
+        <div class="employee-footer">
+          <span class="employee-department"><i class="bi bi-diagram-3-fill"></i>{{ row.employee.department.name }}</span>
+          <a href="{% url 'hr-employee-detail' row.employee.pk %}" class="employee-detail-link" aria-label="{{ row.employee.name }} detayları"><i class="bi bi-arrow-up-right"></i></a>
+        </div>
+      </article>
+    </div>
+    {% empty %}
+    <div class="col-12"><div class="employee-empty"><i class="bi bi-person-x"></i><div class="fw-semibold">Sonuç bulunamadı</div><div class="mt-1">Seçili filtrelere uygun çalışan kaydı yok.</div></div></div>
+    {% endfor %}
+  </div>
+</div>
 {% endblock %}

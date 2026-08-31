@@ -7,7 +7,7 @@ from pgvector.django import CosineDistance
 from inventory.services import get_stock_summary
 from sales.services import get_demand_forecast
 
-from .models import Document
+from .models import Document, DocumentChunk
 from .query_registry import QUERY_REGISTRY
 
 EMBEDDING_MODEL = 'text-embedding-3-small'
@@ -31,6 +31,55 @@ def embed_document(document):
     return document
 
 
+def chunk_text(text, chunk_size=500, overlap=50):
+    """
+    Metni chunk_size karakterlik parcalara boler, overlap kadar ust
+    uste bindirir (bir cumlenin tam ortadan bolunup anlamini kaybetmesini
+    onlemek icin). Metin chunk_size'dan kisaysa, tek parca olarak doner.
+    """
+    if len(text) <= chunk_size:
+        return [text]
+    chunks = []
+    start = 0
+    while start < len(text):
+        end = start + chunk_size
+        chunks.append(text[start:end])
+        start = end - overlap
+    return chunks
+
+
+def embed_document_chunks(document):
+    """
+    Bir Document'in content'ini parcalara boler, HER PARCAYI AYRI AYRI
+    embed eder, DocumentChunk olarak kaydeder. Onceden var olan parcalari
+    once siler (yeniden calistirilirsa duplike olusmasin diye).
+    """
+    document.chunks.all().delete()
+    pieces = chunk_text(document.content)
+    created = []
+    for i, piece in enumerate(pieces):
+        embedding = generate_embedding(piece)
+        chunk = DocumentChunk.objects.create(
+            document=document, content=piece, embedding=embedding, order=i
+        )
+        created.append(chunk)
+    return created
+
+
+def search_similar_chunks(query_embedding, top_k=3):
+    """
+    search_similar_documents'in parca-bazli hali -- artik butun bir
+    dokumani degil, en alakali SPESIFIK PARCAYI buluyor.
+    """
+    return (
+        DocumentChunk.objects
+        .filter(embedding__isnull=False)
+        .select_related('document')
+        .annotate(distance=CosineDistance('embedding', query_embedding))
+        .order_by('distance')[:top_k]
+    )
+
+
 def search_similar_documents(query_embedding, top_k=3):
     """
     Verilen bir embedding vektorune en yakin Document'lari bulur.
@@ -51,16 +100,17 @@ def answer_question(question, top_k=3):
     bu belgeleri baglam olarak LLM'e verip soruyu cevaplatir.
     """
     question_embedding = generate_embedding(question)
-    relevant_docs = search_similar_documents(question_embedding, top_k=top_k)
+    relevant_chunks = search_similar_chunks(question_embedding, top_k=top_k)
 
-    if not relevant_docs:
+    if not relevant_chunks:
         return {
             'answer': 'Bu soruyla ilgili sistemde henuz bir bilgi bulamadim.',
             'sources': [],
         }
 
     context = '\n\n'.join(
-        f'[{doc.title}]\n{doc.content}' for doc in relevant_docs
+        f'[{chunk.document.title}]\n{chunk.content}'
+        for chunk in relevant_chunks
     )
 
     system_prompt = (
@@ -79,7 +129,9 @@ def answer_question(question, top_k=3):
 
     return {
         'answer': response.choices[0].message.content,
-        'sources': [doc.title for doc in relevant_docs],
+        'sources': list(dict.fromkeys(
+            chunk.document.title for chunk in relevant_chunks
+        )),
     }
 
 
@@ -89,10 +141,11 @@ def _search_documents_tool(query):
     (embedding uret + benzer belge bul) bir fonksiyon olarak sarmalar.
     """
     query_embedding = generate_embedding(query)
-    docs = search_similar_documents(query_embedding, top_k=3)
+    chunks = search_similar_chunks(query_embedding, top_k=3)
     return {
         'results': [
-            {'title': doc.title, 'content': doc.content} for doc in docs
+            {'title': chunk.document.title, 'content': chunk.content}
+            for chunk in chunks
         ]
     }
 
