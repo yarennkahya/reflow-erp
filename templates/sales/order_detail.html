@@ -49,4 +49,19 @@
     {% endfor %}
   </tbody>
 </table>
+
+{% if order.status == 'fulfilled' %}
+  {% if order.invoice %}
+    <a href="{% url 'invoice-detail' order.invoice.pk %}" class="btn btn-outline-primary btn-sm mt-3">
+      <i class="bi bi-receipt"></i> Faturayı Görüntüle
+    </a>
+  {% else %}
+    <form method="post" action="{% url 'invoice-create' order.pk %}" class="mt-3">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-primary btn-sm">
+        <i class="bi bi-receipt"></i> Fatura Oluştur
+      </button>
+    </form>
+  {% endif %}
+{% endif %}
 {% endblock %}

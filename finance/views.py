@@ -1,8 +1,11 @@
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
+from sales.models import Order
+
 from .models import Invoice, Payment
-from .services import get_profitability_report, record_payment
+from .services import create_invoice, get_profitability_report, record_payment
 
 
 @login_required
@@ -39,3 +42,16 @@ def invoice_detail_view(request, pk):
         'payment_methods': Payment.Method.choices,
         'error': error,
     })
+
+
+@login_required
+def invoice_create_view(request, order_pk):
+    order = get_object_or_404(Order, pk=order_pk)
+    if request.method == 'POST':
+        try:
+            invoice = create_invoice(order)
+            messages.success(request, 'Fatura oluşturuldu.')
+            return redirect('invoice-detail', pk=invoice.pk)
+        except ValueError as exc:
+            messages.error(request, str(exc))
+    return redirect('order-detail', pk=order_pk)
