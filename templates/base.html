@@ -39,12 +39,8 @@
             <a href="/dashboard/" class="g-sb-item {% block nav_dashboard %}{% endblock %}">
                 <i class="bi bi-grid-1x2-fill"></i> <span data-i18n="nav-dashboard">Dashboard</span>
             </a>
-            <a href="/chat/" class="g-sb-item {% block nav_chat %}{% endblock %}">
-                <i class="bi bi-robot"></i> <span data-i18n="nav-ai">AI Asistan</span>
-            </a>
-            <a href="/meetings/" class="g-sb-item {% block nav_meetings %}{% endblock %}">
-                <i class="bi bi-calendar3"></i> <span data-i18n="nav-calendar">Takvim</span>
-            </a>
+            {% if module_access.ai_layer %}<a href="/chat/" class="g-sb-item {% block nav_chat %}{% endblock %}"><i class="bi bi-robot"></i> <span data-i18n="nav-ai">AI Asistan</span></a>{% else %}<span class="g-sb-item g-sb-locked" title="Erişim izniniz yok"><i class="bi bi-robot"></i> <span data-i18n="nav-ai">AI Asistan</span><i class="bi bi-lock-fill g-sb-lock"></i></span>{% endif %}
+            {% if module_access.meetings %}<a href="/meetings/" class="g-sb-item {% block nav_meetings %}{% endblock %}"><i class="bi bi-calendar3"></i> <span data-i18n="nav-calendar">Takvim</span></a>{% else %}<span class="g-sb-item g-sb-locked" title="Erişim izniniz yok"><i class="bi bi-calendar3"></i> <span data-i18n="nav-calendar">Takvim</span><i class="bi bi-lock-fill g-sb-lock"></i></span>{% endif %}
         </nav>
     </div>
 
@@ -53,40 +49,40 @@
     <div class="g-sb-group">
         <div class="g-sb-group-label" data-i18n="modules">Modüller</div>
         <nav class="g-sb-nav">
-            <div class="g-sb-expandable {% block nav_inventory %}{% endblock %}">
-                <button class="g-sb-expandable-head" type="button">
+            <div class="g-sb-expandable {% if not module_access.inventory %}is-locked{% endif %} {% block nav_inventory %}{% endblock %}">
+                <button class="g-sb-expandable-head" type="button" {% if not module_access.inventory %}disabled aria-disabled="true"{% endif %}>
                     <i class="bi bi-boxes"></i> <span data-i18n="nav-inventory">Stok</span>
-                    <i class="bi bi-chevron-down g-sb-chevron"></i>
+                    {% if module_access.inventory %}<i class="bi bi-chevron-down g-sb-chevron"></i>{% else %}<i class="bi bi-lock-fill g-sb-lock"></i>{% endif %}
                 </button>
                 <div class="g-sb-children">
                     <a href="/inventory/" class="g-sb-child {% block nav_inventory_lots %}{% endblock %}" data-i18n="nav-inventory-lots">Stoklar</a>
                     <a href="/inventory/warehouses/" class="g-sb-child {% block nav_inventory_warehouses %}{% endblock %}" data-i18n="nav-inventory-warehouses">Depolar</a>
                 </div>
             </div>
-            <div class="g-sb-expandable {% block nav_purchasing %}{% endblock %}">
-                <button class="g-sb-expandable-head" type="button">
+            <div class="g-sb-expandable {% if not module_access.purchasing %}is-locked{% endif %} {% block nav_purchasing %}{% endblock %}">
+                <button class="g-sb-expandable-head" type="button" {% if not module_access.purchasing %}disabled aria-disabled="true"{% endif %}>
                     <i class="bi bi-basket3"></i> <span data-i18n="nav-purchasing">Satın Alma</span>
-                    <i class="bi bi-chevron-down g-sb-chevron"></i>
+                    {% if module_access.purchasing %}<i class="bi bi-chevron-down g-sb-chevron"></i>{% else %}<i class="bi bi-lock-fill g-sb-lock"></i>{% endif %}
                 </button>
                 <div class="g-sb-children">
                     <a href="/purchasing/" class="g-sb-child {% block nav_purchasing_orders %}{% endblock %}" data-i18n="nav-purchasing-orders">Siparişler</a>
                     <a href="/purchasing/suppliers/" class="g-sb-child {% block nav_purchasing_suppliers %}{% endblock %}" data-i18n="nav-purchasing-suppliers">Tedarikçiler</a>
                 </div>
             </div>
-            <div class="g-sb-expandable {% block nav_production %}{% endblock %}">
-                <button class="g-sb-expandable-head" type="button">
+            <div class="g-sb-expandable {% if not module_access.production %}is-locked{% endif %} {% block nav_production %}{% endblock %}">
+                <button class="g-sb-expandable-head" type="button" {% if not module_access.production %}disabled aria-disabled="true"{% endif %}>
                     <i class="bi bi-fire"></i> <span data-i18n="nav-production">Üretim</span>
-                    <i class="bi bi-chevron-down g-sb-chevron"></i>
+                    {% if module_access.production %}<i class="bi bi-chevron-down g-sb-chevron"></i>{% else %}<i class="bi bi-lock-fill g-sb-lock"></i>{% endif %}
                 </button>
                 <div class="g-sb-children">
                     <a href="/production/" class="g-sb-child {% block nav_production_batches %}{% endblock %}" data-i18n="nav-production-batches">Üretim Emirleri</a>
                     <a href="/production/recipes/" class="g-sb-child {% block nav_production_recipes %}{% endblock %}" data-i18n="nav-production-recipes">Reçeteler</a>
                 </div>
             </div>
-            <div class="g-sb-expandable {% block nav_sales %}{% endblock %}">
-                <button class="g-sb-expandable-head" type="button">
+            <div class="g-sb-expandable {% if not module_access.sales %}is-locked{% endif %} {% block nav_sales %}{% endblock %}">
+                <button class="g-sb-expandable-head" type="button" {% if not module_access.sales %}disabled aria-disabled="true"{% endif %}>
                     <i class="bi bi-cart3"></i> <span data-i18n="nav-sales">Satış</span>
-                    <i class="bi bi-chevron-down g-sb-chevron"></i>
+                    {% if module_access.sales %}<i class="bi bi-chevron-down g-sb-chevron"></i>{% else %}<i class="bi bi-lock-fill g-sb-lock"></i>{% endif %}
                 </button>
                 <div class="g-sb-children">
                     <a href="/sales/" class="g-sb-child {% block nav_sales_orders %}{% endblock %}" data-i18n="nav-sales-orders">Siparişler</a>
@@ -95,30 +91,30 @@
                     <a href="/sales/returns/" class="g-sb-child {% block nav_sales_returns %}{% endblock %}" data-i18n="nav-sales-returns">İadeler</a>
                 </div>
             </div>
-            <div class="g-sb-expandable {% block nav_finance %}{% endblock %}">
-                <button class="g-sb-expandable-head" type="button">
+            <div class="g-sb-expandable {% if not module_access.finance %}is-locked{% endif %} {% block nav_finance %}{% endblock %}">
+                <button class="g-sb-expandable-head" type="button" {% if not module_access.finance %}disabled aria-disabled="true"{% endif %}>
                     <i class="bi bi-graph-up-arrow"></i> <span data-i18n="nav-finance">Finans</span>
-                    <i class="bi bi-chevron-down g-sb-chevron"></i>
+                    {% if module_access.finance %}<i class="bi bi-chevron-down g-sb-chevron"></i>{% else %}<i class="bi bi-lock-fill g-sb-lock"></i>{% endif %}
                 </button>
                 <div class="g-sb-children">
                     <a href="/finance/" class="g-sb-child {% block nav_finance_overview %}{% endblock %}" data-i18n="nav-finance-overview">Genel Bakış</a>
                     <a href="/finance/invoices/" class="g-sb-child {% block nav_finance_invoices %}{% endblock %}" data-i18n="nav-finance-invoices">Faturalar</a>
                 </div>
             </div>
-            <div class="g-sb-expandable {% block nav_crm %}{% endblock %}">
-                <button class="g-sb-expandable-head" type="button">
+            <div class="g-sb-expandable {% if not module_access.crm %}is-locked{% endif %} {% block nav_crm %}{% endblock %}">
+                <button class="g-sb-expandable-head" type="button" {% if not module_access.crm %}disabled aria-disabled="true"{% endif %}>
                     <i class="bi bi-building"></i> <span data-i18n="nav-crm">CRM</span>
-                    <i class="bi bi-chevron-down g-sb-chevron"></i>
+                    {% if module_access.crm %}<i class="bi bi-chevron-down g-sb-chevron"></i>{% else %}<i class="bi bi-lock-fill g-sb-lock"></i>{% endif %}
                 </button>
                 <div class="g-sb-children">
                     <a href="/crm/" class="g-sb-child {% block nav_crm_customers %}{% endblock %}" data-i18n="nav-customers">Müşteriler</a>
                     <a href="/crm/sales/" class="g-sb-child {% block nav_crm_sales %}{% endblock %}" data-i18n="nav-sales-tracking">Satış Takibi</a>
                 </div>
             </div>
-            <div class="g-sb-expandable {% block nav_hr %}{% endblock %}">
-                <button class="g-sb-expandable-head" type="button">
+            <div class="g-sb-expandable {% if not module_access.hr %}is-locked{% endif %} {% block nav_hr %}{% endblock %}">
+                <button class="g-sb-expandable-head" type="button" {% if not module_access.hr %}disabled aria-disabled="true"{% endif %}>
                     <i class="bi bi-people"></i> <span data-i18n="nav-hr">İnsan Kaynakları</span>
-                    <i class="bi bi-chevron-down g-sb-chevron"></i>
+                    {% if module_access.hr %}<i class="bi bi-chevron-down g-sb-chevron"></i>{% else %}<i class="bi bi-lock-fill g-sb-lock"></i>{% endif %}
                 </button>
                 <div class="g-sb-children">
                     <a href="/hr/" class="g-sb-child {% block nav_hr_overview %}{% endblock %}" data-i18n="nav-hr-overview">Genel Bakış</a>
@@ -135,9 +131,7 @@
     <div class="g-sb-group">
         <div class="g-sb-group-label" data-i18n="system">Sistem</div>
         <nav class="g-sb-nav">
-            <a href="/audit/" class="g-sb-item {% block nav_audit %}{% endblock %}">
-                <i class="bi bi-clock-history"></i> <span data-i18n="nav-audit">Denetim Kaydı</span>
-            </a>
+            {% if module_access.audit %}<a href="/audit/" class="g-sb-item {% block nav_audit %}{% endblock %}"><i class="bi bi-clock-history"></i> <span data-i18n="nav-audit">Denetim Kaydı</span></a>{% else %}<span class="g-sb-item g-sb-locked" title="Erişim izniniz yok"><i class="bi bi-clock-history"></i> <span data-i18n="nav-audit">Denetim Kaydı</span><i class="bi bi-lock-fill g-sb-lock"></i></span>{% endif %}
         </nav>
     </div>
 

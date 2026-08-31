@@ -1450,6 +1450,11 @@ body.erp-layout { background: var(--g-bg); }
 
 .g-sb-item:hover { color: var(--g-sb-text-h); background: rgba(255,255,255,0.05); }
 .g-sb-item.active { color: #fff; background: var(--g-brand); }
+.g-sb-locked,
+.g-sb-expandable.is-locked { opacity: 0.45; }
+.g-sb-locked { cursor: not-allowed; }
+.g-sb-locked:hover { color: var(--g-sb-text); background: none; }
+.g-sb-lock { margin-left: auto; font-size: 11px !important; opacity: 0.8; width: auto !important; }
 
 /* Expandable groups */
 .g-sb-expandable-head {
@@ -1472,6 +1477,9 @@ body.erp-layout { background: var(--g-bg); }
 
 .g-sb-expandable-head i { font-size: 14px; width: 16px; text-align: center; flex-shrink: 0; }
 .g-sb-expandable-head:hover { color: var(--g-sb-text-h); background: rgba(255,255,255,0.05); }
+.g-sb-expandable.is-locked .g-sb-expandable-head { cursor: not-allowed; }
+.g-sb-expandable.is-locked .g-sb-expandable-head:hover { color: var(--g-sb-text); background: none; }
+.g-sb-expandable.is-locked .g-sb-children { display: none; }
 .g-sb-expandable.open .g-sb-expandable-head { color: var(--g-sb-text-h); }
 
 .g-sb-chevron {

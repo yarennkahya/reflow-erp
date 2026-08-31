@@ -2,6 +2,7 @@ from datetime import timedelta
 from decimal import Decimal
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Permission
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -17,6 +18,9 @@ class InventoryViewsTests(TestCase):
             username='inventory-user',
             password='secret123',
         )
+        self.user.user_permissions.add(*Permission.objects.filter(
+            content_type__app_label='inventory'
+        ))
         self.supplier = Business.objects.create(
             name='Inventory Test Supplier',
             business_type=Business.BusinessType.SUPPLIER,
@@ -124,3 +128,24 @@ class InventoryServiceTests(TestCase):
         self.assertEqual(summary['product'], self.product.name)
         self.assertEqual(summary['total_remaining'], 2.75)
         self.assertEqual(summary['lots'][0]['freshness_status'], 'PRIORITY_SALE')
+
+
+class ModuleAccessTests(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(
+            username='purchasing-role-user', password='secret123'
+        )
+        self.user.user_permissions.add(*Permission.objects.filter(
+            content_type__app_label='purchasing'
+        ))
+        self.client.force_login(self.user)
+
+    def test_role_can_open_its_module_but_is_redirected_from_others(self):
+        response = self.client.get(reverse('purchasing-list'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'is-locked')
+
+        self.assertEqual(self.client.get(reverse('chat-page')).status_code, 200)
+
+        response = self.client.get(reverse('hr-list'))
+        self.assertRedirects(response, reverse('dashboard-home'))

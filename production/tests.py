@@ -2,6 +2,7 @@ from datetime import timedelta
 from decimal import Decimal
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Permission
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -16,6 +17,9 @@ class RoastBatchCreateViewTests(TestCase):
         self.user = get_user_model().objects.create_user(
             username='production-user', password='secret123'
         )
+        self.user.user_permissions.add(*Permission.objects.filter(
+            content_type__app_label__in=('production', 'inventory')
+        ))
         self.business = Business.objects.create(
             name='Production Test Business',
             business_type=Business.BusinessType.INTERNAL,

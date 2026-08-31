@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Permission
 from django.test import TestCase
 from django.urls import reverse
 
@@ -65,6 +66,9 @@ class CrmViewsTests(TestCase):
         self.user = get_user_model().objects.create_user(
             username='crm-user', password='safe-test-password'
         )
+        self.user.user_permissions.add(*Permission.objects.filter(
+            content_type__app_label='crm'
+        ))
         self.customer = Customer.objects.create(
             name='Mavi Fincan',
             customer_type=Customer.CustomerType.WHOLESALE,

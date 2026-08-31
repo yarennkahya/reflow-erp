@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Permission
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
@@ -13,6 +14,9 @@ class JobOpeningViewTests(TestCase):
         self.user = get_user_model().objects.create_user(
             username='hr-user', password='secret123'
         )
+        self.user.user_permissions.add(*Permission.objects.filter(
+            content_type__app_label='hr'
+        ))
         self.department = Department.objects.create(name='İnsan Kaynakları')
         self.position = Position.objects.create(
             title='İşe Alım Uzmanı', department=self.department

@@ -12,6 +12,7 @@ from sales.models import Customer, Order
 from crm.models import Opportunity
 from hr.models import Employee, LeaveRequest
 from finance.services import get_profitability_report
+from inventory.rbac import user_can_access_module
 import json
 from ai_layer.models import Conversation
 def landing_view(request):
@@ -41,44 +42,58 @@ def chat_page_view(request, conversation_id=None):
     })
 
 def dashboard_view(request):
-    profitability = get_profitability_report()
+    module_access = {
+        app_label: user_can_access_module(request.user, app_label)
+        for app_label in ('inventory', 'purchasing', 'production', 'sales', 'crm', 'hr', 'finance')
+    }
+    profitability = (
+        get_profitability_report()
+        if module_access['sales'] or module_access['finance']
+        else None
+    )
+    context = {'module_access': module_access}
 
-    context = {
-        'inventory': {
+    if module_access['inventory']:
+        context['inventory'] = {
             'total_lots': Lot.objects.count(),
             'warehouses': Warehouse.objects.count(),
             'critical_lots': sum(
                 1 for lot in Lot.objects.all()
                 if get_freshness_status(lot) in ('PRIORITY_SALE', 'WASTE')
             ),
-        },
-        'purchasing': {
+        }
+    if module_access['purchasing']:
+        context['purchasing'] = {
             'total_orders': PurchaseOrder.objects.count(),
             'open_orders': PurchaseOrder.objects.filter(
                 status__in=['draft', 'sent', 'confirmed', 'partially_received']
             ).count(),
-        },
-        'production': {
+        }
+    if module_access['production']:
+        context['production'] = {
             'total_batches': RoastBatch.objects.count(),
-        },
-        'sales': {
+        }
+    if module_access['sales']:
+        context['sales'] = {
             'total_customers': Customer.objects.count(),
             'fulfilled_orders': Order.objects.filter(status='fulfilled').count(),
             'total_revenue': profitability['total_revenue'],
-        },
-        'crm': {
+        }
+    if module_access['crm']:
+        context['crm'] = {
             'active_sales': Opportunity.objects.filter(status='active').count(),
             'won_sales': Opportunity.objects.filter(status='won').count(),
-        },
-        'hr': {
+        }
+    if module_access['hr']:
+        context['hr'] = {
             'total_employees': Employee.objects.count(),
             'pending_leaves': LeaveRequest.objects.filter(status='pending').count(),
-        },
-        'finance': {
+        }
+    if module_access['finance']:
+        context['finance'] = {
             'total_profit': profitability['total_profit'],
             'margin_percent': profitability['margin_percent'],
-        },
-    }
+        }
 
     return render(request, 'dashboard/home.html', context)
 

@@ -15,7 +15,7 @@
 <!-- KPI stats row -->
 <div class="g-dash-kpis">
 
-  <div class="g-stat g-stat-accent-blue">
+  {% if module_access.inventory %}<div class="g-stat g-stat-accent-blue">
     <div class="g-stat-top">
       <div>
         <div class="g-stat-label" data-i18n="active-lots">Aktif Lot</div>
@@ -32,9 +32,9 @@
         <strong style="color:var(--g-danger);">{{ inventory.critical_lots }}</strong>
       </div>
     </div>
-  </div>
+  </div>{% endif %}
 
-  <div class="g-stat g-stat-accent-amber">
+  {% if module_access.purchasing %}<div class="g-stat g-stat-accent-amber">
     <div class="g-stat-top">
       <div>
         <div class="g-stat-label" data-i18n="open-orders">Açık Sipariş</div>
@@ -51,9 +51,9 @@
         <strong>{{ purchasing.total_orders }}</strong>
       </div>
     </div>
-  </div>
+  </div>{% endif %}
 
-  <div class="g-stat g-stat-accent-green">
+  {% if module_access.sales %}<div class="g-stat g-stat-accent-green">
     <div class="g-stat-top">
       <div>
         <div class="g-stat-label" data-i18n="total-revenue">Toplam Gelir</div>
@@ -70,9 +70,9 @@
         <strong>{{ sales.fulfilled_orders }}</strong>
       </div>
     </div>
-  </div>
+  </div>{% endif %}
 
-  <div class="g-stat g-stat-accent-green">
+  {% if module_access.finance %}<div class="g-stat g-stat-accent-green">
     <div class="g-stat-top">
       <div>
         <div class="g-stat-label" data-i18n="net-profit">Net Kâr</div>
@@ -89,7 +89,7 @@
         <strong style="color:var(--g-success);">%{{ finance.margin_percent }}</strong>
       </div>
     </div>
-  </div>
+  </div>{% endif %}
 
 </div>
 
@@ -97,7 +97,7 @@
 <div class="g-dash-modules">
 
   <!-- Stok -->
-  <div class="g-module-card">
+  {% if module_access.inventory %}<div class="g-module-card">
     <div class="g-module-card-head">
       <div>
         <div class="g-module-label" data-i18n="inventory-management">Stok Yönetimi</div>
@@ -118,10 +118,10 @@
         <strong style="color:var(--g-danger);">{{ inventory.critical_lots }}</strong>
       </div>
     </div>
-  </div>
+  </div>{% endif %}
 
   <!-- Satın Alma -->
-  <div class="g-module-card">
+  {% if module_access.purchasing %}<div class="g-module-card">
     <div class="g-module-card-head">
       <div>
         <div class="g-module-label" data-i18n="purchasing">Satın Alma</div>
@@ -138,10 +138,10 @@
         <strong style="color:var(--g-warning);">{{ purchasing.open_orders }}</strong>
       </div>
     </div>
-  </div>
+  </div>{% endif %}
 
   <!-- Üretim -->
-  <div class="g-module-card">
+  {% if module_access.production %}<div class="g-module-card">
     <div class="g-module-card-head">
       <div>
         <div class="g-module-label" data-i18n="production">Üretim</div>
@@ -158,10 +158,10 @@
         <strong>—</strong>
       </div>
     </div>
-  </div>
+  </div>{% endif %}
 
   <!-- Satış -->
-  <div class="g-module-card" style="border-left:3px solid var(--g-brand);">
+  {% if module_access.sales %}<div class="g-module-card" style="border-left:3px solid var(--g-brand);">
     <div class="g-module-card-head">
       <div>
         <div class="g-module-label" data-i18n="sales">Satış</div>
@@ -182,10 +182,10 @@
         <strong>{{ sales.fulfilled_orders }}</strong>
       </div>
     </div>
-  </div>
+  </div>{% endif %}
 
   <!-- CRM -->
-  <div class="g-module-card">
+  {% if module_access.crm %}<div class="g-module-card">
     <div class="g-module-card-head">
       <div>
         <div class="g-module-label" data-i18n="crm">CRM</div>
@@ -202,10 +202,10 @@
         <strong style="color:var(--g-success);">{{ crm.won_sales }}</strong>
       </div>
     </div>
-  </div>
+  </div>{% endif %}
 
   <!-- İnsan Kaynakları -->
-  <div class="g-module-card">
+  {% if module_access.hr %}<div class="g-module-card">
     <div class="g-module-card-head">
       <div>
         <div class="g-module-label" data-i18n="human-resources">İnsan Kaynakları</div>
@@ -229,10 +229,10 @@
         <a href="/hr/recruitment/" style="font-size:12px; color:#6D28D9; text-decoration:none;" data-i18n="recruitment">İşe Alım</a>
       </div>
     </div>
-  </div>
+  </div>{% endif %}
 
   <!-- Finans -->
-  <div class="g-module-card" style="border-left:3px solid var(--g-success-mid, #15693C);">
+  {% if module_access.finance %}<div class="g-module-card" style="border-left:3px solid var(--g-success-mid, #15693C);">
     <div class="g-module-card-head">
       <div>
         <div class="g-module-label" data-i18n="finance">Finans</div>
@@ -249,10 +249,10 @@
         <strong style="color:var(--g-success);">%{{ finance.margin_percent }}</strong>
       </div>
     </div>
-  </div>
+  </div>{% endif %}
 
   <!-- AI Asistan -->
-  <div class="g-module-card" style="background:var(--g-sb-bg); border-color:transparent;">
+  {% if module_access.ai_layer %}<div class="g-module-card" style="background:var(--g-sb-bg); border-color:transparent;">
     <div class="g-module-card-head">
       <div>
         <div class="g-module-label" style="color:#4A5568;" data-i18n="ai-assistant">AI Asistan</div>
@@ -266,7 +266,7 @@
     <a href="/chat/" class="g-btn g-btn-primary" style="font-size:13px; padding:6px 14px; height:auto; margin-top:4px;">
       <i class="bi bi-chat-dots"></i> <span data-i18n="start-chat">Sohbet Başlat</span>
     </a>
-  </div>
+  </div>{% endif %}
 
 </div>
 
