@@ -2,8 +2,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import LeaveRequestForm
-from .models import Department, Employee, JobOpening, LeaveRequest
+from .forms import ApplicationForm, CandidateForm, LeaveRequestForm
+from .models import Application, Candidate, Department, Employee, JobOpening, LeaveRequest
 from .services import approve_leave_request, check_meeting_conflicts, reject_leave_request
 
 _EMP_STATUS = {
@@ -214,3 +214,23 @@ def recruitment_view(request):
         ]
         openings_data.append({'opening': opening, 'applications': apps})
     return render(request, 'hr/recruitment.html', {'openings': openings_data})
+
+
+@login_required
+def candidate_create_view(request):
+    form = CandidateForm(request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        candidate = form.save()
+        messages.success(request, f'{candidate.name} adayı oluşturuldu.')
+        return redirect('hr-recruitment')
+    return render(request, 'hr/candidate_form.html', {'form': form})
+
+
+@login_required
+def application_create_view(request):
+    form = ApplicationForm(request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        application = form.save()
+        messages.success(request, f'{application.candidate.name} için başvuru oluşturuldu.')
+        return redirect('hr-recruitment')
+    return render(request, 'hr/application_form.html', {'form': form})

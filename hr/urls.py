@@ -10,4 +10,6 @@ urlpatterns = [
     path('leave/<int:pk>/approve/', views.leave_approve_view, name='leave-approve'),
     path('leave/<int:pk>/reject/', views.leave_reject_view, name='leave-reject'),
     path('recruitment/', views.recruitment_view, name='hr-recruitment'),
+    path('recruitment/candidates/new/', views.candidate_create_view, name='candidate-create'),
+    path('recruitment/applications/new/', views.application_create_view, name='application-create'),
 ]

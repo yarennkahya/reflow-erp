@@ -32,9 +32,19 @@
   <a href="{% url 'hr-recruitment' %}" class="active">İşe Alım</a>
 </div>
 
-<div class="d-flex align-items-baseline gap-3 mb-3">
-  <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-person-plus me-2" style="color:#9333ea;"></i>İş İlanları</h5>
-  <span class="text-muted" style="font-size:13px;">{{ openings|length }} ilan</span>
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <div class="d-flex align-items-baseline gap-3">
+    <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-person-plus me-2" style="color:#9333ea;"></i>İş İlanları</h5>
+    <span class="text-muted" style="font-size:13px;">{{ openings|length }} ilan</span>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'candidate-create' %}" class="btn btn-sm btn-outline-secondary">
+      <i class="bi bi-person-plus me-1"></i>+ Yeni Aday
+    </a>
+    <a href="{% url 'application-create' %}" class="btn btn-sm btn-primary" style="background:#9333ea; border-color:#9333ea;">
+      <i class="bi bi-file-earmark-plus me-1"></i>+ Yeni Başvuru
+    </a>
+  </div>
 </div>
 
 {% for item in openings %}

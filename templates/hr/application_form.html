@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Yeni Başvuru — Reflow Coffee ERP{% endblock %}
+{% block nav_hr %}active{% endblock %}
+{% block nav_hr_recruitment %}active{% endblock %}
+{% block page_title %}İnsan Kaynakları{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between gap-3 mb-4">
+  <div>
+    <h4 class="fw-bold mb-1 text-dark"><i class="bi bi-file-earmark-plus me-2" style="color:#9333ea;"></i>Yeni Başvuru</h4>
+    <p class="mb-0 text-muted" style="font-size:13px;">Başvuru aşaması otomatik olarak "Başvurdu" ile başlar.</p>
+  </div>
+  <a href="{% url 'hr-recruitment' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>İşe Alıma Dön</a>
+</div>
+
+<div class="card border-0 shadow-sm" style="max-width:560px;">
+  <div class="card-body p-4">
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+      <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <div class="row g-3">
+        <div class="col-12">
+          <label for="{{ form.candidate.id_for_label }}" class="form-label fw-medium">{{ form.candidate.label }}</label>
+          {{ form.candidate }}
+          {% for error in form.candidate.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+        </div>
+        <div class="col-12">
+          <label for="{{ form.job_opening.id_for_label }}" class="form-label fw-medium">{{ form.job_opening.label }}</label>
+          {{ form.job_opening }}
+          <div class="form-text">Yalnızca açık ilanlar listelenir.</div>
+          {% for error in form.job_opening.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+        <a href="{% url 'hr-recruitment' %}" class="btn btn-outline-secondary">İptal</a>
+        <button type="submit" class="btn btn-primary" style="background:#9333ea; border-color:#9333ea;">
+          <i class="bi bi-send me-1"></i>Başvuruyu Kaydet
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
