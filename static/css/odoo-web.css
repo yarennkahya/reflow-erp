@@ -1235,11 +1235,68 @@ a.o-stat:hover { border-color: var(--o-primary); background: var(--o-primary-sub
   border-color: var(--o-primary);
   color: var(--o-primary-emphasis);
 }
+.o-chat-main { position: relative; }
+
+.o-chat-drop-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(var(--o-primary-rgb, 107, 70, 50), .08);
+  border: 2px dashed var(--o-primary);
+  border-radius: var(--o-radius-lg);
+  pointer-events: none;
+}
+.o-chat-drop-overlay.is-active { display: flex; pointer-events: none; }
+.o-chat-drop-target { text-align: center; color: var(--o-primary-emphasis); }
+.o-chat-drop-target i { font-size: 40px; display: block; margin-bottom: var(--o-sp-2); }
+.o-chat-drop-target p { margin: 0; font-weight: 500; }
+
 .o-chat-bar {
-  display: flex; gap: var(--o-sp-2);
+  display: flex; flex-direction: column; gap: var(--o-sp-2);
   padding: var(--o-sp-3) var(--o-sp-4);
   border-top: 1px solid var(--o-border);
 }
+.o-chat-bar-row { display: flex; align-items: flex-end; gap: var(--o-sp-2); }
+
+.o-chat-attach {
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px;
+  border: 1px solid var(--o-border);
+  border-radius: var(--o-radius);
+  background: var(--o-surface-2);
+  color: var(--o-text-muted);
+  cursor: pointer;
+  transition: background var(--o-tr), color var(--o-tr), border-color var(--o-tr);
+}
+.o-chat-attach:hover { background: var(--o-surface-3); color: var(--o-text); border-color: var(--o-border-strong); }
+
+.o-chat-file-pills { display: flex; flex-wrap: wrap; gap: var(--o-sp-1); }
+.o-chat-file-pills:empty { display: none; }
+
+.o-chat-file-pill {
+  display: inline-flex; align-items: center; gap: var(--o-sp-1);
+  padding: 2px 8px 2px 6px;
+  border-radius: var(--o-radius-pill);
+  border: 1px solid var(--o-border-strong);
+  background: var(--o-surface-3);
+  font-size: var(--o-font-size-sm);
+  max-width: 240px;
+}
+.o-chat-file-pill i { color: var(--o-primary-emphasis); flex-shrink: 0; }
+.o-chat-file-pill-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.o-chat-file-pill-remove {
+  display: flex; align-items: center; justify-content: center;
+  width: 16px; height: 16px;
+  border: 0; background: transparent; padding: 0;
+  color: var(--o-text-muted); cursor: pointer; flex-shrink: 0;
+}
+.o-chat-file-pill-remove:hover { color: var(--o-danger); }
+.o-chat-file-pill--loading { opacity: .6; }
+
 .o-chat-input {
   flex: 1 1 auto;
   max-height: 120px;

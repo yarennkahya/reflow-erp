@@ -45,15 +45,33 @@
       </div>
     </div>
 
+    <div class="o-chat-drop-overlay" id="o-chat-drop-overlay" aria-hidden="true">
+      <div class="o-chat-drop-target">
+        <i class="bi bi-cloud-upload" aria-hidden="true"></i>
+        <p>{% translate "Dosyayı buraya bırakın" %}</p>
+        <p class="o-xs o-muted">{% translate "PDF, TXT, CSV, XLSX" %}</p>
+      </div>
+    </div>
+
     <form class="o-chat-bar" id="o-chat-form"
           data-o-chat-url="{% url 'ai-chat' %}"
+          data-o-upload-url="{% url 'ai-upload' %}"
           data-o-conversation-id="{{ active_conversation.pk|default:'' }}">
-      <textarea class="o-chat-input" id="o-chat-input" rows="1"
-                placeholder="{% translate 'Bir soru yazın…' %}"
-                aria-label="{% translate 'Mesajınız' %}"></textarea>
-      <button type="submit" class="o-btn o-btn--primary" aria-label="{% translate 'Gönder' %}">
-        <i class="bi bi-send-fill" aria-hidden="true"></i>
-      </button>
+      <div class="o-chat-file-pills" id="o-chat-file-pills"></div>
+      <div class="o-chat-bar-row">
+        <button type="button" class="o-chat-attach" id="o-chat-attach"
+                aria-label="{% translate 'Dosya ekle' %}" title="{% translate 'Dosya ekle' %}">
+          <i class="bi bi-paperclip" aria-hidden="true"></i>
+        </button>
+        <textarea class="o-chat-input" id="o-chat-input" rows="1"
+                  placeholder="{% translate 'Bir soru yazın veya dosya sürükleyin…' %}"
+                  aria-label="{% translate 'Mesajınız' %}"></textarea>
+        <button type="submit" class="o-btn o-btn--primary" aria-label="{% translate 'Gönder' %}">
+          <i class="bi bi-send-fill" aria-hidden="true"></i>
+        </button>
+      </div>
+      <input type="file" id="o-chat-file-input" accept=".pdf,.txt,.csv,.md,.xlsx,.xls"
+             multiple style="display:none" aria-hidden="true">
     </form>
   </div>
 </div>
