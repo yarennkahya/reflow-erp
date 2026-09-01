@@ -1,38 +1,49 @@
 {% extends 'base.html' %}
-{% block title %}{% if sale %}{{ sale.title }} Düzenle{% else %}Yeni Satış{% endif %} — CRM{% endblock %}
-{% block nav_crm %}active{% endblock %}
-{% block nav_crm_sales %}active{% endblock %}
-{% block page_title %}CRM / Satış Takibi{% endblock %}
+{% block title %}{% if sale %}{{ sale.title }}{% else %}{% translate "Yeni Fırsat" %}{% endif %}{% endblock %}
 
-{% block extra_head %}
-<style>
-  .form-card { max-width:820px; background: var(--g-surface); border:1px solid var(--g-border); border-radius:12px; overflow:hidden; }
-  .form-card-head { padding:18px 22px; background:var(--g-n-50); border-bottom:1px solid var(--g-border); }
-  .form-card-body { padding:22px; }
-  .form-label { color:var(--g-text); font-size:13px; font-weight:600; }
-  .field-help { color:var(--g-text-2); display:block; font-size:12px; margin-top:5px; }
-</style>
+{% block cp_breadcrumb %}
+  {% if sale %}{% translate "Düzenle" as rec %}{% ui_breadcrumb parent=sale.title record=rec %}
+  {% else %}{% translate "Yeni" as rec %}{% ui_breadcrumb record=rec %}{% endif %}
 {% endblock %}
 
+{% block cp_buttons %}
+  <button type="submit" form="o-form" class="o-btn o-btn--primary">
+    <i class="bi bi-check-lg" aria-hidden="true"></i> {% translate "Kaydet" %}
+  </button>
+  {% if sale and sale.is_open %}
+    <form method="post" action="{% url 'opportunity-advance' sale.pk %}">
+      {% csrf_token %}
+      <button type="submit" class="o-btn">
+        <i class="bi bi-arrow-right" aria-hidden="true"></i> {% translate "Sonraki Aşama" %}
+      </button>
+    </form>
+  {% endif %}
+  {% if sale %}
+    {% url 'crm-sale-delete' sale.pk as del_url %}
+    {% translate "Sil" as del_label %}
+    {% blocktranslate asvar del_msg with name=sale.title %}{{ name }} satış kaydını silmek istediğinize emin misiniz?{% endblocktranslate %}
+    {% ui_confirm url=del_url label=del_label message=del_msg icon="bi-trash" variant="danger" %}
+  {% endif %}
+  <a class="o-btn" href="{% url 'crm-sale-list' %}">{% translate "Vazgeç" %}</a>
+{% endblock %}
+
+{% block content_class %} o-content--sheet{% endblock %}
 {% block content %}
-<div class="mb-3"><a href="{% if sale %}{% url 'crm-customer-detail' sale.customer_id %}{% else %}{% url 'crm-sale-list' %}{% endif %}" class="text-decoration-none" style="font-size:13px;"><i class="bi bi-arrow-left me-1"></i>Geri dön</a></div>
-<div class="form-card">
-  <div class="form-card-head"><h5 class="mb-1 fw-bold">{% if sale %}Satış kaydını düzenle{% else %}Yeni satış kaydı{% endif %}</h5><p class="mb-0 text-muted" style="font-size:13px;">Satışı müşteriye bağlayın; durum ve aşamayı birbirinden bağımsız takip edin.</p></div>
-  <form method="post" class="form-card-body">
+{% ui_sheet %}
+  {% if sale %}{% ui_statusbar sale "stage" hide="lost" %}{% endif %}
+  <form method="post" id="o-form">
     {% csrf_token %}
-    {% if form.non_field_errors %}<div class="alert alert-danger py-2">{{ form.non_field_errors }}</div>{% endif %}
-    <div class="row g-3">
-      <div class="col-md-6"><label for="{{ form.customer.id_for_label }}" class="form-label">{{ form.customer.label }}</label>{{ form.customer }}{% for error in form.customer.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div>
-      <div class="col-md-6"><label for="{{ form.title.id_for_label }}" class="form-label">{{ form.title.label }}</label>{{ form.title }}{% for error in form.title.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div>
-      <div class="col-md-6"><label for="{{ form.status.id_for_label }}" class="form-label">{{ form.status.label }}</label>{{ form.status }}<span class="field-help">Aktif satış ilerletilir, pasif satış bekletilir.</span>{% for error in form.status.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div>
-      <div class="col-md-6"><label for="{{ form.stage.id_for_label }}" class="form-label">{{ form.stage.label }}</label>{{ form.stage }}<span class="field-help">Kazanıldı veya kaybedildi durumunda aşama otomatik güncellenir.</span>{% for error in form.stage.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div>
-      <div class="col-md-6"><label for="{{ form.estimated_value.id_for_label }}" class="form-label">{{ form.estimated_value.label }}</label>{{ form.estimated_value }}{% for error in form.estimated_value.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div>
-      <div class="col-12"><label for="{{ form.notes.id_for_label }}" class="form-label">{{ form.notes.label }}</label>{{ form.notes }}{% for error in form.notes.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div>
-    </div>
-    <div class="d-flex justify-content-end gap-2 border-top mt-4 pt-3"><a href="{% if sale %}{% url 'crm-customer-detail' sale.customer_id %}{% else %}{% url 'crm-sale-list' %}{% endif %}" class="btn btn-light">Vazgeç</a><button class="btn btn-primary" type="submit"><i class="bi bi-check-lg me-1"></i>{% if sale %}Değişiklikleri kaydet{% else %}Satış kaydını oluştur{% endif %}</button></div>
+    {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+    <h1 class="o-form-title">{% if sale %}{{ sale.title }}{% else %}{% translate "Yeni fırsat" %}{% endif %}</h1>
+    {% translate "Fırsat bilgileri" as g %}
+    {% ui_group g %}
+      {% ui_field form.customer cols=6 %}
+      {% ui_field form.title cols=6 %}
+      {% ui_field form.stage cols=4 %}
+      {% ui_field form.status cols=4 %}
+      {% ui_field form.estimated_value cols=4 %}
+      {% ui_field form.notes cols=12 %}
+    {% endui_group %}
   </form>
-</div>
-{% if sale %}
-<div class="mt-3"><form method="post" action="{% url 'crm-sale-delete' sale.pk %}" onsubmit="return confirm('{{ sale.title|escapejs }} satış kaydını silmek istediğinize emin misiniz?');">{% csrf_token %}<button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash me-1"></i>Bu satış kaydını sil</button></form></div>
-{% endif %}
+{% endui_sheet %}
 {% endblock %}

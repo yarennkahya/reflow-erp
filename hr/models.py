@@ -1,5 +1,6 @@
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 
 class Department(models.Model):
@@ -28,9 +29,9 @@ class Position(models.Model):
 
 class Employee(models.Model):
     class EmploymentStatus(models.TextChoices):
-        ACTIVE = 'active', 'Aktif'
-        ON_LEAVE = 'on_leave', 'İzinde'
-        TERMINATED = 'terminated', 'Ayrıldı'
+        ACTIVE = 'active', _('Aktif')
+        ON_LEAVE = 'on_leave', _('İzinde')
+        TERMINATED = 'terminated', _('Ayrıldı')
 
     name = models.CharField(max_length=255)
     department = models.ForeignKey(
@@ -71,9 +72,9 @@ class LeaveType(models.Model):
 
 class LeaveRequest(models.Model):
     class Status(models.TextChoices):
-        PENDING = 'pending', 'Beklemede'
-        APPROVED = 'approved', 'Onaylandı'
-        REJECTED = 'rejected', 'Reddedildi'
+        PENDING = 'pending', _('Beklemede')
+        APPROVED = 'approved', _('Onaylandı')
+        REJECTED = 'rejected', _('Reddedildi')
 
     employee = models.ForeignKey(
         Employee, on_delete=models.PROTECT, related_name='leave_requests'
@@ -103,9 +104,9 @@ class LeaveRequest(models.Model):
 
 class JobOpening(models.Model):
     class Status(models.TextChoices):
-        OPEN = 'open', 'Açık'
-        CLOSED = 'closed', 'Kapatıldı'
-        FILLED = 'filled', 'Dolduruldu'
+        OPEN = 'open', _('Açık')
+        CLOSED = 'closed', _('Kapatıldı')
+        FILLED = 'filled', _('Dolduruldu')
 
     title = models.CharField(max_length=255)
     department = models.ForeignKey(
@@ -148,12 +149,12 @@ class Candidate(models.Model):
 
 class Application(models.Model):
     class Stage(models.TextChoices):
-        APPLIED = 'applied', 'Başvurdu'
-        SCREENING = 'screening', 'İnceleniyor'
-        INTERVIEW = 'interview', 'Mülakat'
-        OFFER = 'offer', 'Teklif'
-        HIRED = 'hired', 'İşe Alındı'
-        REJECTED = 'rejected', 'Reddedildi'
+        APPLIED = 'applied', _('Başvurdu')
+        SCREENING = 'screening', _('İnceleniyor')
+        INTERVIEW = 'interview', _('Mülakat')
+        OFFER = 'offer', _('Teklif')
+        HIRED = 'hired', _('İşe Alındı')
+        REJECTED = 'rejected', _('Reddedildi')
 
     candidate = models.ForeignKey(
         Candidate, on_delete=models.PROTECT, related_name='applications'

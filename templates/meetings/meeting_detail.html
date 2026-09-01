@@ -1,85 +1,80 @@
 {% extends 'base.html' %}
-{% block title %}{{ meeting.title }} — Reflow Coffee ERP{% endblock %}
-{% block nav_meetings %}active{% endblock %}
-{% block page_title %}Takvim / Toplantı Detayı{% endblock %}
+{% block title %}{{ meeting.title }}{% endblock %}
+{% block cp_breadcrumb %}{% ui_breadcrumb record=meeting.title %}{% endblock %}
 
-{% block extra_head %}
-<style>
-  .detail-card, .info-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:12px; }
-  .detail-card { padding:22px; }.info-card { overflow:hidden; }
-  .meeting-icon { align-items:center; background:#eff6ff; border-radius:14px; color:#2563eb; display:flex; font-size:22px; height:52px; justify-content:center; width:52px; }
-  .info-head { background:var(--g-n-50); border-bottom:1px solid var(--g-border); color:var(--g-text-2); font-size:13px; font-weight:700; padding:12px 15px; }
-  .info-body { padding:3px 15px; }
-  .info-row { align-items:flex-start; border-bottom:1px solid var(--g-border-sub); display:flex; gap:10px; padding:12px 0; }
-  .info-row:last-child { border-bottom:0; }.info-row i { color:#2563eb; margin-top:2px; width:16px; }
-  .info-label { color:var(--g-text-2); font-size:12px; min-width:100px; }.info-value { color:var(--g-text); font-size:13px; font-weight:600; }
-  .status-badge { border-radius:20px; display:inline-block; font-size:11.5px; font-weight:700; padding:5px 9px; }
-  .status-scheduled { background:#dbeafe; color:#1d4ed8; }.status-completed { background:#dcfce7; color:#15803d; }.status-cancelled { background:#fee2e2; color:#b91c1c; }
-  .description { color:var(--g-text-2); font-size:13px; line-height:1.65; margin:0; white-space:pre-line; }
-  .attendee { align-items:center; border-bottom:1px solid var(--g-border-sub); display:flex; gap:9px; padding:10px 15px; }.attendee:last-child { border-bottom:0; }
-  .attendee-avatar { align-items:center; background:var(--g-border-sub); border-radius:50%; color:var(--g-text-2); display:flex; font-size:11px; font-weight:700; height:29px; justify-content:center; width:29px; }
-  .empty-copy { color:var(--g-text-3); font-size:12.5px; padding:20px 15px; text-align:center; }
-</style>
+{% block cp_buttons %}
+  {% if meeting.status == 'scheduled' %}
+    <a class="o-btn" href="{% url 'meeting-edit' meeting.pk %}">
+      <i class="bi bi-pencil" aria-hidden="true"></i> {% translate "Düzenle" %}
+    </a>
+    {% url 'meeting-cancel' meeting.pk as cancel_url %}
+    {% translate "İptal Et" as cancel_label %}
+    {% translate "Bu toplantıyı iptal etmek istediğinize emin misiniz?" as cancel_msg %}
+    {% ui_confirm url=cancel_url label=cancel_label message=cancel_msg icon="bi-x-lg" variant="danger" %}
+  {% endif %}
 {% endblock %}
 
+{% block content_class %} o-content--sheet{% endblock %}
 {% block content %}
-<div class="mb-3"><a href="{% url 'meeting-calendar' %}" class="text-decoration-none" style="font-size:13px;"><i class="bi bi-arrow-left me-1"></i>Takvime dön</a></div>
+{% ui_sheet %}
+  {% ui_statusbar meeting "status" hide="cancelled" %}
 
-<div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
-  <div class="d-flex align-items-center gap-3">
-    <div class="meeting-icon"><i class="bi bi-calendar-event"></i></div>
+  <div class="o-form-head">
     <div>
-      <div class="d-flex flex-wrap align-items-center gap-2"><h4 class="fw-bold mb-0">{{ meeting.title }}</h4><span class="status-badge status-{{ meeting.status }}">{{ meeting.get_status_display }}</span></div>
-      <div class="text-muted mt-1" style="font-size:13px;"><i class="bi bi-clock me-1"></i>{{ meeting.start_time|date:"d M Y, H:i" }} — {{ meeting.end_time|date:"H:i" }}</div>
+      <h1 class="o-form-title">{{ meeting.title }}</h1>
+      <p class="o-form-subtitle">
+        {{ meeting.start_time|date:"d M Y" }} · {{ meeting.start_time|time:"H:i" }} – {{ meeting.end_time|time:"H:i" }}
+        {% if meeting.location %}· {{ meeting.location }}{% endif %}
+      </p>
     </div>
+    {% ui_button_box %}
+      {% translate "Katılımcı" as l1 %}{% ui_stat value=meeting.attendees.count label=l1 icon="bi-people" %}
+    {% endui_button_box %}
   </div>
-  <div class="d-flex flex-wrap align-items-center gap-2">
-    {% if meeting.status == 'scheduled' %}
-    <a href="{% url 'meeting-edit' meeting.pk %}" class="btn btn-outline-primary"><i class="bi bi-pencil me-1"></i>Düzenle</a>
-    <form method="post" action="{% url 'meeting-cancel' meeting.pk %}" onsubmit="return confirm('Bu toplantıyı iptal etmek istediğinize emin misiniz?');">
-      {% csrf_token %}
-      <button type="submit" class="btn btn-outline-danger"><i class="bi bi-x-circle me-1"></i>İptal Et</button>
-    </form>
-    {% elif meeting.status == 'cancelled' %}
-    <span class="text-muted" style="font-size:13px;"><i class="bi bi-info-circle me-1"></i>Bu toplantı iptal edildi</span>
-    {% endif %}
-    <a href="{% url 'meeting-create' %}" class="btn btn-outline-primary"><i class="bi bi-plus-lg me-1"></i>Yeni Toplantı</a>
-  </div>
-</div>
 
-<div class="row g-4">
-  <div class="col-xl-8">
-    <div class="detail-card mb-4">
-      <h6 class="fw-bold mb-3">Açıklama</h6>
-      {% if meeting.description %}<p class="description">{{ meeting.description }}</p>{% else %}<p class="description text-muted">Bu toplantı için açıklama eklenmemiş.</p>{% endif %}
-    </div>
-    <div class="info-card">
-      <div class="info-head"><i class="bi bi-people me-1" style="color:#2563eb;"></i>Katılımcılar</div>
-      {% for attendee in meeting.attendees.all %}
-      <div class="attendee"><span class="attendee-avatar">{{ attendee.name|first|upper }}</span><div><div class="fw-semibold" style="font-size:13px;">{{ attendee.name }}</div><div class="text-muted" style="font-size:11.5px;">{{ attendee.position }}</div></div></div>
-      {% empty %}
-      <div class="empty-copy"><i class="bi bi-person-plus d-block fs-4 mb-1"></i>Henüz katılımcı eklenmemiş.</div>
-      {% endfor %}
-    </div>
-  </div>
-  <div class="col-xl-4">
-    <div class="info-card mb-4">
-      <div class="info-head"><i class="bi bi-info-circle me-1" style="color:#2563eb;"></i>Toplantı Bilgileri</div>
-      <div class="info-body">
-        <div class="info-row"><i class="bi bi-calendar-event"></i><span class="info-label">Tarih</span><span class="info-value">{{ meeting.start_time|date:"d M Y" }}</span></div>
-        <div class="info-row"><i class="bi bi-clock"></i><span class="info-label">Saat</span><span class="info-value">{{ meeting.start_time|date:"H:i" }} – {{ meeting.end_time|date:"H:i" }}</span></div>
-        <div class="info-row"><i class="bi bi-person-badge"></i><span class="info-label">Organizatör</span><span class="info-value">{{ meeting.organizer }}</span></div>
-        <div class="info-row"><i class="bi bi-geo-alt"></i><span class="info-label">Konum</span><span class="info-value">{{ meeting.location|default:"Belirtilmedi" }}</span></div>
-        <div class="info-row"><i class="bi bi-activity"></i><span class="info-label">Durum</span><span class="info-value"><span class="status-badge status-{{ meeting.status }}">{{ meeting.get_status_display }}</span></span></div>
+  {% translate "Toplantı bilgileri" as g %}
+  {% ui_group g %}
+    {% translate "Organizatör" as f1 %}
+    {% if meeting.organizer %}{% url 'hr-employee-detail' meeting.organizer_id as org_url %}{% endif %}
+    {% ui_field_value f1 meeting.organizer.name url=org_url icon="bi-person-badge" cols=4 %}
+    {% translate "Konum" as f2 %}{% ui_field_value f2 meeting.location icon="bi-geo-alt" cols=4 %}
+    {% translate "Oluşturulma" as f3 %}{% ui_field_value f3 meeting.created_at|date:"d M Y, H:i" icon="bi-clock" cols=4 %}
+    {% if meeting.customer %}
+      {% translate "Müşteri" as f4 %}
+      {% url 'crm-customer-detail' meeting.customer_id as cust_url %}
+      {% ui_field_value f4 meeting.customer.name url=cust_url icon="bi-building" cols=4 %}
+    {% endif %}
+    {% if meeting.opportunity %}
+      {% translate "Fırsat" as f5 %}
+      {% url 'crm-sale-edit' meeting.opportunity_id as opp_url %}
+      {% ui_field_value f5 meeting.opportunity.title url=opp_url icon="bi-graph-up" cols=4 %}
+    {% endif %}
+  {% endui_group %}
+
+  {% ui_notebook %}
+    {% translate "Açıklama" as t1 %}
+    {% ui_page t1 %}
+      {% if meeting.description %}
+        <p class="o-prose">{{ meeting.description|linebreaksbr }}</p>
+      {% else %}
+        {% translate "Bu toplantı için açıklama eklenmemiş." as e %}
+        {% ui_empty icon="bi-card-text" title=e %}
+      {% endif %}
+    {% endui_page %}
+
+    {% translate "Katılımcılar" as t2 %}
+    {% ui_page t2 badge=meeting.attendees.count %}
+      <div class="o-attendees">
+        {% for attendee in meeting.attendees.all %}
+          <a class="o-attendee" href="{% url 'hr-employee-detail' attendee.pk %}">
+            {% ui_avatar attendee.name size="sm" %}
+            <span>{{ attendee.name }}</span>
+          </a>
+        {% empty %}
+          {% translate "Katılımcı eklenmemiş" as e2 %}{% ui_empty icon="bi-people" title=e2 %}
+        {% endfor %}
       </div>
-    </div>
-    <div class="info-card">
-      <div class="info-head"><i class="bi bi-link-45deg me-1" style="color:#2563eb;"></i>Bağlantılar</div>
-      <div class="info-body">
-        <div class="info-row"><i class="bi bi-building"></i><span class="info-label">Müşteri</span><span class="info-value">{% if meeting.customer %}<a class="text-decoration-none" href="{% url 'crm-customer-detail' meeting.customer.pk %}">{{ meeting.customer }}</a>{% else %}—{% endif %}</span></div>
-        <div class="info-row"><i class="bi bi-graph-up-arrow"></i><span class="info-label">Fırsat</span><span class="info-value">{% if meeting.opportunity %}<a class="text-decoration-none" href="{% url 'crm-sale-edit' meeting.opportunity.pk %}">{{ meeting.opportunity.title }}</a>{% else %}—{% endif %}</span></div>
-      </div>
-    </div>
-  </div>
-</div>
+    {% endui_page %}
+  {% endui_notebook %}
+{% endui_sheet %}
 {% endblock %}

@@ -1,0 +1,22 @@
+<aside class="o-chatter" aria-label="Kayıt geçmişi">
+  <h3 class="o-chatter-title"><i class="bi bi-clock-history" aria-hidden="true"></i> {% translate "Kayıt Geçmişi" %}</h3>
+  {% if logs %}
+    <ol class="o-chatter-feed">
+      {% for log in logs %}
+        <li class="o-chatter-item">
+          {% ui_avatar log.user.username|default:"Sistem" size="xs" %}
+          <div class="o-chatter-body">
+            <p class="o-chatter-action">{{ log.action }}</p>
+            <p class="o-chatter-meta">
+              <span class="o-chatter-user">{{ log.user.username|default:"Sistem" }}</span>
+              <time datetime="{{ log.created_at|date:'c' }}">{{ log.created_at|date:"d.m.Y H:i" }}</time>
+            </p>
+            {% if log.details %}<p class="o-chatter-details">{{ log.details }}</p>{% endif %}
+          </div>
+        </li>
+      {% endfor %}
+    </ol>
+  {% else %}
+    <p class="o-chatter-empty">{% translate "Bu kayıt için henüz bir işlem geçmişi yok." %}</p>
+  {% endif %}
+</aside>

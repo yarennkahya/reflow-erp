@@ -1,0 +1,49 @@
+<div class="o-stack">
+  {% for row in openings %}
+    <section class="o-list">
+      <header class="o-list-head">
+        <div>
+          <h2 class="o-list-title">{{ row.opening.title }} {% ui_badge row.opening "status" %}</h2>
+          <p class="o-muted o-sm">
+            {{ row.opening.department.name }} · {{ row.opening.position.title }}
+            {% if row.opening.closing_date %}· {% translate "Son başvuru" %}: {{ row.opening.closing_date|date:"d M Y" }}{% endif %}
+          </p>
+        </div>
+        <div class="o-row">
+          <span class="o-muted o-sm o-nowrap">
+            {{ row.opening.hired_count }}/{{ row.opening.headcount }} {% translate "doluluk" %}
+          </span>
+          <div class="progress o-occupancy"><div class="progress-bar" style="width:{{ row.occupancy_percent }}%"></div></div>
+        </div>
+      </header>
+      <div class="o-list-scroll">
+        <table class="o-table">
+          <thead><tr>
+            <th>{% translate "Aday" %}</th><th>{% translate "Aşama" %}</th><th>{% translate "Başvuru" %}</th>
+          </tr></thead>
+          <tbody>
+            {% for app in row.applications %}
+              <tr>
+                <td>
+                  <div class="o-row">
+                    {% ui_avatar app.candidate.name size="sm" %}
+                    <span class="o-strong">{{ app.candidate.name }}</span>
+                  </div>
+                </td>
+                <td>{% ui_badge app "stage" %}</td>
+                <td class="o-nowrap o-muted o-sm">{{ app.applied_at|date:"d M Y" }}</td>
+              </tr>
+            {% empty %}
+              {% translate "Bu pozisyona başvuru yok" as e %}{% ui_empty icon="bi-file-earmark-text" title=e colspan=3 %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  {% empty %}
+    {% translate "Açık pozisyon yok" as t %}
+    {% translate "İlk pozisyonu aç" as cta %}
+    {% url 'job-opening-create' as create_url %}
+    {% ui_empty icon="bi-briefcase" title=t action_url=create_url action_label=cta %}
+  {% endfor %}
+</div>

@@ -2,24 +2,25 @@ from decimal import Decimal
 
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from sales.models import Customer
 
 
 class Opportunity(models.Model):
     class Stage(models.TextChoices):
-        NEW = 'new', 'İlk temas'
-        IN_DISCUSSION = 'in_discussion', 'İhtiyaç analizi'
-        PROPOSAL_SENT = 'proposal_sent', 'Teklif sunuldu'
-        NEGOTIATION = 'negotiation', 'Pazarlık'
-        WON = 'won', 'Kazanıldı'
-        LOST = 'lost', 'Kaybedildi'
+        NEW = 'new', _('İlk temas')
+        IN_DISCUSSION = 'in_discussion', _('İhtiyaç analizi')
+        PROPOSAL_SENT = 'proposal_sent', _('Teklif sunuldu')
+        NEGOTIATION = 'negotiation', _('Pazarlık')
+        WON = 'won', _('Kazanıldı')
+        LOST = 'lost', _('Kaybedildi')
 
     class Status(models.TextChoices):
-        ACTIVE = 'active', 'Aktif'
-        PASSIVE = 'passive', 'Pasif'
-        WON = 'won', 'Kazanıldı'
-        LOST = 'lost', 'Kaybedildi'
+        ACTIVE = 'active', _('Aktif')
+        PASSIVE = 'passive', _('Pasif')
+        WON = 'won', _('Kazanıldı')
+        LOST = 'lost', _('Kaybedildi')
 
     customer = models.ForeignKey(
         Customer, on_delete=models.CASCADE, related_name='opportunities'

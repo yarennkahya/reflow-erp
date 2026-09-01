@@ -34,10 +34,6 @@ class QualityCheckForm(forms.Form):
         self.fields['inspector'].queryset = Employee.objects.filter(
             employment_status=Employee.EmploymentStatus.ACTIVE
         ).select_related('department', 'position')
-        for field in self.fields.values():
-            field.widget.attrs.setdefault('class', 'form-control')
-        self.fields['result'].widget.attrs['class'] = 'form-select'
-        self.fields['inspector'].widget.attrs['class'] = 'form-select'
 
 
 class RecipeForm(forms.ModelForm):
@@ -58,4 +54,3 @@ class RecipeForm(forms.ModelForm):
         self.fields['output_product'].queryset = Product.objects.order_by('name')
         for name, field in self.fields.items():
             cls = 'form-select' if name == 'output_product' else 'form-control'
-            field.widget.attrs.setdefault('class', cls)

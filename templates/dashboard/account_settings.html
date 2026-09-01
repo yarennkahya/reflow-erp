@@ -1,117 +1,70 @@
 {% extends 'base.html' %}
-{% block title %}Hesap Ayarları — ERP Platform{% endblock %}
-{% block page_title %}Hesap Ayarları{% endblock %}
+{% block title %}{% translate "Hesap Ayarları" %}{% endblock %}
+{% block content_class %} o-content--sheet{% endblock %}
 
 {% block content %}
-<div class="g-page-header">
-    <div>
-        <h1 class="g-page-title">Hesap Ayarları</h1>
-        <p class="g-page-sub">Profil bilgilerini ve şifreni yönet.</p>
+{% ui_sheet %}
+  <div class="o-form-head">
+    <div class="o-row">
+      {% ui_avatar request.user.username size="lg" %}
+      <div>
+        <h1 class="o-form-title">{{ request.user.username }}</h1>
+        <p class="o-form-subtitle">{{ request.user.email|default:_("E-posta tanımlı değil") }}</p>
+      </div>
     </div>
-</div>
+  </div>
 
-<div class="row g-4" style="max-width:760px;">
-
-    <!-- Profile info -->
-    <div class="col-12">
-        <div class="g-settings-section">
-            <div class="g-settings-section-head">
-                <p class="g-settings-section-title"><i class="bi bi-person me-2"></i>Profil</p>
-                <p class="g-settings-section-sub">Temel hesap bilgilerin.</p>
-            </div>
-            <div class="g-settings-body">
-                <div class="row g-3">
-                    <div class="col-sm-6">
-                        <label class="g-label">Kullanıcı Adı</label>
-                        <input type="text" class="g-input" value="{{ request.user.username }}" readonly style="background: var(--g-n-50); cursor: not-allowed;">
-                    </div>
-                    <div class="col-sm-6">
-                        <label class="g-label">Gruplar</label>
-                        <input type="text" class="g-input" value="{% if groups %}{{ groups|join:', ' }}{% else %}—{% endif %}" readonly style="background: var(--g-n-50); cursor: not-allowed;">
-                    </div>
-                </div>
-            </div>
+  {% translate "Roller" as g0 %}
+  {% ui_group g0 %}
+    <div class="o-col-12">
+      {% if groups %}
+        <div class="o-row o-wrap">
+          {% for group in groups %}<span class="o-badge o-badge--primary">{{ group }}</span>{% endfor %}
         </div>
+      {% else %}
+        <p class="o-muted o-sm">
+          {% if request.user.is_superuser %}
+            {% translate "Süper kullanıcı — tüm modüllere erişiminiz var." %}
+          {% else %}
+            {% translate "Henüz bir role atanmadınız." %}
+          {% endif %}
+        </p>
+      {% endif %}
     </div>
+  {% endui_group %}
 
-    <!-- Email update -->
-    <div class="col-12">
-        <div class="g-settings-section">
-            <div class="g-settings-section-head">
-                <p class="g-settings-section-title"><i class="bi bi-envelope me-2"></i>E-posta</p>
-                <p class="g-settings-section-sub">Bildirimler ve hesap kurtarma için kullanılır.</p>
-            </div>
-            <div class="g-settings-body">
-                <form method="post">
-                    {% csrf_token %}
-                    <input type="hidden" name="action" value="email">
-                    <div class="g-field mb-3">
-                        <label class="g-label" for="id_email">E-posta adresi</label>
-                        <input type="email" name="email" id="id_email" class="g-input"
-                               value="{{ request.user.email }}" placeholder="ornek@sirket.com">
-                    </div>
-                    <button type="submit" class="g-btn g-btn-primary">
-                        <i class="bi bi-check2"></i> Kaydet
-                    </button>
-                </form>
-            </div>
-        </div>
+  <form method="post" class="o-settings-form">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="email">
+    {% translate "E-posta adresi" as g1 %}
+    {% ui_group g1 %}
+      <div class="o-field o-col-8">
+        <label class="o-label" for="email">{% translate "E-posta" %}</label>
+        <input type="email" id="email" name="email" class="o-input" value="{{ request.user.email }}">
+      </div>
+      <div class="o-field o-col-4">
+        <span class="o-label">&nbsp;</span>
+        <button type="submit" class="o-btn o-btn--primary">
+          <i class="bi bi-check-lg" aria-hidden="true"></i> {% translate "Güncelle" %}
+        </button>
+      </div>
+    {% endui_group %}
+  </form>
+
+  <form method="post" class="o-settings-form">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="password">
+    {% translate "Şifre değiştir" as g2 %}
+    {% ui_group g2 %}
+      {% ui_field password_form.old_password cols=4 %}
+      {% ui_field password_form.new_password1 cols=4 %}
+      {% ui_field password_form.new_password2 cols=4 %}
+    {% endui_group %}
+    <div class="o-form-actions">
+      <button type="submit" class="o-btn o-btn--primary">
+        <i class="bi bi-shield-lock" aria-hidden="true"></i> {% translate "Şifreyi Değiştir" %}
+      </button>
     </div>
-
-    <!-- Password change -->
-    <div class="col-12">
-        <div class="g-settings-section">
-            <div class="g-settings-section-head">
-                <p class="g-settings-section-title"><i class="bi bi-lock me-2"></i>Şifre Değiştir</p>
-                <p class="g-settings-section-sub">Güçlü bir şifre seç, düzenli olarak değiştir.</p>
-            </div>
-            <div class="g-settings-body">
-                <form method="post">
-                    {% csrf_token %}
-                    <input type="hidden" name="action" value="password">
-                    <div class="g-field mb-3">
-                        <label class="g-label" for="{{ password_form.old_password.id_for_label }}">Mevcut Şifre</label>
-                        <div class="g-input-wrap">
-                            <i class="bi bi-lock g-input-icon"></i>
-                            <input type="password" name="old_password" id="{{ password_form.old_password.id_for_label }}"
-                                   class="g-input g-input-icon-left" autocomplete="current-password">
-                        </div>
-                        {% if password_form.old_password.errors %}
-                        <div class="g-login-error mt-2" style="font-size:12px;">{{ password_form.old_password.errors|join:', ' }}</div>
-                        {% endif %}
-                    </div>
-                    <div class="g-field mb-3">
-                        <label class="g-label" for="{{ password_form.new_password1.id_for_label }}">Yeni Şifre</label>
-                        <div class="g-input-wrap">
-                            <i class="bi bi-lock g-input-icon"></i>
-                            <input type="password" name="new_password1" id="{{ password_form.new_password1.id_for_label }}"
-                                   class="g-input g-input-icon-left" autocomplete="new-password">
-                        </div>
-                        {% if password_form.new_password1.errors %}
-                        <div class="g-login-error mt-2" style="font-size:12px;">{{ password_form.new_password1.errors|join:', ' }}</div>
-                        {% endif %}
-                    </div>
-                    <div class="g-field mb-3">
-                        <label class="g-label" for="{{ password_form.new_password2.id_for_label }}">Yeni Şifre (Tekrar)</label>
-                        <div class="g-input-wrap">
-                            <i class="bi bi-lock g-input-icon"></i>
-                            <input type="password" name="new_password2" id="{{ password_form.new_password2.id_for_label }}"
-                                   class="g-input g-input-icon-left" autocomplete="new-password">
-                        </div>
-                        {% if password_form.new_password2.errors %}
-                        <div class="g-login-error mt-2" style="font-size:12px;">{{ password_form.new_password2.errors|join:', ' }}</div>
-                        {% endif %}
-                    </div>
-                    {% if password_form.non_field_errors %}
-                    <div class="g-login-error mb-3" style="font-size:12px;">{{ password_form.non_field_errors|join:', ' }}</div>
-                    {% endif %}
-                    <button type="submit" class="g-btn g-btn-primary">
-                        <i class="bi bi-shield-check"></i> Şifreyi Güncelle
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-
-</div>
+  </form>
+{% endui_sheet %}
 {% endblock %}

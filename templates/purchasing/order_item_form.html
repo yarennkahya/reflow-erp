@@ -1,7 +1,54 @@
 {% extends 'base.html' %}
-{% block title %}{% if item %}Sipariş Kalemi Düzenle{% else %}Sipariş Kalemi Ekle{% endif %} — Reflow Coffee ERP{% endblock %}
-{% block nav_purchasing %}active{% endblock %}
-{% block nav_purchasing_orders %}active{% endblock %}
-{% block page_title %}Satın Alma / Sipariş Kalemi{% endblock %}
-{% block extra_head %}<style>.form-card { max-width:760px; background: var(--g-surface); border:1px solid var(--g-border); border-radius:12px; overflow:hidden; }.form-card-head { padding:18px 22px; background:var(--g-n-50); border-bottom:1px solid var(--g-border); }.form-card-body { padding:22px; }.form-label { color:var(--g-text); font-size:13px; font-weight:600; }</style>{% endblock %}
-{% block content %}<div class="mb-3"><a href="{% url 'purchase-order-detail' order.pk %}" class="text-decoration-none" style="font-size:13px;"><i class="bi bi-arrow-left me-1"></i>PO #{{ order.pk }} siparişine dön</a></div><div class="form-card"><div class="form-card-head"><h5 class="mb-1 fw-bold">{% if item %}Sipariş kalemini düzenle{% else %}Sipariş kalemi ekle{% endif %}</h5><p class="mb-0 text-muted" style="font-size:13px;">Tedarikçi: <strong>{{ order.supplier.name }}</strong></p></div><form method="post" class="form-card-body">{% csrf_token %}{% if form.non_field_errors %}<div class="alert alert-danger py-2">{{ form.non_field_errors }}</div>{% endif %}{% if not has_catalog_products %}<div class="alert alert-warning"><i class="bi bi-exclamation-triangle me-1"></i>Bu tedarikçiye ait ürün kataloğu boş. Önce bir ürün ekleyin.<br><a class="btn btn-sm btn-outline-primary mt-2" href="{% url 'supplier-product-create' order.supplier.pk %}">Tedarikçi ürünü ekle</a></div>{% else %}<div class="row g-3"><div class="col-12"><label class="form-label" for="{{ form.product.id_for_label }}">{{ form.product.label }}</label>{{ form.product }}{% for error in form.product.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div><div class="col-md-6"><label class="form-label" for="{{ form.quantity_ordered.id_for_label }}">{{ form.quantity_ordered.label }}</label>{{ form.quantity_ordered }}{% for error in form.quantity_ordered.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div><div class="col-md-6"><label class="form-label" for="{{ form.unit_price.id_for_label }}">{{ form.unit_price.label }}</label>{{ form.unit_price }}{% for error in form.unit_price.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div></div><div class="d-flex justify-content-end gap-2 border-top mt-4 pt-3"><a href="{% url 'purchase-order-detail' order.pk %}" class="btn btn-light">Vazgeç</a><button class="btn btn-primary" type="submit"><i class="bi bi-check-lg me-1"></i>{% if item %}Kalemi güncelle{% else %}Kalemi ekle{% endif %}</button></div>{% endif %}</form></div>{% endblock %}
+{% block title %}{% if item %}{% translate "Kalem Düzenle" %}{% else %}{% translate "Kalem Ekle" %}{% endif %}{% endblock %}
+
+{% block cp_breadcrumb %}
+  {% with pk=order.pk|stringformat:"s" %}
+    {% url 'purchase-order-detail' order.pk as back %}
+    {% if item %}{% translate "Kalem düzenle" as rec %}{% else %}{% translate "Kalem ekle" as rec %}{% endif %}
+    {% ui_breadcrumb parent="PO #"|add:pk parent_url=back record=rec %}
+  {% endwith %}
+{% endblock %}
+
+{% block cp_buttons %}
+  {% if has_catalog_products %}
+    <button type="submit" form="o-form" class="o-btn o-btn--primary">
+      <i class="bi bi-check-lg" aria-hidden="true"></i> {% translate "Kaydet" %}
+    </button>
+  {% endif %}
+  <a class="o-btn" href="{% url 'purchase-order-detail' order.pk %}">{% translate "Vazgeç" %}</a>
+{% endblock %}
+
+{% block content_class %} o-content--sheet{% endblock %}
+
+{% block content %}
+{% ui_sheet %}
+  <h1 class="o-form-title">
+    {% if item %}{% translate "Sipariş kalemini düzenle" %}{% else %}{% translate "Sipariş kalemi ekle" %}{% endif %}
+  </h1>
+  <p class="o-form-subtitle">
+    {% translate "Tedarikçi" %}:
+    <a href="{% url 'supplier-detail' order.supplier.pk %}">{{ order.supplier.name }}</a>
+  </p>
+
+  {% if not has_catalog_products %}
+    <div class="alert alert-warning">
+      <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+      {% translate "Bu tedarikçiye ait ürün kataloğu boş. Önce bir ürün ekleyin." %}
+      <a class="o-btn o-btn--sm" href="{% url 'supplier-product-create' order.supplier.pk %}">
+        {% translate "Tedarikçi ürünü ekle" %}
+      </a>
+    </div>
+  {% else %}
+    <form method="post" id="o-form">
+      {% csrf_token %}
+      {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+      {% translate "Kalem bilgileri" as g %}
+      {% ui_group g %}
+        {% ui_field form.product cols=12 %}
+        {% ui_field form.quantity_ordered cols=6 %}
+        {% ui_field form.unit_price cols=6 %}
+      {% endui_group %}
+    </form>
+  {% endif %}
+{% endui_sheet %}
+{% endblock %}

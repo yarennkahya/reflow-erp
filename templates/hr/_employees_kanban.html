@@ -1,0 +1,28 @@
+<div class="o-kanban" data-o-kanban data-o-kanban-url="{% ui_kanban_url 'employee-set-status' %}">
+  {% for column in columns %}
+    <section class="o-kanban-col" aria-label="{{ column.label }}"
+             data-o-kanban-col data-o-kanban-value="{{ column.value }}">
+      <header class="o-kanban-head">
+        <span class="o-kanban-title">{{ column.label }}</span>
+        <span class="o-kanban-count">{{ column.count }}</span>
+      </header>
+      <div class="o-kanban-body" data-o-kanban-body>
+        {% for emp in column.items %}
+          {% ui_kanban_card pk=emp.pk %}
+            <a class="o-kanban-card-link" href="{% url 'hr-employee-detail' emp.pk %}" aria-label="{{ emp.name }}"></a>
+            <div class="o-row">
+              {% ui_avatar emp.name size="lg" %}
+              <div>
+                <p class="o-kanban-card-title">{{ emp.name }}</p>
+                <p class="o-kanban-card-sub">{{ emp.position.title|default:"—" }}</p>
+              </div>
+            </div>
+            <div class="o-kanban-card-foot">
+              <span class="o-tag"><i class="bi bi-diagram-3" aria-hidden="true"></i> {{ emp.department.name|default:"—" }}</span>
+            </div>
+          {% endui_kanban_card %}
+        {% empty %}<p class="o-kanban-empty">—</p>{% endfor %}
+      </div>
+    </section>
+  {% endfor %}
+</div>

@@ -1,0 +1,48 @@
+<div class="o-list">
+  <div class="o-list-scroll">
+    <table class="o-table">
+      <thead>
+        <tr>
+          <th>{% translate "Sipariş" %}</th>
+          <th>{% translate "Tedarikçi" %}</th>
+          <th>{% translate "Durum" %}</th>
+          <th>{% translate "Beklenen teslimat" %}</th>
+          <th class="o-num">{% translate "Kalem" %}</th>
+          <th class="o-num">{% translate "Toplam" %}</th>
+          <th>{% translate "Oluşturulma" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in orders %}
+          <tr>
+            <td>
+              <a href="{% url 'purchase-order-detail' row.order.pk %}" class="o-table-link o-mono">PO #{{ row.order.pk }}</a>
+              {% if row.order.notes %}<span class="o-table-sub">{{ row.order.notes|truncatechars:44 }}</span>{% endif %}
+            </td>
+            <td><a href="{% url 'supplier-detail' row.order.supplier_id %}" class="o-table-link">{{ row.order.supplier.name }}</a></td>
+            <td>{% ui_badge row.order "status" %}</td>
+            <td class="o-nowrap">
+              {% if row.order.expected_delivery_date %}
+                {% if row.is_overdue %}
+                  <span class="o-overdue">
+                    {{ row.order.expected_delivery_date|date:"d M Y" }}
+                    <i class="bi bi-exclamation-circle" title="{% translate 'Teslimat gecikti' %}" aria-hidden="true"></i>
+                  </span>
+                {% else %}{{ row.order.expected_delivery_date|date:"d M Y" }}{% endif %}
+              {% else %}<span class="o-faint">{% translate "Belirtilmedi" %}</span>{% endif %}
+            </td>
+            <td class="o-num">{{ row.item_count }}</td>
+            <td class="o-num o-strong">{{ row.total|money }}</td>
+            <td class="o-nowrap o-muted o-sm">{{ row.order.created_at|date:"d M Y" }}</td>
+          </tr>
+        {% empty %}
+          {% translate "Gösterilecek satın alma siparişi yok" as t %}
+          {% translate "Filtreleri temizleyin ya da ilk siparişinizi oluşturun." as d %}
+          {% translate "İlk siparişi oluştur" as cta %}
+          {% url 'purchase-order-create' as create_url %}
+          {% ui_empty icon="bi-bag-x" title=t text=d action_url=create_url action_label=cta colspan=7 %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>

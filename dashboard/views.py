@@ -42,6 +42,10 @@ def chat_page_view(request, conversation_id=None):
     })
 
 def dashboard_view(request):
+    # DİKKAT: bu sözlük context'e KONULMAZ. Eskiden konuyordu ve
+    # dashboard.context_processors.navigation'ın 10 anahtarlı sürümünü
+    # gölgeliyordu; bu yüzden /dashboard/ sayfasında AI Asistan, Takvim ve
+    # Denetim Kaydı her zaman kilitli görünüyordu.
     module_access = {
         app_label: user_can_access_module(request.user, app_label)
         for app_label in ('inventory', 'purchasing', 'production', 'sales', 'crm', 'hr', 'finance')
@@ -51,7 +55,7 @@ def dashboard_view(request):
         if module_access['sales'] or module_access['finance']
         else None
     )
-    context = {'module_access': module_access}
+    context = {}
 
     if module_access['inventory']:
         context['inventory'] = {

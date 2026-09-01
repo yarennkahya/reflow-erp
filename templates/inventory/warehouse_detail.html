@@ -1,25 +1,88 @@
 {% extends 'base.html' %}
-{% block title %}{{ warehouse.name }} — Depo{% endblock %}
-{% block nav_inventory %}active{% endblock %}
-{% block nav_inventory_warehouses %}active{% endblock %}
-{% block page_title %}Stok / Depo Kartı{% endblock %}
+{% block title %}{{ warehouse.name }}{% endblock %}
 
-{% block extra_head %}
-<style>
-  .profile-card, .data-card, .stat-card, .notice-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:12px; }.profile-card { padding:20px; }.warehouse-avatar-lg { width:52px; height:52px; border-radius:14px; background:#eff6ff; color:#2563eb; display:flex; align-items:center; justify-content:center; font-size:21px; }.stat-card { height:100%; padding:15px; }.stat-label { color:var(--g-text-2); font-size:11px; font-weight:600; letter-spacing:.6px; text-transform:uppercase; }.stat-value { color:var(--g-text); font-size:20px; font-weight:700; margin-top:3px; }
-  .data-card { overflow:hidden; }.data-card .table { margin:0; font-size:13px; }.data-card .table thead th { background:var(--g-n-50); border-bottom:1px solid var(--g-border); color:var(--g-text-2); font-size:11px; font-weight:700; letter-spacing:.65px; padding:11px 16px; text-transform:uppercase; white-space:nowrap; }.data-card .table tbody td { border-color:var(--g-border-sub); color:var(--g-text); padding:13px 16px; vertical-align:middle; }.data-card .table tbody tr:hover { background:var(--g-n-50); }
-  .freshness-pill { border-radius:20px; display:inline-block; font-size:11.5px; font-weight:600; padding:4px 8px; white-space:nowrap; }.freshness-normal { background:#f0fdf4; color:#15803d; }.freshness-priority_sale { background:#fff7ed; color:#c2410c; }.freshness-waste { background:#fef2f2; color:#b91c1c; }.stock-empty { background:var(--g-border-sub); color:var(--g-text-2); }.lot-link { color:var(--g-text); font-weight:600; text-decoration:none; }.lot-link:hover { color:#2563eb; }.lot-sub { color:var(--g-text-2); font-size:11.5px; margin-top:2px; }.lot-code { background:var(--g-n-50); border-radius:5px; color:var(--g-text-2); font-family:monospace; font-size:12px; padding:3px 6px; }
-  .info-row { display:flex; gap:10px; padding:11px 0; border-bottom:1px solid var(--g-border-sub); font-size:13px; }.info-row:last-child { border:0; padding-bottom:0; }.info-row i { color:#2563eb; width:16px; }.info-label { color:var(--g-text-2); min-width:84px; }.info-value { color:var(--g-text); font-weight:500; }.notice-card { color:var(--g-text-2); font-size:12.5px; padding:13px 14px; }.empty { color:var(--g-text-3); padding:44px 24px; text-align:center; }.empty i { display:block; font-size:34px; margin-bottom:8px; }
-</style>
+{% block cp_breadcrumb %}{% ui_breadcrumb record=warehouse.name %}{% endblock %}
+
+{% block cp_buttons %}
+  <a class="o-btn" href="{% url 'warehouse-edit' warehouse.pk %}">
+    <i class="bi bi-pencil" aria-hidden="true"></i> {% translate "Düzenle" %}
+  </a>
+  <form method="post" action="{% url 'warehouse-activity' warehouse.pk %}">
+    {% csrf_token %}
+    <button type="submit" class="o-btn">
+      <i class="bi {% if warehouse.is_active %}bi-pause-circle{% else %}bi-play-circle{% endif %}" aria-hidden="true"></i>
+      {% if warehouse.is_active %}{% translate "Pasife al" %}{% else %}{% translate "Aktifleştir" %}{% endif %}
+    </button>
+  </form>
+  {% url 'warehouse-delete' warehouse.pk as del_url %}
+  {% translate "Sil" as del_label %}
+  {% blocktranslate asvar del_msg with name=warehouse.name %}{{ name }} deposunu silmek istediğinize emin misiniz?{% endblocktranslate %}
+  {% ui_confirm url=del_url label=del_label message=del_msg icon="bi-trash" variant="danger" %}
 {% endblock %}
 
+{% block content_class %} o-content--sheet{% endblock %}
+
 {% block content %}
-<div class="mb-3"><a href="{% url 'warehouse-list' %}" class="text-decoration-none" style="font-size:13px;"><i class="bi bi-arrow-left me-1"></i><span data-i18n="back-to-warehouses">Depolara dön</span></a></div>
-<div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4"><div class="d-flex align-items-center gap-3"><div class="warehouse-avatar-lg"><i class="bi bi-building"></i></div><div><div class="d-flex align-items-center gap-2"><h4 class="fw-bold mb-0">{{ warehouse.name }}</h4>{% if warehouse.is_active %}<span class="badge bg-success-subtle text-success-emphasis" data-i18n="active">Aktif</span>{% else %}<span class="badge bg-secondary-subtle text-secondary-emphasis" data-i18n="passive">Pasif</span>{% endif %}</div><div class="text-muted mt-1" style="font-size:13px;"><i class="bi bi-geo-alt me-1"></i>{{ warehouse.city }}</div></div></div><div class="d-flex flex-wrap gap-2"><a class="btn btn-outline-primary" href="{% url 'warehouse-edit' warehouse.pk %}"><i class="bi bi-pencil me-1"></i><span data-i18n="edit">Düzenle</span></a><form method="post" action="{% url 'warehouse-activity' warehouse.pk %}">{% csrf_token %}<button class="btn btn-outline-secondary" type="submit"><i class="bi {% if warehouse.is_active %}bi-pause-circle{% else %}bi-play-circle{% endif %} me-1"></i>{% if warehouse.is_active %}Pasife al{% else %}Aktifleştir{% endif %}</button></form><form method="post" action="{% url 'warehouse-delete' warehouse.pk %}" onsubmit="return confirm('{{ warehouse.name|escapejs }} deposunu silmek istediğinize emin misiniz?');">{% csrf_token %}<button class="btn btn-outline-danger" type="submit" title="Depoyu sil"><i class="bi bi-trash"></i></button></form></div></div>
+{% ui_sheet %}
+  <div class="o-form-head">
+    <div class="o-row">
+      {% ui_avatar warehouse.name size="lg" %}
+      <div>
+        <h1 class="o-form-title">{{ warehouse.name }} {% ui_badge warehouse "is_active" %}</h1>
+        <p class="o-form-subtitle">{{ warehouse.city|default:"—" }}</p>
+      </div>
+    </div>
+    {% ui_button_box %}
+      {% translate "Lot" as l1 %}{% ui_stat value=lot_count label=l1 icon="bi-box-seam" %}
+      {% translate "Stokta olan" as l2 %}{% ui_stat value=available_lots label=l2 icon="bi-check2-circle" variant="success" %}
+      {% translate "Dikkat gerektiren" as l3 %}{% ui_stat value=attention_lots label=l3 icon="bi-exclamation-triangle" variant="warning" %}
+    {% endui_button_box %}
+  </div>
 
-<div class="row g-3 mb-4"><div class="col-lg-4 col-sm-6"><div class="stat-card"><div class="stat-label" data-i18n="total-lots">Toplam lot</div><div class="stat-value">{{ lot_count }}</div></div></div><div class="col-lg-4 col-sm-6"><div class="stat-card"><div class="stat-label" data-i18n="in-stock-lots">Stokta olan lot</div><div class="stat-value text-success">{{ available_lots }}</div></div></div><div class="col-lg-4 col-sm-6"><div class="stat-card"><div class="stat-label" data-i18n="needs-attention">Dikkat gerektiren</div><div class="stat-value {% if attention_lots %}text-warning-emphasis{% endif %}">{{ attention_lots }}</div></div></div></div>
+  {% ui_notebook %}
+    {% translate "Lotlar" as t1 %}
+    {% ui_page t1 badge=lot_count %}
+      <div class="o-list"><div class="o-list-scroll">
+        <table class="o-table">
+          <thead>
+            <tr>
+              <th>{% translate "Ürün" %}</th>
+              <th>{% translate "Lot kodu" %}</th>
+              <th class="o-num">{% translate "Kalan" %}</th>
+              <th>{% translate "SKT" %}</th>
+              <th>{% translate "Tazelik" %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in lots %}
+              <tr>
+                <td><a href="{% url 'lot-detail' row.lot.pk %}" class="o-table-link">{{ row.lot.product.name }}</a></td>
+                <td class="o-mono">{{ row.lot.lot_code }}</td>
+                <td class="o-num {% if row.is_empty %}o-faint{% else %}o-strong{% endif %}">
+                  {{ row.remaining|qty:row.lot.product.get_unit_display }}
+                </td>
+                <td class="o-nowrap">{{ row.lot.expiry_date|date:"d M Y" }}</td>
+                <td>{% ui_badge_raw "inventory.Lot.freshness" row.freshness %}</td>
+              </tr>
+            {% empty %}
+              {% translate "Bu depoda lot yok" as e %}
+              {% ui_empty icon="bi-box2" title=e colspan=5 %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div></div>
+    {% endui_page %}
 
-{% if not warehouse.is_active %}<div class="notice-card mb-4" style="background:var(--g-n-50);"><i class="bi bi-pause-circle-fill text-secondary me-1"></i>Bu depo pasif. Yeni teslim alma işlemlerinde depo seçimini kapatmak için operasyonel kullanımını gözden geçirin.</div>{% endif %}
-
-<div class="row g-4"><div class="col-xl-8"><div class="data-card"><div class="p-3 border-bottom d-flex flex-wrap align-items-center justify-content-between gap-2"><div><h6 class="mb-0 fw-bold" data-i18n="lots-in-warehouse">Depodaki lotlar</h6><small class="text-muted" data-i18n="lots-in-warehouse-desc">Lotların kalan miktarını ve son kullanma durumunu inceleyin.</small></div><a href="{% url 'inventory-list' %}?warehouse={{ warehouse.pk }}" class="btn btn-sm btn-outline-primary"><span data-i18n="open-in-stock-screen">Stok ekranında aç</span> <i class="bi bi-arrow-right ms-1"></i></a></div><div class="table-responsive"><table class="table table-borderless align-middle"><thead><tr><th data-i18n="product">Ürün</th><th data-i18n="lot-code">Lot kodu</th><th class="text-end" data-i18n="remaining-quantity">Kalan miktar</th><th data-i18n="expiry-date-short">SKT</th><th data-i18n="status">Durum</th><th class="text-end"></th></tr></thead><tbody>{% for row in lots %}<tr><td><a class="lot-link" href="{% url 'lot-detail' row.lot.pk %}">{{ row.lot.product.name }}</a><div class="lot-sub">{{ row.lot.product.category }} · {{ row.lot.product.get_unit_display }}</div></td><td><span class="lot-code">{{ row.lot.lot_code }}</span></td><td class="text-end">{% if row.is_empty %}<span class="freshness-pill stock-empty" data-i18n="depleted">Tükendi</span>{% else %}<span class="fw-semibold">{{ row.remaining|floatformat:3 }} {{ row.lot.product.get_unit_display }}</span>{% endif %}</td><td {% if row.freshness == 'WASTE' %}class="text-danger fw-semibold"{% elif row.freshness == 'PRIORITY_SALE' %}class="text-warning-emphasis fw-semibold"{% endif %}>{{ row.lot.expiry_date|date:"d M Y" }}</td><td><span class="freshness-pill {{ row.freshness_class }}">{{ row.freshness_label }}</span></td><td class="text-end"><a href="{% url 'lot-detail' row.lot.pk %}" class="btn btn-sm btn-light" title="Lot detayı"><i class="bi bi-arrow-right"></i></a></td></tr>{% empty %}<tr><td colspan="6" class="empty"><i class="bi bi-box2"></i><div class="fw-medium" data-i18n="no-lots-in-warehouse">Bu depoda henüz lot bulunmuyor.</div><a href="{% url 'purchasing-list' %}" class="btn btn-primary btn-sm mt-3" data-i18n="go-to-receiving">Teslim alma işlemlerine git</a></td></tr>{% endfor %}</tbody></table></div></div></div><div class="col-xl-4"><div class="profile-card mb-4"><h6 class="fw-bold mb-3" data-i18n="warehouse-information">Depo bilgileri</h6><div class="info-row"><i class="bi bi-building"></i><span class="info-label" data-i18n="warehouse">Depo</span><span class="info-value">{{ warehouse.name }}</span></div><div class="info-row"><i class="bi bi-geo-alt"></i><span class="info-label" data-i18n="city">Şehir</span><span class="info-value">{{ warehouse.city }}</span></div><div class="info-row"><i class="bi bi-activity"></i><span class="info-label" data-i18n="status">Durum</span><span class="info-value">{% if warehouse.is_active %}<span class="text-success" data-i18n="active">Aktif</span>{% else %}<span class="text-secondary" data-i18n="passive">Pasif</span>{% endif %}</span></div><div class="info-row"><i class="bi bi-box-seam"></i><span class="info-label" data-i18n="lot-count">Lot sayısı</span><span class="info-value">{{ lot_count }}</span></div></div><div class="notice-card"><i class="bi bi-info-circle-fill text-primary me-1"></i><span data-i18n="warehouse-notice">Yeni lotlar satın alma siparişinin teslim alma adımında bu depoya atanır. Bu sayede stok kaynağı izlenebilir kalır.</span></div></div></div>
+    {% translate "Bilgiler" as t2 %}
+    {% ui_page t2 %}
+      {% ui_group %}
+        {% translate "Depo adı" as f1 %}{% ui_field_value f1 warehouse.name icon="bi-buildings" cols=6 %}
+        {% translate "Şehir" as f2 %}{% ui_field_value f2 warehouse.city icon="bi-geo-alt" cols=6 %}
+        {% translate "Durum" as f3 %}
+        {% if warehouse.is_active %}{% translate "Aktif" as v3 %}{% else %}{% translate "Pasif" as v3 %}{% endif %}
+        {% ui_field_value f3 v3 icon="bi-toggle-on" cols=6 %}
+      {% endui_group %}
+    {% endui_page %}
+  {% endui_notebook %}
+{% endui_sheet %}
 {% endblock %}

@@ -1,136 +1,112 @@
 {% extends 'base.html' %}
-{% block title %}Parti #{{ batch.pk }} — Reflow Coffee ERP{% endblock %}
-{% block nav_production %}active{% endblock %}
-{% block nav_production_batches %}active{% endblock %}
-{% block page_title %}Üretim{% endblock %}
+{% block title %}RB #{{ batch.pk }}{% endblock %}
 
-{% block extra_head %}
-<style>
-  .prod-subnav { display:flex; gap:4px; margin-bottom:20px; border-bottom:1px solid var(--g-border); padding-bottom:0; }
-  .prod-subnav a { padding:8px 14px; font-size:13px; font-weight:500; color:var(--g-text-2); text-decoration:none; border-bottom:2px solid transparent; margin-bottom:-1px; white-space:nowrap; }
-  .prod-subnav a:hover { color:var(--g-text); }
-  .prod-subnav a.active { color:#ca8a04; border-bottom-color:#ca8a04; font-weight:600; }
-  .info-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:10px; padding:20px 24px; }
-  .info-row { display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--g-border-sub); font-size:13.5px; }
-  .info-row:last-child { border-bottom:none; }
-  .info-label { color:var(--g-text-2); font-weight:500; }
-  .info-value { color:var(--g-text); font-weight:600; }
-  .lot-code { font-family:monospace; font-size:13px; color:var(--g-text-2); background:var(--g-border-sub); padding:2px 7px; border-radius:4px; }
-  .data-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:10px; overflow:hidden; }
-  .data-card .table { margin-bottom:0; font-size:13.5px; }
-  .data-card .table thead th { background:var(--g-n-50); color:var(--g-text-2); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.7px; border-bottom:1px solid var(--g-border); padding:10px 16px; white-space:nowrap; }
-  .data-card .table tbody td { padding:11px 16px; vertical-align:middle; color:var(--g-text); border-color:var(--g-border-sub); }
-  .data-card .table tbody tr:last-child td { border-bottom:none; }
-  .section-head { font-size:13px; font-weight:600; color:var(--g-text-2); padding:10px 16px; background:var(--g-n-50); border-bottom:1px solid var(--g-border); display:flex; align-items:center; gap:8px; }
-  .quality-body { padding:18px 20px; }
-  .quality-badge { display:inline-flex; align-items:center; gap:5px; border-radius:20px; font-size:12px; font-weight:700; padding:5px 10px; }
-  .quality-pass { background:#f0fdf4; color:#15803d; }
-  .quality-fail { background:#fef2f2; color:#b91c1c; }
-  .quality-meta { color:var(--g-text-2); font-size:12px; }
-  .quality-score { background:var(--g-n-50); border:1px solid var(--g-border); border-radius:8px; color:var(--g-text); display:inline-flex; flex-direction:column; min-width:86px; padding:9px 11px; }
-  .quality-score strong { color:var(--g-text); font-size:18px; line-height:1.1; }
-  .form-label { color:var(--g-text); font-size:12.5px; font-weight:600; }
-  .form-help { color:var(--g-text-2); font-size:11.5px; }
-  .quality-note { background:var(--g-n-50); border-radius:8px; color:var(--g-text-2); font-size:13px; padding:11px 12px; white-space:pre-line; }
-</style>
+{% block cp_breadcrumb %}
+  {% with pk=batch.pk|stringformat:"s" %}{% ui_breadcrumb record="RB #"|add:pk %}{% endwith %}
 {% endblock %}
 
+{% block cp_buttons %}
+  <a class="o-btn" href="{% url 'lot-detail' batch.output_lot_id %}">
+    <i class="bi bi-box-seam" aria-hidden="true"></i> {% translate "Çıktı Lotu" %}
+  </a>
+{% endblock %}
+
+{% block content_class %} o-content--sheet{% endblock %}
+
 {% block content %}
-<div class="prod-subnav">
-  <a href="{% url 'production-list' %}" class="active" data-i18n="roast-batches-nav">Kavurma Partileri</a>
-  <a href="{% url 'production-recipes' %}" data-i18n="recipes-bom">Reçeteler (BOM)</a>
-</div>
+{% ui_sheet %}
+  <ol class="o-statusbar" aria-label="{% translate 'Kalite kontrolü' %}">
+    <li class="o-statusbar-step{% if not quality_check %} o-current{% else %} o-done{% endif %}">
+      <span class="o-statusbar-label">{% translate "Kavuruldu" %}</span>
+    </li>
+    <li class="o-statusbar-step{% if quality_check %} o-current{% endif %}">
+      <span class="o-statusbar-label">
+        {% if quality_check %}{{ quality_check.get_result_display }}{% else %}{% translate "Kalite kontrolü bekliyor" %}{% endif %}
+      </span>
+    </li>
+  </ol>
 
-<div class="d-flex align-items-center gap-3 mb-3">
-  <a href="{% url 'production-list' %}" class="text-muted" style="font-size:13px; text-decoration:none;"><i class="bi bi-arrow-left me-1"></i><span data-i18n="batch-list">Parti Listesi</span></a>
-</div>
-
-<div class="row g-3">
-  <div class="col-md-5">
-    <div class="info-card">
-      <div class="d-flex align-items-center gap-3 mb-4">
-        <div style="width:48px; height:48px; border-radius:10px; background:#fefce8; color:#ca8a04; display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0;">
-          <i class="bi bi-fire"></i>
-        </div>
-        <div>
-          <div style="font-size:17px; font-weight:700; color:var(--g-text);">Kavurma Partisi #{{ batch.pk }}</div>
-          <div style="font-size:13px; color:var(--g-text-2);">{{ batch.roasted_at|date:"d M Y H:i" }}</div>
-        </div>
-      </div>
-      <div class="info-row"><span class="info-label" data-i18n="recipe">Reçete</span><span class="info-value">{{ batch.recipe.name }}</span></div>
-      <div class="info-row"><span class="info-label" data-i18n="output-product">Çıktı Ürünü</span><span class="info-value">{{ batch.output_lot.product.name }}</span></div>
-      <div class="info-row">
-        <span class="info-label" data-i18n="output-lot-code">Çıktı Lot Kodu</span>
-        <span class="lot-code">{{ batch.output_lot.lot_code }}</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label" data-i18n="output-quantity">Çıktı Miktarı</span>
-        <span class="info-value">{{ batch.total_output_quantity|floatformat:3 }} {{ batch.output_lot.product.unit }}</span>
-      </div>
-      <div class="info-row"><span class="info-label" data-i18n="warehouse">Depo</span><span class="info-value">{{ batch.output_lot.warehouse }}</span></div>
-      <div class="info-row"><span class="info-label" data-i18n="roast-date">Kavurma Tarihi</span><span class="info-value">{{ batch.roasted_at|date:"d M Y H:i" }}</span></div>
+  <div class="o-form-head">
+    <div>
+      <h1 class="o-form-title o-mono">RB #{{ batch.pk }}</h1>
+      <p class="o-form-subtitle">{{ batch.recipe.name }} · {{ batch.roasted_at|date:"d M Y, H:i" }}</p>
     </div>
-  </div>
-
-  <div class="col-md-7">
-    <div class="data-card">
-      <div class="section-head"><i class="bi bi-journal-bookmark" style="color:#ca8a04;"></i>Reçete Bileşenleri — {{ batch.recipe.name }}</div>
-      <table class="table table-borderless">
-        <thead>
-          <tr><th data-i18n="input-product">Girdi Ürün</th><th class="text-end" data-i18n="ratio-percent">Oran (%)</th></tr>
-        </thead>
-        <tbody>
-          {% for comp in batch.recipe.components.all %}
-          <tr>
-            <td class="fw-medium">{{ comp.input_product.name }}</td>
-            <td class="text-end">%{{ comp.ratio_percent|floatformat:2 }}</td>
-          </tr>
-          {% empty %}
-          <tr><td colspan="2" style="padding:24px; text-align:center; color:var(--g-text-3);" data-i18n="no-components">Bileşen tanımlanmamış.</td></tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<div class="data-card mt-3">
-  <div class="section-head"><i class="bi bi-clipboard2-check" style="color:#ca8a04;"></i><span data-i18n="quality-control">Kalite Kontrolü</span></div>
-  <div class="quality-body">
-    {% if quality_check %}
-    <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
-      <div>
-        {% if quality_check.result == 'pass' %}
-        <span class="quality-badge quality-pass"><i class="bi bi-check-circle-fill"></i>{{ quality_check.get_result_display }}</span>
-        {% else %}
-        <span class="quality-badge quality-fail"><i class="bi bi-x-circle-fill"></i>{{ quality_check.get_result_display }}</span>
-        {% endif %}
-        <div class="quality-meta mt-2"><i class="bi bi-person-check me-1"></i>{{ quality_check.inspector }} tarafından kontrol edildi · {{ quality_check.checked_at|date:"d M Y H:i" }}</div>
-      </div>
-      {% if quality_check.score is not None %}
-      <div class="quality-score"><span class="quality-meta">Cupping skoru</span><strong>{{ quality_check.score }}<small class="fs-6 text-muted">/100</small></strong></div>
+    {% ui_button_box %}
+      {% translate "Çıktı miktarı" as l1 %}
+      {% ui_stat value=batch.total_output_quantity|qty:batch.output_lot.product.get_unit_display label=l1 icon="bi-box-seam" %}
+      {% translate "Bileşen" as l2 %}{% ui_stat value=batch.recipe.components.count label=l2 icon="bi-journal-text" %}
+      {% if quality_check and quality_check.score %}
+        {% translate "Kupa puanı" as l3 %}{% ui_stat value=quality_check.score label=l3 icon="bi-star" %}
       {% endif %}
-    </div>
-    {% if quality_check.notes %}
-    <div class="quality-note mt-3"><span class="fw-semibold d-block mb-1" data-i18n="inspection-notes">Kontrol notları</span>{{ quality_check.notes }}</div>
-    {% endif %}
-    {% if quality_check.result == 'fail' %}
-    <div class="alert alert-danger py-2 px-3 mt-3 mb-0" style="font-size:12.5px;"><i class="bi bi-trash3-fill me-1"></i>Partide kalan stok kalite kontrolü sonucu otomatik olarak ıskartaya ayrıldı.</div>
-    {% endif %}
-    {% else %}
-    <p class="text-muted mb-3" style="font-size:13px;">Bu parti için henüz kalite kontrolü kaydedilmedi. Sonuç kaydedildiğinde başarısız partinin kalan stoğu otomatik olarak ıskartaya ayrılır.</p>
-    <form method="post" novalidate>
-      {% csrf_token %}
-      {% if quality_check_form.non_field_errors %}<div class="alert alert-danger py-2">{{ quality_check_form.non_field_errors }}</div>{% endif %}
-      <div class="row g-3">
-        <div class="col-md-4"><label class="form-label" for="{{ quality_check_form.result.id_for_label }}">{{ quality_check_form.result.label }}</label>{{ quality_check_form.result }}{% for error in quality_check_form.result.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div>
-        <div class="col-md-4"><label class="form-label" for="{{ quality_check_form.score.id_for_label }}">{{ quality_check_form.score.label }}</label>{{ quality_check_form.score }}<div class="form-help mt-1">{{ quality_check_form.score.help_text }}</div>{% for error in quality_check_form.score.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div>
-        <div class="col-md-4"><label class="form-label" for="{{ quality_check_form.inspector.id_for_label }}">{{ quality_check_form.inspector.label }}</label>{{ quality_check_form.inspector }}{% for error in quality_check_form.inspector.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div>
-        <div class="col-12"><label class="form-label" for="{{ quality_check_form.notes.id_for_label }}">{{ quality_check_form.notes.label }}</label>{{ quality_check_form.notes }}{% for error in quality_check_form.notes.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div>
-      </div>
-      <div class="d-flex justify-content-end mt-3"><button class="btn btn-primary" type="submit"><i class="bi bi-clipboard2-check me-1"></i><span data-i18n="save-quality-check">Kalite kontrolünü kaydet</span></button></div>
-    </form>
-    {% endif %}
+    {% endui_button_box %}
   </div>
-</div>
+
+  {% translate "Üretim bilgileri" as g %}
+  {% ui_group g %}
+    {% translate "Reçete" as f1 %}{% ui_field_value f1 batch.recipe.name icon="bi-journal-text" cols=4 %}
+    {% translate "Çıktı ürünü" as f2 %}{% ui_field_value f2 batch.output_lot.product.name icon="bi-cup-hot" cols=4 %}
+    {% translate "Çıktı lotu" as f3 %}
+    {% url 'lot-detail' batch.output_lot_id as lot_url %}
+    {% ui_field_value f3 batch.output_lot.lot_code url=lot_url icon="bi-upc" mono=True cols=4 %}
+    {% translate "Depo" as f4 %}{% ui_field_value f4 batch.output_lot.warehouse.name icon="bi-buildings" cols=4 %}
+    {% translate "SKT" as f5 %}{% ui_field_value f5 batch.output_lot.expiry_date|date:"d M Y" icon="bi-calendar-x" cols=4 %}
+    {% translate "Kavurma zamanı" as f6 %}{% ui_field_value f6 batch.roasted_at|date:"d M Y, H:i" icon="bi-clock" cols=4 %}
+  {% endui_group %}
+
+  {% ui_notebook %}
+    {% translate "Reçete Bileşenleri" as t1 %}
+    {% ui_page t1 badge=batch.recipe.components.count %}
+      <div class="o-list"><div class="o-list-scroll">
+        <table class="o-table">
+          <thead><tr><th>{% translate "Ürün" %}</th><th class="o-num">{% translate "Oran" %}</th></tr></thead>
+          <tbody>
+            {% for component in batch.recipe.components.all %}
+              <tr>
+                <td class="o-strong">{{ component.input_product.name }}</td>
+                <td class="o-num">%{{ component.ratio_percent|floatformat:"-2" }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div></div>
+    {% endui_page %}
+
+    {% translate "Kalite Kontrolü" as t2 %}
+    {% ui_page t2 %}
+      {% if quality_check %}
+        {% ui_group %}
+          {% translate "Sonuç" as q1 %}
+          {% ui_field_value q1 quality_check.get_result_display icon="bi-clipboard-check" cols=4 %}
+          {% translate "Kupa puanı" as q2 %}{% ui_field_value q2 quality_check.score icon="bi-star" cols=4 %}
+          {% translate "Kontrol eden" as q3 %}{% ui_field_value q3 quality_check.inspector.name icon="bi-person-badge" cols=4 %}
+          {% translate "Tarih" as q4 %}{% ui_field_value q4 quality_check.checked_at|date:"d M Y, H:i" icon="bi-clock" cols=4 %}
+          {% if quality_check.notes %}
+            {% translate "Notlar" as q5 %}{% ui_field_value q5 quality_check.notes cols=12 %}
+          {% endif %}
+        {% endui_group %}
+      {% else %}
+        <form method="post" id="o-qc-form">
+          {% csrf_token %}
+          {% if quality_check_form.non_field_errors %}
+            <div class="alert alert-danger">{{ quality_check_form.non_field_errors }}</div>
+          {% endif %}
+          {% translate "Kalite kontrolü kaydet" as qg %}
+          {% ui_group qg %}
+            {% ui_field quality_check_form.result cols=4 %}
+            {% ui_field quality_check_form.score cols=4 %}
+            {% ui_field quality_check_form.inspector cols=4 %}
+            {% ui_field quality_check_form.notes cols=12 %}
+          {% endui_group %}
+          <div class="o-form-actions">
+            <button type="submit" class="o-btn o-btn--primary">
+              <i class="bi bi-clipboard-check" aria-hidden="true"></i> {% translate "Kaydet" %}
+            </button>
+          </div>
+        </form>
+      {% endif %}
+    {% endui_page %}
+  {% endui_notebook %}
+{% endui_sheet %}
+
+{% if quality_check %}{% ui_chatter batch related=quality_check_list %}{% endif %}
 {% endblock %}

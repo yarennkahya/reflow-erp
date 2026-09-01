@@ -1,124 +1,25 @@
 {% extends 'base.html' %}
-{% block title %}İşe Alım — Reflow Coffee ERP{% endblock %}
-{% block nav_hr %}active{% endblock %}
-{% block nav_hr_recruitment %}active{% endblock %}
-{% block page_title %}İnsan Kaynakları{% endblock %}
+{% block title %}{% translate "İşe Alım" %}{% endblock %}
 
-{% block extra_head %}
-<style>
-  .hr-subnav { display:flex; gap:4px; margin-bottom:20px; border-bottom:1px solid var(--g-border); padding-bottom:0; }
-  .hr-subnav a { padding:8px 14px; font-size:13px; font-weight:500; color:var(--g-text-2); text-decoration:none; border-bottom:2px solid transparent; margin-bottom:-1px; white-space:nowrap; }
-  .hr-subnav a:hover { color:var(--g-text); }
-  .hr-subnav a.active { color:#9333ea; border-bottom-color:#9333ea; font-weight:600; }
-  .data-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:10px; overflow:hidden; margin-bottom:16px; }
-  .data-card .table { margin-bottom:0; font-size:13.5px; }
-  .data-card .table thead th { background:var(--g-n-50); color:var(--g-text-2); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.7px; border-bottom:1px solid var(--g-border); padding:10px 16px; white-space:nowrap; }
-  .data-card .table tbody td { padding:11px 16px; vertical-align:middle; color:var(--g-text); border-color:var(--g-border-sub); }
-  .data-card .table tbody tr:last-child td { border-bottom:none; }
-  .data-card .table tbody tr:hover { background:var(--g-n-50); }
-  .empty-state { padding:32px 24px; text-align:center; color:var(--g-text-3); }
-  .empty-state i { font-size:28px; display:block; margin-bottom:6px; }
-  .opening-head { padding:14px 16px; background:var(--g-n-50); border-bottom:1px solid var(--g-border); display:flex; align-items:center; gap:10px; }
-  .opening-title { font-size:14px; font-weight:700; color:var(--g-text); }
-  .opening-meta { font-size:12px; color:var(--g-text-2); }
-  .pipeline-card { background:var(--g-surface); border:1px solid var(--g-border); border-radius:10px; height:100%; padding:13px; }
-  .pipeline-label { color:var(--g-text-2); font-size:11px; font-weight:600; text-transform:uppercase; }
-  .pipeline-value { color:var(--g-text); font-size:21px; font-weight:700; margin-top:2px; }
-  .occupancy { min-width:130px; }
-  .occupancy .progress { height:6px; }
-</style>
+{% block cp_buttons %}
+  <a href="{% url 'job-opening-create' %}" class="o-btn o-btn--primary">
+    <i class="bi bi-plus-lg" aria-hidden="true"></i> {% translate "Pozisyon" %}
+  </a>
+  <a href="{% url 'candidate-create' %}" class="o-btn">
+    <i class="bi bi-person-plus" aria-hidden="true"></i> {% translate "Aday" %}
+  </a>
+  <a href="{% url 'application-create' %}" class="o-btn">
+    <i class="bi bi-file-earmark-text" aria-hidden="true"></i> {% translate "Başvuru" %}
+  </a>
 {% endblock %}
 
+{% block cp_views %}{% ui_view_switcher "kanban,list" current=view %}{% endblock %}
+
 {% block content %}
-<div class="hr-subnav">
-  <a href="{% url 'hr-list' %}">Genel Bakış</a>
-  <a href="{% url 'hr-employees' %}">Çalışanlar</a>
-  <a href="{% url 'hr-leave' %}">İzin & Devamsızlık</a>
-  <a href="{% url 'hr-recruitment' %}" class="active">İşe Alım</a>
-</div>
-
-<div class="d-flex align-items-center justify-content-between mb-3">
-  <div class="d-flex align-items-baseline gap-3">
-    <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-person-plus me-2" style="color:#9333ea;"></i>İş İlanları</h5>
-    <span class="text-muted" style="font-size:13px;">{{ openings|length }} ilan</span>
+  <div class="o-button-box o-po-kpis">
+    {% translate "Açık pozisyon" as l1 %}{% ui_stat value=open_count label=l1 icon="bi-briefcase" %}
+    {% translate "Aday" as l2 %}{% ui_stat value=candidate_count label=l2 icon="bi-people" %}
+    {% translate "Aktif başvuru" as l3 %}{% ui_stat value=application_count label=l3 icon="bi-file-earmark-text" %}
   </div>
-  <div class="d-flex gap-2">
-    <a href="{% url 'job-opening-create' %}" class="btn btn-sm btn-outline-primary" style="color:#9333ea; border-color:#9333ea;">
-      <i class="bi bi-briefcase-fill me-1"></i>+ Yeni Pozisyon
-    </a>
-    <a href="{% url 'candidate-create' %}" class="btn btn-sm btn-outline-secondary">
-      <i class="bi bi-person-plus me-1"></i>+ Yeni Aday
-    </a>
-    <a href="{% url 'application-create' %}" class="btn btn-sm btn-primary" style="background:#9333ea; border-color:#9333ea;">
-      <i class="bi bi-file-earmark-plus me-1"></i>+ Yeni Başvuru
-    </a>
-  </div>
-</div>
-
-<div class="mb-4">
-  <div class="d-flex align-items-center gap-2 mb-2">
-    <h6 class="fw-bold mb-0">Pipeline Özeti</h6>
-    <span class="text-muted" style="font-size:12px;">Açık pozisyonlardaki başvurular</span>
-  </div>
-  <div class="row g-2">
-    {% for stage in pipeline_summary %}
-    <div class="col-xl-2 col-md-4 col-sm-6">
-      <div class="pipeline-card">
-        <span class="badge {{ stage.badge_cls }} fw-medium" style="font-size:11px;">{{ stage.label }}</span>
-        <div class="pipeline-value">{{ stage.count }}</div>
-      </div>
-    </div>
-    {% endfor %}
-  </div>
-</div>
-
-{% for item in openings %}
-<div class="data-card">
-  <div class="opening-head">
-    <i class="bi bi-briefcase" style="color:#9333ea;"></i>
-    <div>
-      <div class="opening-title">{{ item.opening.title }}</div>
-      <div class="opening-meta">{{ item.opening.department.name }} · {{ item.opening.position.title }} · {{ item.opening.opened_at|date:"d M Y" }}{% if item.opening.closing_date %} · Son başvuru: {{ item.opening.closing_date|date:"d M Y" }}{% endif %}</div>
-    </div>
-    <span class="badge ms-auto
-      {% if item.opening.status == 'open' %}bg-success-subtle text-success
-      {% elif item.opening.status == 'filled' %}bg-primary-subtle text-primary
-      {% else %}bg-secondary-subtle text-secondary{% endif %}
-      fw-medium" style="font-size:11.5px; padding:4px 9px;">
-      {{ item.opening.get_status_display }}
-    </span>
-    <div class="occupancy ms-2">
-      <div class="d-flex justify-content-between text-muted" style="font-size:11px;"><span>Kontenjan</span><span>{{ item.opening.hired_count }}/{{ item.opening.headcount }} · %{{ item.occupancy_percent }}</span></div>
-      <div class="progress mt-1"><div class="progress-bar bg-success" style="width:{% if item.occupancy_percent > 100 %}100{% else %}{{ item.occupancy_percent }}{% endif %}%"></div></div>
-    </div>
-    <span class="text-muted" style="font-size:12px;">{{ item.applications|length }} aday</span>
-  </div>
-  {% if item.applications %}
-  <table class="table table-borderless">
-    <thead>
-      <tr><th>Aday</th><th>E-posta</th><th>Başvuru Tarihi</th><th>Aşama</th></tr>
-    </thead>
-    <tbody>
-      {% for row in item.applications %}
-      <tr>
-        <td class="fw-medium">{{ row.app.candidate.name }}</td>
-        <td style="font-size:12.5px; color:var(--g-text-2);">{{ row.app.candidate.email }}</td>
-        <td style="font-size:12.5px; color:var(--g-text-2);">{{ row.app.applied_at|date:"d M Y" }}</td>
-        <td><span class="badge {{ row.badge_cls }} fw-medium" style="font-size:11.5px; padding:4px 9px;">{{ row.app.get_stage_display }}</span></td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  {% else %}
-  <div class="empty-state"><i class="bi bi-inbox"></i>Henüz başvuru yok.</div>
-  {% endif %}
-</div>
-{% empty %}
-<div class="data-card">
-  <div class="empty-state" style="padding:48px 24px;">
-    <i class="bi bi-inbox" style="font-size:36px; display:block; margin-bottom:8px;"></i>
-    Henüz hiç iş ilanı yok.
-  </div>
-</div>
-{% endfor %}
+  {% include view_template %}
 {% endblock %}

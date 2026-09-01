@@ -29,8 +29,6 @@ class SupplierForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.widget.attrs.setdefault('class', 'form-control')
 
 
 class SupplierProductForm(forms.ModelForm):
@@ -50,9 +48,6 @@ class SupplierProductForm(forms.ModelForm):
     def __init__(self, *args, supplier, **kwargs):
         self.supplier = supplier
         super().__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.widget.attrs.setdefault('class', 'form-control')
-        self.fields['unit'].widget.attrs['class'] = 'form-select'
 
     def clean_name(self):
         name = self.cleaned_data['name']
@@ -96,9 +91,6 @@ class PurchaseOrderForm(forms.ModelForm):
                 )
             )
         self.fields['supplier'].queryset = supplier_queryset.order_by('name')
-        self.fields['supplier'].widget.attrs['class'] = 'form-select'
-        self.fields['expected_delivery_date'].widget.attrs['class'] = 'form-control'
-        self.fields['notes'].widget.attrs['class'] = 'form-control'
 
     def clean_supplier(self):
         supplier = self.cleaned_data['supplier']
@@ -138,9 +130,6 @@ class PurchaseOrderItemForm(forms.ModelForm):
             products = products | Product.objects.filter(pk=self.instance.product_id)
 
         self.fields['product'].queryset = products.order_by('name').distinct()
-        self.fields['product'].widget.attrs['class'] = 'form-select'
-        self.fields['quantity_ordered'].widget.attrs['class'] = 'form-control'
-        self.fields['unit_price'].widget.attrs['class'] = 'form-control'
 
     def clean_product(self):
         product = self.cleaned_data['product']
@@ -179,9 +168,6 @@ class GoodsReceiptForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['warehouse'].queryset = Warehouse.objects.filter(is_active=True)
-        self.fields['warehouse'].widget.attrs['class'] = 'form-select'
-        for name in ('quantity_received', 'lot_code', 'expiry_date'):
-            self.fields[name].widget.attrs['class'] = 'form-control'
 
     def clean_expiry_date(self):
         expiry_date = self.cleaned_data['expiry_date']

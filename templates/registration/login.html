@@ -1,239 +1,123 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n-title-tr="Giriş — ERP Platform" data-i18n-title-en="Sign in — ERP Platform">Giriş — ERP Platform</title>
-    {% load static %}
-    <link rel="stylesheet" href="{% static 'css/meridian.css' %}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <script>
-    (function () {
-        if (localStorage.getItem('reflow-theme') === 'dark') {
-            document.documentElement.classList.add('dark-mode');
-            document.documentElement.setAttribute('data-bs-theme', 'dark');
-        }
-    })();
-    </script>
-</head>
-<body class="g-login-body">
+{% extends 'public/base_public.html' %}
+{% block title %}{% translate "Giriş" %} · {{ site_brand }}{% endblock %}
 
-    <!-- Top-right controls -->
-    <div class="g-login-controls">
-        <button class="g-login-ctrl-btn" id="loginLangBtn" aria-label="Dil değiştir">
-            <i class="bi bi-translate"></i>
-            <span id="loginLangLabel">EN</span>
-        </button>
-        <button class="g-login-ctrl-btn" id="loginThemeBtn" aria-label="Tema değiştir">
-            <i class="bi bi-moon-fill" id="loginThemeIcon"></i>
-        </button>
+{% block body %}
+<div class="p-login">
+  <section class="p-login-brand">
+    <a class="p-brand" href="{% url 'landing' %}">
+      <span class="p-brand-mark" aria-hidden="true">{{ site_brand_mark }}</span>
+      <span>{{ site_brand }}</span>
+    </a>
+
+    <h1>{% translate "Yeşil kahveden fincana, tek sistemde." %}</h1>
+    <p>{% translate "Tedarik, kavurma, satış ve finansı aynı kayıt defterinde birleştirin; kararları AI ile destekleyin." %}</p>
+
+    <div class="p-pillars">
+      <div class="p-pillar">
+        <i class="bi bi-boxes" aria-hidden="true"></i>
+        <div>
+          <b>{% translate "Lot bazlı tazelik takibi" %}</b>
+          <span>{% translate "Kavurma sonrası tazelik penceresini kaçırmayın." %}</span>
+        </div>
+      </div>
+      <div class="p-pillar">
+        <i class="bi bi-thermometer-high" aria-hidden="true"></i>
+        <div>
+          <b>{% translate "Reçete tabanlı üretim" %}</b>
+          <span>{% translate "Harman oranları stok hareketlerine otomatik yansır." %}</span>
+        </div>
+      </div>
+      <div class="p-pillar">
+        <i class="bi bi-graph-up-arrow" aria-hidden="true"></i>
+        <div>
+          <b>{% translate "Gerçek kârlılık" %}</b>
+          <span>{% translate "Lot maliyetinden sipariş kârına kadar izlenebilir." %}</span>
+        </div>
+      </div>
+      <div class="p-pillar">
+        <i class="bi bi-robot" aria-hidden="true"></i>
+        <div>
+          <b>{% translate "AI karar desteği" %}</b>
+          <span>{% translate "Verilerinize doğal dille soru sorun." %}</span>
+        </div>
+      </div>
     </div>
+  </section>
 
-    <div class="g-login-wrap">
+  <section class="p-login-form-wrap">
+    <div class="p-login-form">
+      <div class="p-login-controls">
+        <form method="post" action="{% url 'set_language' %}">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ request.get_full_path }}">
+          <input type="hidden" name="language" value="{% if LANGUAGE_CODE == 'tr' %}en{% else %}tr{% endif %}">
+          <button type="submit" class="p-btn p-btn--ghost">
+            {% if LANGUAGE_CODE == 'tr' %}EN{% else %}TR{% endif %}
+          </button>
+        </form>
+        <button type="button" class="p-btn p-btn--ghost" data-o-theme-toggle
+                aria-label="{% translate 'Tema değiştir' %}">
+          <i class="bi bi-moon" aria-hidden="true"></i>
+        </button>
+      </div>
 
-        <!-- Left panel: Brand -->
-        <div class="g-login-brand">
-            <div class="g-login-brand-inner">
-                <a href="/" class="g-login-logo">
-                    <span class="g-login-logo-mark">E</span>
-                    <span class="g-login-logo-name">ERP Platform</span>
-                </a>
+      <h2>{% translate "Giriş yapın" %}</h2>
+      <p class="p-login-sub">{% translate "Hesabınızla devam edin." %}</p>
 
-                <div class="g-login-brand-content">
-                    <h1 class="g-login-headline" data-i18n-tr="İşletmeniz,<br>tek noktada." data-i18n-en="Your business,<br>connected.">İşletmeniz,<br>tek noktada.</h1>
-                    <p class="g-login-subline" data-i18n-tr="Yeşil çekirdek alımından kavurmaya, toptan ve perakende satışa — tüm operasyon tek sistemde." data-i18n-en="From green bean procurement to roasting, wholesale and retail — every operation in a single reference point.">
-                        Yeşil çekirdek alımından kavurmaya, toptan ve perakende satışa — tüm operasyon tek sistemde.
-                    </p>
+      {% if form.errors %}
+        <p class="p-login-error">
+          <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+          {% translate "Kullanıcı adı veya şifre hatalı." %}
+        </p>
+      {% endif %}
 
-                    <div class="g-login-pillars">
-                        <div class="g-login-pillar">
-                            <i class="bi bi-boxes"></i>
-                            <span data-i18n-tr="Stok & Lot Takibi" data-i18n-en="Inventory & Lots">Stok & Lot Takibi</span>
-                        </div>
-                        <div class="g-login-pillar">
-                            <i class="bi bi-fire"></i>
-                            <span data-i18n-tr="Kavurma Üretimi" data-i18n-en="Roast Production">Kavurma Üretimi</span>
-                        </div>
-                        <div class="g-login-pillar">
-                            <i class="bi bi-graph-up-arrow"></i>
-                            <span data-i18n-tr="Satış & CRM" data-i18n-en="Sales & CRM">Satış & CRM</span>
-                        </div>
-                        <div class="g-login-pillar">
-                            <i class="bi bi-cpu"></i>
-                            <span data-i18n-tr="AI Karar Desteği" data-i18n-en="AI Decision Layer">AI Karar Desteği</span>
-                        </div>
-                    </div>
-                </div>
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next }}">
 
-                <div class="g-login-brand-footer">
-                    <p data-i18n-tr="Kahve kavurma & dağıtım ERP" data-i18n-en="Coffee roasting & distribution ERP">Kahve kavurma & dağıtım ERP</p>
-                </div>
-            </div>
-
-            <div class="g-login-grid-deco" aria-hidden="true"></div>
+        <div class="p-field">
+          <label for="id_username">{% translate "Kullanıcı adı" %}</label>
+          <div class="p-input-wrap">
+            <i class="bi bi-person" aria-hidden="true"></i>
+            <input type="text" name="username" id="id_username" class="p-input"
+                   required autofocus autocomplete="username">
+          </div>
         </div>
 
-        <!-- Right panel: Form -->
-        <div class="g-login-form-panel">
-            <div class="g-login-form-wrap">
-
-                <div class="g-login-form-header">
-                    <h2 class="g-login-form-title" data-i18n-tr="Giriş Yap" data-i18n-en="Sign in">Giriş Yap</h2>
-                    <p class="g-login-form-sub" data-i18n-tr="Çalışma alanınıza erişin" data-i18n-en="Access your workspace">Çalışma alanınıza erişin</p>
-                </div>
-
-                {% if form.errors %}
-                <div class="g-login-error" role="alert">
-                    <i class="bi bi-exclamation-circle"></i>
-                    <span data-i18n-tr="Kullanıcı adı veya şifre hatalı." data-i18n-en="Username or password is incorrect.">Kullanıcı adı veya şifre hatalı.</span>
-                </div>
-                {% endif %}
-
-                <form method="post" class="g-login-form">
-                    {% csrf_token %}
-                    <input type="hidden" name="next" value="{{ next }}">
-
-                    <div class="g-field">
-                        <label class="g-label" for="id_username" data-i18n-tr="Kullanıcı Adı" data-i18n-en="Username">Kullanıcı Adı</label>
-                        <div class="g-input-wrap">
-                            <i class="bi bi-person g-input-icon"></i>
-                            <input
-                                type="text"
-                                name="username"
-                                id="id_username"
-                                class="g-input g-input-icon-left"
-                                placeholder="root"
-                                required
-                                autofocus
-                                autocomplete="username"
-                            >
-                        </div>
-                    </div>
-
-                    <div class="g-field">
-                        <label class="g-label" for="id_password" data-i18n-tr="Şifre" data-i18n-en="Password">Şifre</label>
-                        <div class="g-input-wrap">
-                            <i class="bi bi-lock g-input-icon"></i>
-                            <input
-                                type="password"
-                                name="password"
-                                id="id_password"
-                                class="g-input g-input-icon-left"
-                                required
-                                autocomplete="current-password"
-                            >
-                            <button type="button" class="g-input-toggle" onclick="togglePassword()" aria-label="Şifreyi göster">
-                                <i class="bi bi-eye" id="pwd-eye"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <button type="submit" class="g-btn g-btn-primary g-btn-login">
-                        <span data-i18n-tr="Giriş Yap" data-i18n-en="Sign in">Giriş Yap</span>
-                        <i class="bi bi-arrow-right"></i>
-                    </button>
-                </form>
-
-                <!-- Demo access -->
-                <div class="g-login-demo">
-                    <div class="g-login-demo-label">
-                        <span class="g-login-demo-line"></span>
-                        <span data-i18n-tr="Demo erişimi" data-i18n-en="Demo access">Demo erişimi</span>
-                        <span class="g-login-demo-line"></span>
-                    </div>
-                    <div class="g-demo-cred" onclick="fillDemo()">
-                        <div class="g-demo-cred-inner">
-                            <div class="g-demo-cred-row">
-                                <span class="g-demo-cred-key" data-i18n-tr="Kullanıcı" data-i18n-en="Username">Kullanıcı</span>
-                                <code class="g-demo-cred-val">root</code>
-                            </div>
-                            <div class="g-demo-cred-row">
-                                <span class="g-demo-cred-key" data-i18n-tr="Şifre" data-i18n-en="Password">Şifre</span>
-                                <code class="g-demo-cred-val">root</code>
-                            </div>
-                        </div>
-                        <div class="g-demo-cred-action">
-                            <i class="bi bi-cursor-fill"></i>
-                            <span data-i18n-tr="Tıkla & Doldur" data-i18n-en="Click to fill">Tıkla & Doldur</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="g-login-back">
-                    <a href="/" class="g-login-back-link">
-                        <i class="bi bi-arrow-left"></i>
-                        <span data-i18n-tr="Ana sayfaya dön" data-i18n-en="Back to homepage">Ana sayfaya dön</span>
-                    </a>
-                </div>
-
-            </div>
+        <div class="p-field">
+          <label for="id_password">{% translate "Şifre" %}</label>
+          <div class="p-input-wrap">
+            <i class="bi bi-lock" aria-hidden="true"></i>
+            <input type="password" name="password" id="id_password" class="p-input"
+                   required autocomplete="current-password">
+            <button type="button" class="p-toggle" data-o-password-toggle="#id_password"
+                    aria-label="{% translate 'Şifreyi göster' %}">
+              <i class="bi bi-eye" aria-hidden="true"></i>
+            </button>
+          </div>
         </div>
 
+        <button type="submit" class="p-btn p-btn--primary p-btn--block">
+          <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i> {% translate "Giriş Yap" %}
+        </button>
+      </form>
+
+      <div class="p-demo">
+        <p class="p-demo-title">{% translate "Demo hesapları" %}</p>
+        <div class="p-demo-row"><span>{% translate "Yönetici" %}</span><code>root / root</code></div>
+        <div class="p-demo-row"><span>{% translate "Satın alma" %}</span><code>satinalma_kullanici</code></div>
+        <div class="p-demo-row"><span>{% translate "Satış &amp; CRM" %}</span><code>satis_kullanici</code></div>
+        <div class="p-demo-row"><span>{% translate "Üretim &amp; stok" %}</span><code>uretim_kullanici</code></div>
+        <div class="p-demo-row"><span>{% translate "İK" %}</span><code>ik_kullanici</code></div>
+        <div class="p-demo-row"><span>{% translate "Rol şifresi" %}</span><code>Reflow2026!</code></div>
+      </div>
+
+      <a class="p-login-back" href="{% url 'landing' %}">
+        <i class="bi bi-arrow-left" aria-hidden="true"></i> {% translate "Tanıtım sayfasına dön" %}
+      </a>
     </div>
+  </section>
+</div>
+{% endblock %}
 
-    <script>
-        /* ── Password toggle ── */
-        function togglePassword() {
-            const input = document.getElementById('id_password');
-            const eye = document.getElementById('pwd-eye');
-            input.type = input.type === 'password' ? 'text' : 'password';
-            eye.className = input.type === 'password' ? 'bi bi-eye' : 'bi bi-eye-slash';
-        }
-
-        /* ── Demo fill ── */
-        function fillDemo() {
-            document.getElementById('id_username').value = 'root';
-            document.getElementById('id_password').value = 'root';
-            document.getElementById('id_username').focus();
-        }
-
-        /* ── i18n ── */
-        var currentLang = 'tr';
-        try { currentLang = localStorage.getItem('reflow-lang') || 'tr'; } catch(e) {}
-
-        function applyLang(lang) {
-            currentLang = lang;
-            document.documentElement.lang = lang;
-            document.getElementById('loginLangLabel').textContent = lang === 'tr' ? 'EN' : 'TR';
-
-            document.querySelectorAll('[data-i18n-' + lang + ']').forEach(function(el) {
-                var val = el.getAttribute('data-i18n-' + lang);
-                if (el.tagName === 'TITLE' || el.nodeName === '#text') return;
-                el.innerHTML = val;
-            });
-
-            /* title */
-            var titleAttr = lang === 'tr' ? 'data-i18n-title-tr' : 'data-i18n-title-en';
-            var titleEl = document.querySelector('title');
-            var titleVal = titleEl && titleEl.getAttribute(titleAttr);
-            if (titleVal) document.title = titleVal;
-
-            try { localStorage.setItem('reflow-lang', lang); } catch(e) {}
-        }
-
-        document.getElementById('loginLangBtn').addEventListener('click', function() {
-            applyLang(currentLang === 'tr' ? 'en' : 'tr');
-        });
-
-        /* ── Theme ── */
-        function applyTheme(theme) {
-            var isDark = theme === 'dark';
-            document.documentElement.classList.toggle('dark-mode', isDark);
-            document.documentElement.setAttribute('data-bs-theme', isDark ? 'dark' : 'light');
-            document.getElementById('loginThemeIcon').className = isDark ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
-            try { localStorage.setItem('reflow-theme', theme); } catch(e) {}
-        }
-
-        document.getElementById('loginThemeBtn').addEventListener('click', function() {
-            applyTheme(document.documentElement.classList.contains('dark-mode') ? 'light' : 'dark');
-        });
-
-        /* ── Init ── */
-        applyLang(currentLang);
-
-        var savedTheme = 'light';
-        try { savedTheme = localStorage.getItem('reflow-theme') || 'light'; } catch(e) {}
-        applyTheme(savedTheme);
-    </script>
-</body>
-</html>
+{% block scripts %}<script src="{% static 'js/o-public.js' %}?v={{ asset_version }}"></script>{% endblock %}

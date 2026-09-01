@@ -1,0 +1,14 @@
+<nav class="o-breadcrumb" aria-label="{% translate 'Konum' %}">
+  <ol>
+    {% if app %}<li><span class="o-breadcrumb-app">{{ app.label }}</span></li>{% endif %}
+    {% if menu %}
+      <li>{% if record or parent %}<a href="{{ menu.url }}">{{ menu.label }}</a>
+          {% else %}<span aria-current="page">{{ menu.label }}</span>{% endif %}</li>
+    {% endif %}
+    {% if parent %}
+      <li>{% if parent_url %}<a href="{{ parent_url }}">{{ parent }}</a>
+          {% else %}<span>{{ parent }}</span>{% endif %}</li>
+    {% endif %}
+    {% if record %}<li><span class="o-breadcrumb-record" aria-current="page">{{ record }}</span></li>{% endif %}
+  </ol>
+</nav>

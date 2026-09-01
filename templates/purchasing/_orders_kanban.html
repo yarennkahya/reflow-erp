@@ -1,0 +1,34 @@
+<div class="o-kanban" data-o-kanban data-o-kanban-url="{% ui_kanban_url 'purchase-order-set-status' %}">
+  {% for column in columns %}
+    <section class="o-kanban-col" aria-label="{{ column.label }}"
+             data-o-kanban-col data-o-kanban-value="{{ column.value }}">
+      <header class="o-kanban-head">
+        <span class="o-kanban-title">{{ column.label }}</span>
+        <span class="o-kanban-count">{{ column.count }}</span>
+        {% if column.total %}<span class="o-kanban-total">{{ column.total|money }}</span>{% endif %}
+      </header>
+      <div class="o-kanban-body" data-o-kanban-body>
+        {% for row in column.items %}
+          {% ui_kanban_card pk=row.order.pk %}
+            <a class="o-kanban-card-link" href="{% url 'purchase-order-detail' row.order.pk %}"
+               aria-label="PO #{{ row.order.pk }}"></a>
+            <p class="o-kanban-card-title o-mono">PO #{{ row.order.pk }}</p>
+            <p class="o-kanban-card-sub">{{ row.order.supplier.name }}</p>
+            {% if row.order.expected_delivery_date %}
+              <p class="o-kanban-card-sub{% if row.is_overdue %} o-overdue{% endif %}">
+                <i class="bi bi-calendar3" aria-hidden="true"></i>
+                {{ row.order.expected_delivery_date|date:"d M Y" }}
+              </p>
+            {% endif %}
+            <div class="o-kanban-card-foot">
+              <span class="o-tag">{{ row.item_count }} {% translate "kalem" %}</span>
+              <span class="o-strong">{{ row.total|money }}</span>
+            </div>
+          {% endui_kanban_card %}
+        {% empty %}
+          <p class="o-kanban-empty">—</p>
+        {% endfor %}
+      </div>
+    </section>
+  {% endfor %}
+</div>

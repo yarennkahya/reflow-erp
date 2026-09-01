@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" rx="7" fill="#3A2A20"/>
+  <!-- kavrulmuş çekirdek: gövde + orta yarık -->
+  <ellipse cx="16" cy="16" rx="9" ry="11.5" fill="#C87941" transform="rotate(-28 16 16)"/>
+  <path d="M16 5.5c-3.2 3.6-3.2 17.4 0 21" stroke="#3A2A20" stroke-width="2.2"
+        fill="none" stroke-linecap="round" transform="rotate(-28 16 16)"/>
+</svg>

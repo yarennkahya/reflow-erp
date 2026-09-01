@@ -1,0 +1,51 @@
+<div class="o-kanban" data-o-kanban data-o-kanban-url="{% ui_kanban_url 'application-set-stage' %}">
+  {% for column in columns %}
+    <section class="o-kanban-col" aria-label="{{ column.label }}"
+             data-o-kanban-col data-o-kanban-value="{{ column.value }}">
+      <header class="o-kanban-head">
+        <span class="o-kanban-title">{{ column.label }}</span>
+        <span class="o-kanban-count">{{ column.count }}</span>
+      </header>
+      <div class="o-kanban-body" data-o-kanban-body>
+        {% for app in column.items %}
+          {% ui_kanban_card pk=app.pk %}
+            <div class="o-row">
+              {% ui_avatar app.candidate.name size="lg" %}
+              <div class="o-grow">
+                <p class="o-kanban-card-title">{{ app.candidate.name }}</p>
+                <p class="o-kanban-card-sub">{{ app.job_opening.title }}</p>
+              </div>
+            </div>
+            <div class="o-kanban-card-foot">
+              <span class="o-tag">{{ app.applied_at|date:"d M Y" }}</span>
+              <div class="o-row">
+                {% if app.candidate.email %}
+                  <a class="o-btn o-btn--sm o-btn--ghost" href="mailto:{{ app.candidate.email }}"
+                     title="{{ app.candidate.email }}"><i class="bi bi-envelope" aria-hidden="true"></i></a>
+                {% endif %}
+
+                {% comment %}
+                  İşe alma ve reddetme kapanmış aşamalardır; oralarda buton olmaz.
+                  Son adım (İşe Alındı) hr.services.hire_candidate'ten geçer:
+                  Employee kaydı oluşur ve kontenjan dolarsa pozisyon kapanır.
+                {% endcomment %}
+                {% if app.stage != 'hired' and app.stage != 'rejected' %}
+                  <form method="post" action="{% url 'application-advance' app.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="o-btn o-btn--sm o-btn--ghost"
+                            title="{% translate 'Sonraki aşamaya taşı' %}">
+                      <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                    </button>
+                  </form>
+                  {% url 'application-reject' app.pk as reject_url %}
+                  {% blocktranslate asvar reject_msg with name=app.candidate.name %}{{ name }} başvurusunu reddetmek istiyor musunuz?{% endblocktranslate %}
+                  {% ui_confirm url=reject_url label="" message=reject_msg icon="bi-x-lg" variant="danger" %}
+                {% endif %}
+              </div>
+            </div>
+          {% endui_kanban_card %}
+        {% empty %}<p class="o-kanban-empty">—</p>{% endfor %}
+      </div>
+    </section>
+  {% endfor %}
+</div>

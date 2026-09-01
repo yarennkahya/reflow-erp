@@ -5,10 +5,14 @@ from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.db.models import Count, Q
 from django.db.models.deletion import ProtectedError
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
 
+from dashboard.grouping import group_by_choice
+from dashboard.views_helpers import is_ajax, paginate, pick_view
 from inventory.models import Business, Product
 
 from .forms import (
@@ -24,17 +28,8 @@ from .services import (
     cancel_purchase_order,
     delete_draft_purchase_order,
     receive_goods,
+    set_purchase_order_status,
 )
-
-
-STATUS_CLASSES = {
-    PurchaseOrder.Status.DRAFT: 'status-draft',
-    PurchaseOrder.Status.SENT: 'status-sent',
-    PurchaseOrder.Status.CONFIRMED: 'status-confirmed',
-    PurchaseOrder.Status.PARTIALLY_RECEIVED: 'status-partially_received',
-    PurchaseOrder.Status.RECEIVED: 'status-received',
-    PurchaseOrder.Status.CANCELLED: 'status-cancelled',
-}
 
 
 def _order_rows(orders):
@@ -46,7 +41,6 @@ def _order_rows(orders):
             'order': order,
             'item_count': len(items),
             'total': sum((item.line_total for item in items), Decimal('0')),
-            'status_class': STATUS_CLASSES.get(order.status, 'status-draft'),
             'is_overdue': bool(
                 order.expected_delivery_date
                 and order.expected_delivery_date < timezone.localdate()
@@ -92,8 +86,24 @@ def order_list(request):
         ),
     )
 
+    view = pick_view(request, ('list', 'kanban'))
+    rows = _order_rows(orders.order_by('-created_at'))
+
+    # Kanban tüm kayıtları kolonlara böler; liste sayfalanır.
+    page_obj = paginate(request, rows) if view == 'list' else None
+
     context = {
-        'orders': _order_rows(orders.order_by('-created_at')),
+        'view': view,
+        'view_template': f'purchasing/_orders_{view}.html',
+        'page_obj': page_obj,
+        'orders': list(page_obj) if page_obj is not None else rows,
+        'columns': (
+            group_by_choice(
+                rows, 'status', PurchaseOrder.Status.choices,
+                key=lambda row: row['order'].status,
+                aggregate=lambda row: row['total'],
+            ) if view == 'kanban' else None
+        ),
         'query': query,
         'selected_status': selected_status,
         'status_choices': PurchaseOrder.Status.choices,
@@ -103,10 +113,10 @@ def order_list(request):
         ).count(),
         'overdue_count': overdue_orders.count(),
     }
-    template_name = 'purchasing/partials/order_list_region.html'
-    if request.headers.get('x-requested-with') != 'XMLHttpRequest':
-        template_name = 'purchasing/list.html'
-    response = render(request, template_name, context)
+    # AJAX bölgesi artık base.html'deki #o-view (control panel + görünüm
+    # birlikte yenilenir). Bu yüzden ayrı bir partial şablona gerek yok:
+    # tam sayfa render edilir, o-ajax.js içinden #o-view'i ayıklar.
+    response = render(request, 'purchasing/list.html', context)
     response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
     response['Pragma'] = 'no-cache'
     response['Expires'] = '0'
@@ -207,7 +217,6 @@ def order_detail_view(request, pk):
         'order': order,
         'items': item_rows,
         'receipts': receipts,
-        'status_class': STATUS_CLASSES.get(order.status, 'status-draft'),
         'item_count': len(item_rows),
         'total': sum((row['item'].line_total for row in item_rows), Decimal('0')),
         'can_advance': (
@@ -411,10 +420,17 @@ def supplier_list_view(request):
         ),
     ).order_by('-is_active', 'name')
 
+    page_obj = paginate(request, suppliers)
+
     context = {
-        'suppliers': suppliers,
+        'page_obj': page_obj,
+        'suppliers': page_obj,
         'query': query,
         'selected_status': selected_status,
+        'status_options': (
+            ('active', _('Aktif tedarikçiler')),
+            ('inactive', _('Pasif tedarikçiler')),
+        ),
         'supplier_count': Business.objects.filter(
             business_type=Business.BusinessType.SUPPLIER
         ).count(),
@@ -423,8 +439,7 @@ def supplier_list_view(request):
             is_active=True,
         ).count(),
     }
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        return render(request, 'purchasing/partials/supplier_list_region.html', context)
+    # AJAX bölgesi base.html'deki #o-view; ayrı partial gerekmiyor.
     return render(request, 'purchasing/supplier_list.html', context)
 
 
@@ -578,3 +593,16 @@ def supplier_product_delete(request, pk, product_pk):
     else:
         messages.success(request, 'Tedarikçi ürünü silindi.')
     return redirect('supplier-detail', pk=supplier.pk)
+
+
+@login_required
+@require_POST
+def purchase_order_set_status_view(request, pk):
+    """Kanban sürükle-bırak hedefi. JSON döner; JS kartı geri alabilsin diye
+    hata durumunda 400 + mesaj verir."""
+    obj = get_object_or_404(PurchaseOrder, pk=pk)
+    try:
+        set_purchase_order_status(obj, request.POST.get('stage', ''))
+    except ValueError as error:
+        return JsonResponse({'ok': False, 'error': str(error)}, status=400)
+    return JsonResponse({'ok': True})

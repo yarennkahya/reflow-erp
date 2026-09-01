@@ -1,36 +1,32 @@
 {% extends 'base.html' %}
-{% block title %}Satın Alma — Reflow Coffee ERP{% endblock %}
-{% block nav_purchasing %}active{% endblock %}
-{% block nav_purchasing_orders %}active{% endblock %}
-{% block page_title %}Satın Alma{% endblock %}
+{% block title %}{% translate "Siparişler" %}{% endblock %}
+{% block region_attr %} data-ajax-region{% endblock %}
 
-{% block extra_head %}
-<style>
-  .purchase-stat, .data-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:12px; }
-  .purchase-stat { height:100%; padding:16px; display:flex; align-items:center; gap:12px; }
-  .purchase-stat-icon { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto; }
-  .purchase-stat-value { color:var(--g-text); font-size:22px; font-weight:700; line-height:1.1; }
-  .purchase-stat-label { color:var(--g-text-2); font-size:11px; font-weight:600; letter-spacing:.6px; margin-top:3px; text-transform:uppercase; }
-  .data-card { overflow:hidden; }.data-card .table { margin:0; font-size:13px; }.data-card .table thead th { background:var(--g-n-50); border-bottom:1px solid var(--g-border); color:var(--g-text-2); font-size:11px; font-weight:700; letter-spacing:.65px; padding:11px 16px; text-transform:uppercase; white-space:nowrap; }.data-card .table tbody td { border-color:var(--g-border-sub); color:var(--g-text); padding:13px 16px; vertical-align:middle; }.data-card .table tbody tr:hover { background:var(--g-n-50); }
-  .po-link, .supplier-link { color:var(--g-text); font-weight:600; text-decoration:none; }.po-link:hover, .supplier-link:hover { color:#ea580c; }
-  .po-sub { color:var(--g-text-2); font-size:12px; margin-top:2px; }
-  .status-pill { border-radius:20px; display:inline-block; font-size:11.5px; font-weight:600; padding:4px 8px; white-space:nowrap; }
-  .status-draft { background:var(--g-border-sub); color:var(--g-text-2); }.status-sent { background:#e0f2fe; color:#0369a1; }.status-confirmed { background:#eff6ff; color:#1d4ed8; }.status-partially_received { background:#fff7ed; color:#c2410c; }.status-received { background:#f0fdf4; color:#15803d; }.status-cancelled { background:#fef2f2; color:#b91c1c; }
-  .empty-state { color:var(--g-text-3); padding:52px 24px; text-align:center; }.empty-state i { display:block; font-size:34px; margin-bottom:8px; }
-</style>
+{% block cp_buttons %}
+  <a href="{% url 'purchase-order-create' %}" class="o-btn o-btn--primary">
+    <i class="bi bi-plus-lg" aria-hidden="true"></i> {% translate "Yeni" %}
+  </a>
+  <a href="{% url 'supplier-list' %}" class="o-btn">
+    <i class="bi bi-truck" aria-hidden="true"></i> {% translate "Tedarikçiler" %}
+  </a>
+{% endblock %}
+
+{% block cp_pager %}{% ui_pager page_obj %}{% endblock %}
+{% block cp_views %}{% ui_view_switcher "list,kanban" current=view %}{% endblock %}
+
+{% block cp_search %}
+  <div class="o-cp-search-row">
+    {% translate "Sipariş no, tedarikçi veya not ara" as ph %}
+    {% ui_search target="#o-view" placeholder=ph filters=status_choices filter_param="status" selected=selected_status %}
+  </div>
 {% endblock %}
 
 {% block content %}
-<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
-  <div><h4 class="fw-bold mb-1 text-dark"><i class="bi bi-basket3 me-2" style="color:#ea580c;"></i>Satın Alma Siparişleri</h4><p class="mb-0 text-muted" style="font-size:13px;">Taslak oluşturmadan teslim almaya kadar satın alma sürecinizi takip edin.</p></div>
-  <div class="d-flex gap-2"><a href="{% url 'supplier-list' %}" class="btn btn-outline-primary"><i class="bi bi-truck me-1"></i>Tedarikçiler</a><a href="{% url 'purchase-order-create' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Yeni Sipariş</a></div>
-</div>
+  <div class="o-button-box o-po-kpis">
+    {% translate "Açık sipariş" as l1 %}{% ui_stat value=open_order_count label=l1 icon="bi-cart-check" %}
+    {% translate "Teslimat bekleyen" as l2 %}{% ui_stat value=awaiting_delivery_count label=l2 icon="bi-box-seam" %}
+    {% translate "Geciken teslimat" as l3 %}{% ui_stat value=overdue_count label=l3 icon="bi-exclamation-triangle" variant="danger" %}
+  </div>
 
-<div class="row g-3 mb-4">
-  <div class="col-md-4"><div class="purchase-stat"><div class="purchase-stat-icon" style="background:#fff7ed;color:#ea580c;"><i class="bi bi-cart-check"></i></div><div><div class="purchase-stat-value">{{ open_order_count }}</div><div class="purchase-stat-label">Açık Sipariş</div></div></div></div>
-  <div class="col-md-4"><div class="purchase-stat"><div class="purchase-stat-icon" style="background:#eff6ff;color:#2563eb;"><i class="bi bi-box-seam"></i></div><div><div class="purchase-stat-value">{{ awaiting_delivery_count }}</div><div class="purchase-stat-label">Teslimat Bekleyen</div></div></div></div>
-  <div class="col-md-4"><div class="purchase-stat"><div class="purchase-stat-icon" style="background:#fef2f2;color:#dc2626;"><i class="bi bi-exclamation-triangle"></i></div><div><div class="purchase-stat-value">{{ overdue_count }}</div><div class="purchase-stat-label">Geciken Teslimat</div></div></div></div>
-</div>
-
-{% include 'purchasing/partials/order_list_region.html' %}
+  {% include view_template %}
 {% endblock %}

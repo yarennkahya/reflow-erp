@@ -2,15 +2,16 @@ from decimal import Decimal
 
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from sales.models import Order
 
 
 class Invoice(models.Model):
     class Status(models.TextChoices):
-        UNPAID = 'unpaid', 'Ödenmedi'
-        PARTIALLY_PAID = 'partially_paid', 'Kısmen Ödendi'
-        PAID = 'paid', 'Ödendi'
+        UNPAID = 'unpaid', _('Ödenmedi')
+        PARTIALLY_PAID = 'partially_paid', _('Kısmen Ödendi')
+        PAID = 'paid', _('Ödendi')
 
     order = models.OneToOneField(Order, on_delete=models.PROTECT, related_name='invoice')
     issued_at = models.DateTimeField(auto_now_add=True)
@@ -35,9 +36,9 @@ class Invoice(models.Model):
 
 class Payment(models.Model):
     class Method(models.TextChoices):
-        CASH = 'cash', 'Nakit'
-        BANK_TRANSFER = 'bank_transfer', 'Havale/EFT'
-        CREDIT_CARD = 'credit_card', 'Kredi Kartı'
+        CASH = 'cash', _('Nakit')
+        BANK_TRANSFER = 'bank_transfer', _('Havale/EFT')
+        CREDIT_CARD = 'credit_card', _('Kredi Kartı')
 
     invoice = models.ForeignKey(Invoice, on_delete=models.PROTECT, related_name='payments')
     amount = models.DecimalField(

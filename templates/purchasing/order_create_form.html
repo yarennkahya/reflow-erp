@@ -1,141 +1,129 @@
 {% extends 'base.html' %}
-{% block title %}Yeni Satın Alma Siparişi — Reflow Coffee ERP{% endblock %}
-{% block nav_purchasing %}active{% endblock %}
-{% block nav_purchasing_orders %}active{% endblock %}
-{% block page_title %}Satın Alma / Yeni Sipariş{% endblock %}
+{% block title %}{% translate "Yeni Satın Alma Siparişi" %}{% endblock %}
 
-{% block extra_head %}
-<style>
-  .purchase-form-card { background:var(--g-surface); border:1px solid var(--g-border); border-radius:12px; max-width:1040px; overflow:hidden; }
-  .purchase-form-head { background:var(--g-n-50); border-bottom:1px solid var(--g-border); padding:18px 22px; }
-  .purchase-form-body { padding:22px; }.form-label { color:var(--g-text); font-size:13px; font-weight:600; }
-  .purchase-item-row { background:var(--g-n-50); border:1px solid var(--g-border-sub); border-radius:9px; margin-bottom:10px; padding:12px; }
-  .purchase-item-title { color:var(--g-text-2); font-size:11px; font-weight:700; letter-spacing:.55px; text-transform:uppercase; }
-  .purchase-note { background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; color:#1e40af; font-size:12.5px; padding:12px 13px; }
-</style>
+{% block cp_breadcrumb %}
+  {% translate "Yeni sipariş" as rec %}{% ui_breadcrumb record=rec %}
 {% endblock %}
 
+{% block cp_buttons %}
+  <button type="submit" form="o-form" class="o-btn o-btn--primary">
+    <i class="bi bi-bag-check" aria-hidden="true"></i> {% translate "Oluştur" %}
+  </button>
+  <a class="o-btn" href="{% url 'purchasing-list' %}">{% translate "Vazgeç" %}</a>
+{% endblock %}
+
+{% block content_class %} o-content--sheet{% endblock %}
+
 {% block content %}
-<div class="mb-3"><a href="{% url 'purchasing-list' %}" class="text-decoration-none" style="font-size:13px;"><i class="bi bi-arrow-left me-1"></i>Siparişlere dön</a></div>
-
-<div class="purchase-form-card">
-  <div class="purchase-form-head">
-    <h5 class="mb-1 fw-bold">Yeni Satın Alma Siparişi</h5>
-    <p class="mb-0 text-muted" style="font-size:13px;">Tedarikçiyi ve alınacak ürünleri seçin. Lot bilgisi teslim alma aşamasında eklenir.</p>
-  </div>
-
-  <form method="post" class="purchase-form-body">
+{% ui_sheet %}
+  <form method="post" id="o-form">
     {% csrf_token %}
-    <div class="row g-3">
-      <div class="col-md-6">
-        <label for="supplier" class="form-label">Tedarikçi</label>
-        <select id="supplier" name="supplier" class="form-select" required>
-          <option value="">Tedarikçi seçin</option>
+
+    <h1 class="o-form-title">{% translate "Yeni satın alma siparişi" %}</h1>
+    <p class="o-form-subtitle">{% translate "Tedarikçiyi seçin, ardından sipariş kalemlerini ekleyin." %}</p>
+
+    {% translate "Sipariş bilgileri" as g1 %}
+    {% ui_group g1 %}
+      <div class="o-field o-col-6">
+        <label class="o-label" for="supplier">
+          {% translate "Tedarikçi" %}<span class="o-required" aria-hidden="true">*</span>
+        </label>
+        <select id="supplier" name="supplier" class="o-select" required>
+          <option value="">{% translate "Tedarikçi seçin" %}</option>
           {% for supplier in suppliers %}
-          <option value="{{ supplier.pk }}" {% if selected_supplier_id == supplier.pk|stringformat:"s" %}selected{% endif %}>{{ supplier.name }}</option>
+            <option value="{{ supplier.pk }}"
+              {% if selected_supplier_id == supplier.pk|stringformat:"s" %}selected{% endif %}>{{ supplier.name }}</option>
           {% endfor %}
         </select>
+        <p class="o-field-help">
+          {% translate "Listede yalnızca aktif tedarikçiler görünür." %}
+          <a href="{% url 'supplier-create' %}">{% translate "Yeni tedarikçi ekle" %}</a>
+        </p>
       </div>
-    </div>
 
-    <div class="d-flex align-items-center justify-content-between gap-3 mt-4 mb-2">
-      <div>
-        <h6 class="fw-bold mb-0">Sipariş Kalemleri</h6>
-        <div class="text-muted mt-1" style="font-size:12px;">Ürün, sipariş miktarı ve tedarikçi birim fiyatını ekleyin.</div>
-      </div>
-      <button id="add-purchase-item" type="button" class="btn btn-outline-primary btn-sm text-nowrap"><i class="bi bi-plus-lg me-1"></i>Kalem Ekle</button>
-    </div>
-
-    <div id="purchase-items">
-      <div class="purchase-item-row">
-        <div class="d-flex align-items-center justify-content-between mb-2">
-          <span class="purchase-item-title">Kalem</span>
-          <button type="button" class="btn btn-sm btn-outline-danger remove-purchase-item"><i class="bi bi-trash"></i><span class="visually-hidden">Kalemi sil</span></button>
+      <div class="o-field o-col-6 o-field--check">
+        <div class="o-check-row">
+          <input class="o-check" type="checkbox" id="send_now" name="send_now">
+          <label class="o-label o-label--inline" for="send_now">{% translate "Hemen tedarikçiye gönder" %}</label>
         </div>
-        <div class="row g-2 align-items-end">
-          <div class="col-lg-6">
-            <label class="form-label">Ürün</label>
-            <select name="product" class="form-select" required>
-              <option value="">Önce tedarikçi seçin</option>
-              {% for product in products %}
-              <option value="{{ product.pk }}" data-supplier="{{ product.business_id }}">{{ product.name }}</option>
-              {% endfor %}
-            </select>
-          </div>
-          <div class="col-sm-6 col-lg-3">
-            <label class="form-label">Miktar</label>
-            <input name="quantity" type="number" class="form-control" min="0.001" step="0.001" required>
-          </div>
-          <div class="col-sm-6 col-lg-3">
-            <label class="form-label">Birim Fiyat</label>
-            <div class="input-group"><span class="input-group-text">₺</span><input name="unit_price" type="number" class="form-control" min="0" step="0.01" required></div>
-          </div>
-        </div>
+        <p class="o-field-help">{% translate "Seçilmezse sipariş taslak olarak oluşturulur." %}</p>
       </div>
-    </div>
+    {% endui_group %}
 
-    <div class="form-check mt-4">
-      <input class="form-check-input" type="checkbox" id="send_now" name="send_now">
-      <label class="form-check-label" for="send_now">Hemen gönder</label>
-      <div class="text-muted ms-4" style="font-size:12px;">Seçildiğinde sipariş taslak yerine tedarikçiye gönderildi durumunda oluşturulur.</div>
-    </div>
+    {% translate "Sipariş kalemleri" as g2 %}
+    {% ui_group g2 %}
+      <div class="o-col-12">
+        {% ui_x2many min=1 %}
+          <template data-o-x2many-template>
+            <div class="o-x2many-row o-po-row">
+              <div class="o-field">
+                <label class="o-label">{% translate "Ürün" %}</label>
+                <select name="product" class="o-select" required
+                        data-o-filter-source="#supplier" data-o-filter-attr="supplier">
+                  <option value="">{% translate "Önce tedarikçi seçin" %}</option>
+                  {% for product in products %}
+                    <option value="{{ product.pk }}" data-supplier="{{ product.business_id }}">{{ product.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="o-field">
+                <label class="o-label">{% translate "Miktar" %}</label>
+                <input name="quantity" type="number" class="o-input" min="0.001" step="0.001" required>
+              </div>
+              <div class="o-field">
+                <label class="o-label">{% translate "Birim fiyat" %}</label>
+                <input name="unit_price" type="number" class="o-input" min="0" step="0.01" required>
+              </div>
+              <button type="button" class="o-x2many-del" data-o-x2many-del
+                      title="{% translate 'Kalemi sil' %}" aria-label="{% translate 'Kalemi sil' %}">
+                <i class="bi bi-trash" aria-hidden="true"></i>
+              </button>
+            </div>
+          </template>
 
-    <div class="purchase-note mt-4"><i class="bi bi-info-circle-fill me-1"></i>Lot ve teslim alınan miktar bilgileri, sipariş gönderildikten sonra teslim alma adımında kaydedilir.</div>
-    <div class="d-flex justify-content-end gap-2 border-top mt-4 pt-3">
-      <a href="{% url 'purchasing-list' %}" class="btn btn-light">Vazgeç</a>
-      <button class="btn btn-primary" type="submit"><i class="bi bi-bag-check me-1"></i>Oluştur</button>
-    </div>
+          <div data-o-x2many-rows>
+            {# İlk satır sunucudan gelir; şablonla BİREBİR aynı markup olmalı. #}
+            <div class="o-x2many-row o-po-row">
+              <div class="o-field">
+                <label class="o-label">{% translate "Ürün" %}</label>
+                <select name="product" class="o-select" required
+                        data-o-filter-source="#supplier" data-o-filter-attr="supplier">
+                  <option value="">{% translate "Önce tedarikçi seçin" %}</option>
+                  {% for product in products %}
+                    <option value="{{ product.pk }}" data-supplier="{{ product.business_id }}">{{ product.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="o-field">
+                <label class="o-label">{% translate "Miktar" %}</label>
+                <input name="quantity" type="number" class="o-input" min="0.001" step="0.001" required>
+              </div>
+              <div class="o-field">
+                <label class="o-label">{% translate "Birim fiyat" %}</label>
+                <input name="unit_price" type="number" class="o-input" min="0" step="0.01" required>
+              </div>
+              <button type="button" class="o-x2many-del" data-o-x2many-del
+                      title="{% translate 'Kalemi sil' %}" aria-label="{% translate 'Kalemi sil' %}">
+                <i class="bi bi-trash" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+
+          <button type="button" class="o-btn o-btn--sm" data-o-x2many-add>
+            <i class="bi bi-plus-lg" aria-hidden="true"></i> {% translate "Kalem ekle" %}
+          </button>
+        {% endui_x2many %}
+
+        <p class="o-note">
+          <i class="bi bi-info-circle" aria-hidden="true"></i>
+          {% translate "Lot ve teslim alınan miktar, sipariş gönderildikten sonra teslim alma adımında kaydedilir." %}
+        </p>
+      </div>
+    {% endui_group %}
   </form>
-</div>
+{% endui_sheet %}
+{% endblock %}
 
-<script>
-  const supplierSelect = document.getElementById('supplier');
-  const purchaseItems = document.getElementById('purchase-items');
-  const addPurchaseItemButton = document.getElementById('add-purchase-item');
-
-  function updateProductOptions() {
-    const supplierId = supplierSelect.value;
-    purchaseItems.querySelectorAll('select[name="product"]').forEach((select) => {
-      select.querySelectorAll('option[data-supplier]').forEach((option) => {
-        const isCurrentSupplier = option.dataset.supplier === supplierId;
-        option.hidden = !isCurrentSupplier;
-        option.disabled = !isCurrentSupplier;
-      });
-      if (select.selectedOptions[0]?.dataset.supplier !== supplierId) {
-        select.value = '';
-      }
-    });
-  }
-
-  function updateRemoveButtons() {
-    const rows = purchaseItems.querySelectorAll('.purchase-item-row');
-    rows.forEach((row) => {
-      row.querySelector('.remove-purchase-item').disabled = rows.length === 1;
-    });
-  }
-
-  addPurchaseItemButton.addEventListener('click', () => {
-    const firstRow = purchaseItems.querySelector('.purchase-item-row');
-    const newRow = firstRow.cloneNode(true);
-    newRow.querySelectorAll('select, input').forEach((input) => {
-      input.value = '';
-    });
-    purchaseItems.appendChild(newRow);
-    updateProductOptions();
-    updateRemoveButtons();
-  });
-
-  purchaseItems.addEventListener('click', (event) => {
-    const removeButton = event.target.closest('.remove-purchase-item');
-    if (!removeButton || purchaseItems.querySelectorAll('.purchase-item-row').length === 1) {
-      return;
-    }
-    removeButton.closest('.purchase-item-row').remove();
-    updateRemoveButtons();
-  });
-
-  supplierSelect.addEventListener('change', updateProductOptions);
-  updateProductOptions();
-  updateRemoveButtons();
-</script>
+{% block scripts %}
+<script src="{% static 'js/o-x2many.js' %}?v={{ asset_version }}"></script>
 {% endblock %}

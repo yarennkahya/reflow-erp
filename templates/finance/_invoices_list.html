@@ -1,0 +1,32 @@
+<div class="o-list"><div class="o-list-scroll">
+  <table class="o-table">
+    <thead>
+      <tr>
+        <th>{% translate "Fatura" %}</th>
+        <th>{% translate "Müşteri" %}</th>
+        <th>{% translate "Durum" %}</th>
+        <th class="o-num">{% translate "Tutar" %}</th>
+        <th class="o-num">{% translate "Ödenen" %}</th>
+        <th class="o-num">{% translate "Kalan" %}</th>
+        <th>{% translate "Vade" %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for invoice in invoices %}
+        <tr>
+          <td><a href="{% url 'invoice-detail' invoice.pk %}" class="o-table-link o-mono">INV #{{ invoice.pk }}</a></td>
+          <td>{{ invoice.order.customer.name }}</td>
+          <td>{% ui_badge invoice "status" %}</td>
+          <td class="o-num o-strong">{{ invoice.total_amount|money }}</td>
+          <td class="o-num o-ok">{{ invoice.total_paid|money }}</td>
+          <td class="o-num">{{ invoice.balance_due|money }}</td>
+          <td class="o-nowrap o-muted o-sm">{{ invoice.due_date|date:"d M Y"|default:"—" }}</td>
+        </tr>
+      {% empty %}
+        {% translate "Fatura yok" as t %}
+        {% translate "Fatura, karşılanmış bir siparişten oluşturulur." as d %}
+        {% ui_empty icon="bi-receipt" title=t text=d colspan=7 %}
+      {% endfor %}
+    </tbody>
+  </table>
+</div></div>

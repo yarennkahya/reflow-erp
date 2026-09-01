@@ -1,0 +1,7 @@
+<figure class="o-graph">
+  {% if title %}<figcaption class="o-graph-title">{{ title }}</figcaption>{% endif %}
+  <div class="o-graph-canvas" style="height:{{ height }}px;">
+    <canvas id="{{ chart_id }}" data-o-chart="{{ type }}" data-o-chart-data="{{ chart_id }}-data"></canvas>
+  </div>
+  <script type="application/json" id="{{ chart_id }}-data">{{ payload }}</script>
+</figure>

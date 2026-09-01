@@ -1,4 +1,3 @@
-import calendar as pycal
 import json
 from datetime import date, datetime as dt
 
@@ -8,6 +7,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
+from dashboard.calendars import month_grid, normalize_period, period_nav
 from hr.models import Employee
 
 from .models import Meeting
@@ -15,66 +15,29 @@ from .services import check_leave_conflicts
 from .tasks import send_meeting_invites_task
 
 
-MONTH_NAMES = [
-    '', 'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
-    'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık',
-]
-
-
 @login_required
 def calendar_view(request):
-    today = timezone.localdate()
-    try:
-        year = int(request.GET.get('year', today.year))
-        month = int(request.GET.get('month', today.month))
-    except (TypeError, ValueError):
-        year, month = today.year, today.month
-
-    if not 1 <= year <= 9999 or not 1 <= month <= 12:
-        year, month = today.year, today.month
-
-    cal = pycal.Calendar(firstweekday=0)
-    month_days = cal.monthdayscalendar(year, month)
+    """Ay ızgarası artık dashboard/calendars.py'deki ortak kurucudan geliyor."""
+    year, month = normalize_period(request.GET.get('year'), request.GET.get('month'))
 
     meetings = Meeting.objects.filter(
         start_time__year=year, start_time__month=month
     ).select_related('organizer', 'customer')
-    meetings_by_day = {}
-    for meeting in meetings:
-        meetings_by_day.setdefault(meeting.start_time.day, []).append(meeting)
 
-    weeks = []
-    for week in month_days:
-        week_data = []
-        for day in week:
-            if day == 0:
-                week_data.append(None)
-            else:
-                week_data.append({
-                    'day': day,
-                    'meetings': meetings_by_day.get(day, []),
-                    'is_today': date(year, month, day) == today,
-                })
-        weeks.append(week_data)
+    context = period_nav(year, month)
+    context['weeks'] = month_grid(
+        year, month, meetings, date_of=lambda meeting: meeting.start_time,
+    )
+    context['upcoming'] = (
+        Meeting.objects.filter(start_time__gte=timezone.now(),
+                               status=Meeting.Status.SCHEDULED)
+        .select_related('organizer', 'customer')
+        .order_by('start_time')[:5]
+    )
+    context['scheduled_count'] = Meeting.objects.filter(
+        status=Meeting.Status.SCHEDULED).count()
+    context['month_count'] = meetings.count()
 
-    prev_month, prev_year = (12, year - 1) if month == 1 else (month - 1, year)
-    next_month, next_year = (1, year + 1) if month == 12 else (month + 1, year)
-
-    upcoming = Meeting.objects.filter(
-        start_time__gte=timezone.now(), status='scheduled'
-    ).select_related('organizer', 'customer').order_by('start_time')[:5]
-
-    context = {
-        'weeks': weeks,
-        'month_label': f'{MONTH_NAMES[month]} {year}',
-        'prev_year': prev_year,
-        'prev_month': prev_month,
-        'next_year': next_year,
-        'next_month': next_month,
-        'upcoming': upcoming,
-    }
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        return render(request, 'meetings/_calendar_results.html', context)
     return render(request, 'meetings/calendar.html', context)
 
 

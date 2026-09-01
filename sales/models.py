@@ -2,14 +2,15 @@ from decimal import Decimal
 
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from inventory.models import Lot, Product
 
 
 class Customer(models.Model):
     class CustomerType(models.TextChoices):
-        WHOLESALE = 'wholesale', 'Toptan (kafe)'
-        RETAIL = 'retail', 'Perakende (bireysel)'
+        WHOLESALE = 'wholesale', _('Toptan (kafe)')
+        RETAIL = 'retail', _('Perakende (bireysel)')
 
     name = models.CharField(max_length=255)
     customer_type = models.CharField(max_length=20, choices=CustomerType.choices)
@@ -24,9 +25,10 @@ class Customer(models.Model):
 
 class Order(models.Model):
     class Status(models.TextChoices):
-        PENDING = 'pending', 'Pending'
-        FULFILLED = 'fulfilled', 'Fulfilled'
-        CANCELLED = 'cancelled', 'Cancelled'
+        # Diğer tüm modellerde etiketler Türkçe; burası tek istisnaydı.
+        PENDING = 'pending', _('Beklemede')
+        FULFILLED = 'fulfilled', _('Karşılandı')
+        CANCELLED = 'cancelled', _('İptal edildi')
 
     customer = models.ForeignKey(
         Customer, on_delete=models.PROTECT, related_name='orders'
@@ -67,13 +69,13 @@ class OrderItem(models.Model):
 
 class ReturnRequest(models.Model):
     class Reason(models.TextChoices):
-        CUSTOMER_CHANGED_MIND = 'customer_changed_mind', 'Müşteri vazgeçti'
-        DEFECTIVE = 'defective', 'Kusurlu ürün'
+        CUSTOMER_CHANGED_MIND = 'customer_changed_mind', _('Müşteri vazgeçti')
+        DEFECTIVE = 'defective', _('Kusurlu ürün')
 
     class Status(models.TextChoices):
-        REQUESTED = 'requested', 'Talep Edildi'
-        COMPLETED = 'completed', 'Tamamlandı'
-        REJECTED = 'rejected', 'Reddedildi'
+        REQUESTED = 'requested', _('Talep Edildi')
+        COMPLETED = 'completed', _('Tamamlandı')
+        REJECTED = 'rejected', _('Reddedildi')
 
     order_item = models.ForeignKey(
         OrderItem, on_delete=models.PROTECT, related_name='return_requests'

@@ -7,29 +7,32 @@ from django.db.models.deletion import ProtectedError
 from django.db.models.functions import Coalesce
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
+
+from dashboard.calendars import month_grid, normalize_period, period_nav
+from dashboard.grouping import group_by_choice
+from dashboard.views_helpers import is_ajax, paginate, pick_view
 
 from .forms import WarehouseForm
 from .models import Lot, MovementType, Warehouse
+from dashboard import badges
+
 from .services import get_freshness_status
 
 
-FRESHNESS = {
-    'NORMAL': ('freshness-normal', 'Normal'),
-    'PRIORITY_SALE': ('freshness-priority_sale', 'Öncelikli kullanım'),
-    'WASTE': ('freshness-waste', 'SKT geçti'),
-}
+# Tazelik etiketleri/renkleri dashboard/badges.py'ye taşındı; burada yalnızca
+# geçerli anahtar kümesi filtre doğrulaması için tutuluyor.
+FRESHNESS_KEYS = ('NORMAL', 'PRIORITY_SALE', 'WASTE')
 
+# (etiket, rozet varyantı, ikon) — varyantlar dashboard/badges.py ile aynı
+# kelime dağarcığını kullanır, böylece CSS tek yerden gelir.
 MOVEMENT_META = {
-    MovementType.IN: ('Stok girişi', 'movement-in', 'bi-box-arrow-in-down'),
-    MovementType.OUT_PRODUCTION: ('Üretimde kullanıldı', 'movement-production', 'bi-fire'),
-    MovementType.OUT_SALE: ('Satış sevkiyatı', 'movement-sale', 'bi-cart-check'),
-    MovementType.WASTE: ('İmha / zayi', 'movement-waste', 'bi-trash3'),
+    MovementType.IN: (_('Stok girişi'), 'success', 'bi-box-arrow-in-down'),
+    MovementType.OUT_PRODUCTION: (_('Üretimde kullanıldı'), 'info', 'bi-thermometer-high'),
+    MovementType.OUT_SALE: (_('Satış sevkiyatı'), 'primary', 'bi-cart-check'),
+    MovementType.WASTE: (_('İmha / zayi'), 'danger', 'bi-trash3'),
 }
-
-
-def _is_ajax(request):
-    return request.headers.get('x-requested-with') == 'XMLHttpRequest'
 
 
 def _with_remaining_quantity(queryset):
@@ -50,14 +53,11 @@ def _lot_rows(lots):
     rows = []
     for lot in lots:
         freshness = get_freshness_status(lot)
-        freshness_class, freshness_label = FRESHNESS[freshness]
         remaining = lot.current_quantity
         rows.append({
             'lot': lot,
             'remaining': remaining,
             'freshness': freshness,
-            'freshness_class': freshness_class,
-            'freshness_label': freshness_label,
             'is_empty': remaining <= 0,
         })
     return rows
@@ -84,13 +84,41 @@ def lot_list(request):
         selected_warehouse = 'all'
 
     rows = _lot_rows(_with_remaining_quantity(lots).order_by('expiry_date', 'lot_code'))
-    if selected_freshness in FRESHNESS:
+    if selected_freshness in FRESHNESS_KEYS:
         rows = [row for row in rows if row['freshness'] == selected_freshness]
     else:
         selected_freshness = 'all'
 
+    view = pick_view(request, ('list', 'kanban', 'calendar'))
+
+    # KPI'lar TÜM sonuç kümesinden; tablo yalnızca sayfalanmış dilimden.
+    page_obj = paginate(request, rows) if view == 'list' else None
+
+    freshness_choices = [
+        (key, badges.label('inventory.Lot.freshness', key)) for key in FRESHNESS_KEYS
+    ]
+
+    calendar_ctx = {}
+    if view == 'calendar':
+        year, month = normalize_period(request.GET.get('year'), request.GET.get('month'))
+        calendar_ctx = period_nav(year, month)
+        calendar_ctx['weeks'] = month_grid(
+            year, month, rows, date_of=lambda row: row['lot'].expiry_date,
+        )
+
     context = {
-        'lots': rows,
+        'view': view,
+        'view_template': f'inventory/_lots_{view}.html',
+        'page_obj': page_obj,
+        'lots': list(page_obj) if page_obj is not None else rows,
+        'columns': (
+            group_by_choice(
+                rows, 'freshness', freshness_choices,
+                key=lambda row: row['freshness'],
+            ) if view == 'kanban' else None
+        ),
+        'freshness_choices': freshness_choices,
+        **calendar_ctx,
         'query': query,
         'selected_warehouse': selected_warehouse,
         'selected_freshness': selected_freshness,
@@ -102,11 +130,8 @@ def lot_list(request):
             row['freshness'] != 'NORMAL' and not row['is_empty'] for row in rows
         ),
     }
-    template_name = (
-        'inventory/partials/lot_results.html'
-        if _is_ajax(request) else 'inventory/list.html'
-    )
-    return render(request, template_name, context)
+    # AJAX bölgesi base.html'deki #o-view (control panel + görünüm birlikte).
+    return render(request, 'inventory/list.html', context)
 
 
 @login_required
@@ -123,19 +148,18 @@ def lot_detail(request, pk):
     )
     movements = []
     for movement in lot.stock_movements.all().order_by('-created_at', '-pk'):
-        label, css_class, icon = MOVEMENT_META.get(
+        label, variant, icon = MOVEMENT_META.get(
             movement.movement_type,
-            (movement.get_movement_type_display(), 'movement-in', 'bi-arrow-left-right'),
+            (movement.get_movement_type_display(), 'muted', 'bi-arrow-left-right'),
         )
         movements.append({
             'movement': movement,
             'label': label,
-            'css_class': css_class,
+            'variant': variant,
             'icon': icon,
         })
 
     freshness = get_freshness_status(lot)
-    freshness_class, freshness_label = FRESHNESS[freshness]
     if hasattr(lot, 'goods_receipt'):
         receipt = lot.goods_receipt
         order = receipt.purchase_order_item.purchase_order
@@ -151,7 +175,7 @@ def lot_detail(request, pk):
             'label': 'Kavurma partisi',
             'description': batch.recipe.name,
             'url': reverse('production-batch-detail', args=[batch.pk]),
-            'icon': 'bi-fire',
+            'icon': 'bi-thermometer-high',
         }
     else:
         stock_source = {
@@ -164,10 +188,12 @@ def lot_detail(request, pk):
         'lot': lot,
         'remaining': lot.remaining_quantity,
         'freshness': freshness,
-        'freshness_class': freshness_class,
-        'freshness_label': freshness_label,
         'movements': movements,
         'stock_source': stock_source,
+        # Statusbar için tazelik aşamaları (model choice'ı olmayan sözde-alan).
+        'freshness_steps': [
+            (key, badges.label('inventory.Lot.freshness', key)) for key in FRESHNESS_KEYS
+        ],
     })
 
 
@@ -195,11 +221,7 @@ def warehouse_list(request):
         'warehouse_count': Warehouse.objects.count(),
         'active_warehouse_count': Warehouse.objects.filter(is_active=True).count(),
     }
-    template_name = (
-        'inventory/partials/warehouse_results.html'
-        if _is_ajax(request) else 'inventory/warehouse_list.html'
-    )
-    return render(request, template_name, context)
+    return render(request, 'inventory/warehouse_list.html', context)
 
 
 @login_required

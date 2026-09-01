@@ -1,0 +1,32 @@
+# Sırlar — compose bunları env_file ile ÇALIŞMA ANINDA veriyor.
+# İmaja kopyalanırsa katmanlara gömülür ve imajı alan herkes okuyabilir.
+.env
+.env.*
+
+# Sürüm kontrolü ve editör
+.git
+.gitignore
+.dockerignore
+.vscode
+.idea
+*.swp
+.DS_Store
+
+# Python artefaktları
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+
+# collectstatic bunu build sırasında kendisi üretir; kopyalamak bayat
+# dosyaların imaja sızmasına yol açar.
+staticfiles/
+
+# Çalışma zamanı artefaktları
+media/
+*.log
+celerybeat-schedule
+db.sqlite3

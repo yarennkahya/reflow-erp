@@ -24,10 +24,6 @@ class LeaveRequestForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.widget.attrs.setdefault('class', 'form-control')
-        self.fields['employee'].widget.attrs['class'] = 'form-select'
-        self.fields['leave_type'].widget.attrs['class'] = 'form-select'
 
     def clean(self):
         cleaned_data = super().clean()
@@ -56,8 +52,6 @@ class CandidateForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.widget.attrs.setdefault('class', 'form-control')
 
 
 class ApplicationForm(forms.ModelForm):
@@ -72,8 +66,6 @@ class ApplicationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['job_opening'].queryset = JobOpening.objects.filter(status='open')
-        for field in self.fields.values():
-            field.widget.attrs.setdefault('class', 'form-select')
 
 
 class JobOpeningForm(forms.ModelForm):
@@ -95,10 +87,6 @@ class JobOpeningForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.widget.attrs.setdefault('class', 'form-control')
-        self.fields['department'].widget.attrs['class'] = 'form-select'
-        self.fields['position'].widget.attrs['class'] = 'form-select'
 
     def clean(self):
         cleaned_data = super().clean()

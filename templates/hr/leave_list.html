@@ -1,39 +1,26 @@
 {% extends 'base.html' %}
-{% block title %}İzin & Devamsızlık — Reflow Coffee ERP{% endblock %}
-{% block nav_hr %}active{% endblock %}
-{% block nav_hr_leave %}active{% endblock %}
-{% block page_title %}İnsan Kaynakları{% endblock %}
+{% block title %}{% translate "İzinler" %}{% endblock %}
+{% block region_attr %} data-ajax-region{% endblock %}
 
-{% block extra_head %}
-<style>
-  .hr-subnav { display:flex; gap:4px; margin-bottom:20px; border-bottom:1px solid var(--g-border); padding-bottom:0; }
-  .hr-subnav a { padding:8px 14px; font-size:13px; font-weight:500; color:var(--g-text-2); text-decoration:none; border-bottom:2px solid transparent; margin-bottom:-1px; white-space:nowrap; }
-  .hr-subnav a:hover { color:var(--g-text); }
-  .hr-subnav a.active { color:#9333ea; border-bottom-color:#9333ea; font-weight:600; }
-  .data-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:10px; overflow:hidden; }
-  .data-card .table { margin-bottom:0; font-size:13.5px; }
-  .data-card .table thead th { background:var(--g-n-50); color:var(--g-text-2); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.7px; border-bottom:1px solid var(--g-border); padding:10px 16px; white-space:nowrap; }
-  .data-card .table tbody td { padding:11px 16px; vertical-align:middle; color:var(--g-text); border-color:var(--g-border-sub); }
-  .data-card .table tbody tr:last-child td { border-bottom:none; }
-  .data-card .table tbody tr:hover { background:var(--g-n-50); }
-  .empty-state { padding:48px 24px; text-align:center; color:var(--g-text-3); }
-  .empty-state i { font-size:36px; display:block; margin-bottom:8px; }
-</style>
+{% block cp_buttons %}
+  <a href="{% url 'leave-request-create' %}" class="o-btn o-btn--primary">
+    <i class="bi bi-plus-lg" aria-hidden="true"></i> {% translate "Yeni" %}
+  </a>
+{% endblock %}
+
+{% block cp_pager %}{% ui_pager page_obj %}{% endblock %}
+{% block cp_views %}{% ui_view_switcher "list,calendar" current=view %}{% endblock %}
+
+{% block cp_search %}
+  <div class="o-cp-search-row">
+    {% translate "İzin ara" as ph %}
+    {% ui_search target="#o-view" placeholder=ph filters=status_choices filter_param="status" selected=selected_status %}
+  </div>
 {% endblock %}
 
 {% block content %}
-<div class="hr-subnav">
-  <a href="{% url 'hr-list' %}">Genel Bakış</a>
-  <a href="{% url 'hr-employees' %}">Çalışanlar</a>
-  <a href="{% url 'hr-leave' %}" class="active">İzin & Devamsızlık</a>
-  <a href="{% url 'hr-recruitment' %}">İşe Alım</a>
-</div>
-
-<div class="d-flex justify-content-end mb-3">
-  <a href="{% url 'leave-request-create' %}" class="btn btn-primary">
-    <i class="bi bi-plus-lg me-1"></i>İzin Talebi
-  </a>
-</div>
-
-{% include 'hr/partials/leave_results.html' %}
+  <div class="o-button-box o-po-kpis">
+    {% translate "Bekleyen izin" as l1 %}{% ui_stat value=pending_count label=l1 icon="bi-hourglass-split" variant="warning" %}
+  </div>
+  {% include view_template %}
 {% endblock %}

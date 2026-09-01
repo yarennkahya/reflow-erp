@@ -1,64 +1,100 @@
 {% extends 'base.html' %}
-{% block title %}{{ customer.name }} — CRM{% endblock %}
-{% block nav_crm %}active{% endblock %}
-{% block nav_crm_customers %}active{% endblock %}
-{% block page_title %}CRM / Müşteri Kartı{% endblock %}
+{% block title %}{{ customer.name }}{% endblock %}
+{% block cp_breadcrumb %}{% ui_breadcrumb record=customer.name %}{% endblock %}
 
-{% block extra_head %}
-<style>
-  .data-card, .profile-card, .stat-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:12px; }
-  .profile-card { padding:20px; }
-  .customer-avatar-lg { width:52px; height:52px; border-radius:14px; background:#ede9fe; color:#6d28d9; display:flex; align-items:center; justify-content:center; font-size:21px; font-weight:700; }
-  .stat-card { padding:15px; height:100%; }
-  .stat-label { color:var(--g-text-2); font-size:11px; font-weight:600; letter-spacing:.6px; text-transform:uppercase; }
-  .stat-value { color:var(--g-text); font-size:20px; font-weight:700; margin-top:3px; }
-  .data-card { overflow:hidden; }
-  .data-card .table { margin:0; font-size:13px; }
-  .data-card .table thead th { background:var(--g-n-50); border-bottom:1px solid var(--g-border); color:var(--g-text-2); font-size:11px; font-weight:700; letter-spacing:.65px; padding:11px 16px; text-transform:uppercase; white-space:nowrap; }
-  .data-card .table tbody td { border-color:var(--g-border-sub); color:var(--g-text); padding:12px 16px; vertical-align:middle; }
-  .stage-pill, .sale-status-pill { border-radius:20px; display:inline-block; font-size:11.5px; font-weight:600; padding:4px 8px; white-space:nowrap; }
-  .stage-new { background:var(--g-border-sub); color:var(--g-text-2); } .stage-in_discussion { background:#e0f2fe; color:#0369a1; } .stage-proposal_sent { background:#eff6ff; color:#1d4ed8; } .stage-negotiation { background:#fdf4ff; color:#a21caf; } .stage-won { background:#f0fdf4; color:#15803d; } .stage-lost { background:#fef2f2; color:#b91c1c; }
-  .sale-status-active { background:#dcfce7; color:#166534; } .sale-status-passive { background:var(--g-border-sub); color:var(--g-text-2); } .sale-status-won { background:#d1fae5; color:#047857; } .sale-status-lost { background:#fee2e2; color:#b91c1c; }
-  .info-row { display:flex; gap:10px; padding:11px 0; border-bottom:1px solid var(--g-border-sub); font-size:13px; } .info-row:last-child { border:0; padding-bottom:0; } .info-row i { color:#8b5cf6; width:16px; } .info-label { color:var(--g-text-2); min-width:96px; } .info-value { color:var(--g-text); font-weight:500; overflow-wrap:anywhere; }
-  .empty { color:var(--g-text-3); padding:34px; text-align:center; }
-</style>
+{% block cp_buttons %}
+  <a class="o-btn o-btn--primary" href="{% url 'crm-sale-create' %}?customer={{ customer.pk }}">
+    <i class="bi bi-plus-lg" aria-hidden="true"></i> {% translate "Yeni Fırsat" %}
+  </a>
+  <a class="o-btn" href="{% url 'crm-customer-edit' customer.pk %}">
+    <i class="bi bi-pencil" aria-hidden="true"></i> {% translate "Düzenle" %}
+  </a>
+  <form method="post" action="{% url 'crm-customer-activity' customer.pk %}">
+    {% csrf_token %}
+    <button type="submit" class="o-btn">
+      <i class="bi {% if customer.is_active %}bi-pause-circle{% else %}bi-play-circle{% endif %}" aria-hidden="true"></i>
+      {% if customer.is_active %}{% translate "Pasife al" %}{% else %}{% translate "Aktifleştir" %}{% endif %}
+    </button>
+  </form>
+  {% url 'crm-customer-delete' customer.pk as del_url %}
+  {% translate "Sil" as del_label %}
+  {% blocktranslate asvar del_msg with name=customer.name %}{{ name }} müşterisini ve bağlı CRM kayıtlarını silmek istediğinize emin misiniz?{% endblocktranslate %}
+  {% ui_confirm url=del_url label=del_label message=del_msg icon="bi-trash" variant="danger" %}
 {% endblock %}
 
+{% block content_class %} o-content--sheet{% endblock %}
+
 {% block content %}
-<div class="mb-3"><a href="{% url 'crm-list' %}" class="text-decoration-none" style="font-size:13px;"><i class="bi bi-arrow-left me-1"></i>Müşterilere dön</a></div>
-<div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
-  <div class="d-flex align-items-center gap-3"><div class="customer-avatar-lg">{{ customer.name|first|upper }}</div><div><div class="d-flex align-items-center gap-2"><h4 class="fw-bold mb-0">{{ customer.name }}</h4>{% if customer.is_active %}<span class="badge bg-success-subtle text-success-emphasis">Aktif</span>{% else %}<span class="badge bg-secondary-subtle text-secondary-emphasis">Pasif</span>{% endif %}</div><div class="text-muted mt-1" style="font-size:13px;">{{ customer.get_customer_type_display }} · {{ customer.created_at|date:"d M Y" }} tarihinde kaydedildi</div></div></div>
-  <div class="d-flex flex-wrap gap-2">
-    {% if customer.is_active %}<a class="btn btn-primary" href="{% url 'crm-sale-create' %}?customer={{ customer.pk }}"><i class="bi bi-plus-lg me-1"></i>Yeni Satış</a>{% endif %}
-    <a class="btn btn-outline-primary" href="{% url 'crm-customer-edit' customer.pk %}"><i class="bi bi-pencil me-1"></i>Düzenle</a>
-    <form method="post" action="{% url 'crm-customer-activity' customer.pk %}">{% csrf_token %}<button class="btn btn-outline-secondary" type="submit"><i class="bi {% if customer.is_active %}bi-pause-circle{% else %}bi-play-circle{% endif %} me-1"></i>{% if customer.is_active %}Pasife al{% else %}Aktifleştir{% endif %}</button></form>
-    <form method="post" action="{% url 'crm-customer-delete' customer.pk %}" onsubmit="return confirm('{{ customer.name|escapejs }} müşterisini ve bağlı CRM satışlarını silmek istediğinize emin misiniz?');">{% csrf_token %}<button class="btn btn-outline-danger" type="submit" title="Müşteriyi sil"><i class="bi bi-trash"></i></button></form>
-  </div>
-</div>
-
-<div class="row g-3 mb-4">
-  <div class="col-lg-3 col-sm-6"><div class="stat-card"><div class="stat-label">Toplam CRM satışı</div><div class="stat-value">{{ sale_count }}</div></div></div>
-  <div class="col-lg-3 col-sm-6"><div class="stat-card"><div class="stat-label">Aktif satış</div><div class="stat-value text-success">{{ active_sale_count }}</div></div></div>
-  <div class="col-lg-3 col-sm-6"><div class="stat-card"><div class="stat-label">Tahmini toplam</div><div class="stat-value">₺{{ estimated_total|floatformat:0 }}</div></div></div>
-  <div class="col-lg-3 col-sm-6"><div class="stat-card"><div class="stat-label">Sipariş kaydı</div><div class="stat-value">{{ orders|length }}</div></div></div>
-</div>
-
-<div class="row g-4">
-  <div class="col-xl-8">
-    <div class="data-card">
-      <div class="p-3 border-bottom d-flex align-items-center justify-content-between"><div><h6 class="mb-0 fw-bold">Müşteriye ait satışlar</h6><small class="text-muted">Satışın durumunu ve bulunduğu aşamayı buradan takip edin.</small></div>{% if customer.is_active %}<a href="{% url 'crm-sale-create' %}?customer={{ customer.pk }}" class="btn btn-sm btn-outline-primary">Satış ekle</a>{% endif %}</div>
-      <div class="table-responsive"><table class="table table-borderless"><thead><tr><th>Satış</th><th>Aşama</th><th>Durum</th><th class="text-end">Tutar</th><th>Güncelleme</th><th class="text-end"></th></tr></thead><tbody>
-        {% for sale in sales %}
-        <tr><td><a class="fw-semibold text-decoration-none" href="{% url 'crm-sale-edit' sale.pk %}">{{ sale.title }}</a></td><td><span class="stage-pill stage-{{ sale.stage }}">{{ sale.get_stage_display }}</span></td><td><span class="sale-status-pill sale-status-{{ sale.status }}">{{ sale.get_status_display }}</span></td><td class="text-end">{% if sale.estimated_value %}₺{{ sale.estimated_value|floatformat:0 }}{% else %}—{% endif %}</td><td class="text-muted" style="font-size:12px;">{{ sale.updated_at|date:"d M Y" }}</td><td class="text-end"><div class="d-inline-flex gap-1">{% if sale.status == 'active' %}<form method="post" action="{% url 'opportunity-advance' sale.pk %}">{% csrf_token %}<button class="btn btn-sm btn-outline-primary" title="Bir sonraki aşama"><i class="bi bi-arrow-right"></i></button></form>{% endif %}<a class="btn btn-sm btn-light" href="{% url 'crm-sale-edit' sale.pk %}" title="Düzenle"><i class="bi bi-pencil"></i></a></div></td></tr>
-        {% empty %}
-        <tr><td colspan="6" class="empty"><i class="bi bi-graph-up d-block fs-3 mb-2"></i>Bu müşteri için henüz CRM satış kaydı yok.</td></tr>
-        {% endfor %}
-      </tbody></table></div>
+{% ui_sheet %}
+  <div class="o-form-head">
+    <div class="o-row">
+      {% ui_avatar customer.name size="lg" %}
+      <div>
+        <h1 class="o-form-title">{{ customer.name }} {% ui_badge customer "is_active" %}</h1>
+        <p class="o-form-subtitle">{% ui_badge customer "customer_type" %}</p>
+      </div>
     </div>
+    {% ui_button_box %}
+      {% translate "Fırsat" as l1 %}{% ui_stat value=sale_count label=l1 icon="bi-graph-up" %}
+      {% translate "Aktif fırsat" as l2 %}{% ui_stat value=active_sale_count label=l2 icon="bi-lightning" variant="success" %}
+      {% translate "Tahmini tutar" as l3 %}{% ui_stat value=estimated_total|money label=l3 icon="bi-cash-stack" %}
+      {% translate "Sipariş" as l4 %}{% ui_stat value=orders|length label=l4 icon="bi-cart3" %}
+    {% endui_button_box %}
   </div>
-  <div class="col-xl-4">
-    <div class="profile-card mb-4"><h6 class="fw-bold mb-3">Müşteri bilgileri</h6><div class="info-row"><i class="bi bi-envelope"></i><span class="info-label">E-posta</span><span class="info-value">{{ customer.contact_email|default:"—" }}</span></div><div class="info-row"><i class="bi bi-telephone"></i><span class="info-label">Telefon</span><span class="info-value">{{ customer.contact_phone|default:"—" }}</span></div><div class="info-row"><i class="bi bi-calendar3"></i><span class="info-label">Kayıt tarihi</span><span class="info-value">{{ customer.created_at|date:"d F Y, H:i" }}</span></div></div>
-    <div class="profile-card"><h6 class="fw-bold mb-3">Sipariş geçmişi</h6>{% for order in orders %}<div class="d-flex align-items-center justify-content-between py-2 border-bottom"><a href="{% url 'order-detail' order.pk %}" class="text-decoration-none">Sipariş #{{ order.pk }}</a><small class="text-muted">{{ order.get_status_display }}</small></div>{% empty %}<p class="text-muted mb-0" style="font-size:13px;">Henüz sipariş kaydı yok.</p>{% endfor %}</div>
-  </div>
-</div>
+
+  {% translate "İletişim bilgileri" as g %}
+  {% ui_group g %}
+    {% translate "E-posta" as f1 %}{% ui_field_value f1 customer.contact_email icon="bi-envelope" cols=4 %}
+    {% translate "Telefon" as f2 %}{% ui_field_value f2 customer.contact_phone icon="bi-telephone" cols=4 %}
+    {% translate "Kayıt tarihi" as f3 %}{% ui_field_value f3 customer.created_at|date:"d M Y" icon="bi-calendar3" cols=4 %}
+  {% endui_group %}
+
+  {% ui_notebook %}
+    {% translate "Fırsatlar" as t1 %}
+    {% ui_page t1 badge=sale_count %}
+      <div class="o-list"><div class="o-list-scroll">
+        <table class="o-table">
+          <thead><tr>
+            <th>{% translate "Fırsat" %}</th><th>{% translate "Aşama" %}</th>
+            <th>{% translate "Durum" %}</th><th class="o-num">{% translate "Tutar" %}</th>
+          </tr></thead>
+          <tbody>
+            {% for sale in sales %}
+              <tr>
+                <td><a href="{% url 'crm-sale-edit' sale.pk %}" class="o-table-link">{{ sale.title }}</a></td>
+                <td>{% ui_badge sale "stage" %}</td>
+                <td>{% ui_badge sale "status" %}</td>
+                <td class="o-num o-strong">{{ sale.estimated_value|money }}</td>
+              </tr>
+            {% empty %}
+              {% translate "Bu müşteriye ait fırsat yok" as e %}{% ui_empty icon="bi-graph-up" title=e colspan=4 %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div></div>
+    {% endui_page %}
+
+    {% translate "Siparişler" as t2 %}
+    {% ui_page t2 badge=orders|length %}
+      <div class="o-list"><div class="o-list-scroll">
+        <table class="o-table">
+          <thead><tr>
+            <th>{% translate "Sipariş" %}</th><th>{% translate "Durum" %}</th><th>{% translate "Tarih" %}</th>
+          </tr></thead>
+          <tbody>
+            {% for order in orders %}
+              <tr>
+                <td><a href="{% url 'order-detail' order.pk %}" class="o-table-link o-mono">SO #{{ order.pk }}</a></td>
+                <td>{% ui_badge order "status" %}</td>
+                <td class="o-nowrap o-muted o-sm">{{ order.created_at|date:"d M Y" }}</td>
+              </tr>
+            {% empty %}
+              {% translate "Bu müşteriye ait sipariş yok" as e2 %}{% ui_empty icon="bi-cart-x" title=e2 colspan=3 %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div></div>
+    {% endui_page %}
+  {% endui_notebook %}
+{% endui_sheet %}
 {% endblock %}

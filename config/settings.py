@@ -63,6 +63,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -73,17 +74,35 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'config.urls'
 
+# APP_DIRS yerine açık loader listesi kullanıyoruz. Sebep: APP_DIRS=True,
+# DEBUG ne olursa olsun cached.Loader'ı devreye sokuyor — yani her şablon
+# düzenlemesinden sonra konteyneri yeniden başlatmak gerekiyordu.
+_TEMPLATE_LOADERS = [
+    'django.template.loaders.filesystem.Loader',
+    'django.template.loaders.app_directories.Loader',
+]
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [BASE_DIR / 'templates'],
-        'APP_DIRS': True,
         'OPTIONS': {
+            'loaders': (
+                _TEMPLATE_LOADERS if DEBUG
+                else [('django.template.loaders.cached.Loader', _TEMPLATE_LOADERS)]
+            ),
+            # Her sablonda otomatik yuklu: load ui / load i18n gerekmez.
+            'builtins': [
+                'dashboard.templatetags.ui',
+                'django.templatetags.i18n',
+                'django.templatetags.static',
+            ],
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
+                'django.template.context_processors.i18n',
                 'notifications.context_processors.notifications_processor',
-                'inventory.context_processors.module_access_processor',
+                'dashboard.context_processors.navigation',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
@@ -130,19 +149,24 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'tr'
 
-TIME_ZONE = 'UTC'
+LANGUAGES = [
+    ('tr', 'Türkçe'),
+    ('en', 'English'),
+]
+
+LOCALE_PATHS = [BASE_DIR / 'locale']
+
+# Celery zaten Europe/Istanbul kullanıyordu; arayüz de aynı dilimde olmalı.
+TIME_ZONE = 'Europe/Istanbul'
 
 USE_I18N = True
 
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.0/howto/static-files/
-
-STATIC_URL = 'static/'
+# Statik dosya ayarları aşağıda, tek yerde toplandı.
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
@@ -172,6 +196,38 @@ CELERY_BEAT_SCHEDULE = {
 }
 
 
+
+# Marka adı TEK yerden beslenir. Önceden üç farklı yerde üç farklı
+# değer vardı: sayfa başlıklarında 'Reflow Coffee ERP', kabukta
+# 'ERP Platform', landing sayfasında '[TBD]'.
+SITE_BRAND = 'Reflow Coffee ERP'
+SITE_BRAND_SHORT = 'Reflow'
+SITE_BRAND_MARK = 'R'
+SITE_VERSION = '0.2.0'
+
+
+def asset_version():
+    """
+    static/ altındaki en yeni dosyanın zaman damgası — önbellek kırıcı.
+
+    NGINX statikleri `expires 1h` ile servis ediyor; sürüm parametresi olmadan
+    CSS/JS değişiklikleri tarayıcıda bir saat boyunca görünmez. Bu değer her
+    varlık düzenlemesinde kendiliğinden değişir, elle bump gerektirmez.
+
+    DEBUG'ta her istekte yeniden hesaplanır (≈150 dosya, ölçülemeyecek kadar
+    ucuz) — aksi halde CSS düzenleyip sayfayı yenilediğinizde eski dosyayı
+    görürdünüz. Üretimde başlangıçta bir kez hesaplanır.
+    """
+    newest = 0
+    static_dir = BASE_DIR / 'static'
+    if static_dir.exists():
+        for path in static_dir.rglob('*'):
+            if path.is_file():
+                newest = max(newest, int(path.stat().st_mtime))
+    return format(newest, 'x')
+
+
+ASSET_VERSION = asset_version()
 
 LOGIN_REDIRECT_URL = '/dashboard/'
 LOGOUT_REDIRECT_URL = '/'

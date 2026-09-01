@@ -1,0 +1,16 @@
+{% load i18n %}{% translate "Sayın" %} {{ customer.name }},
+
+{% blocktranslate with pk=invoice.pk %}#{{ pk }} numaralı faturanız aşağıdadır.{% endblocktranslate %}
+
+{% translate "Sipariş" %}: #{{ order.pk }}
+{% translate "Düzenlenme" %}: {{ invoice.issued_at|date:"d.m.Y" }}{% if invoice.due_date %}
+{% translate "Vade" %}: {{ invoice.due_date|date:"d.m.Y" }}{% endif %}
+
+{% translate "Kalemler" %}:
+{% for item in order.items.all %}  - {{ item.product.name }} x {{ item.quantity }} = {{ item.line_total }} TL
+{% endfor %}
+{% translate "Toplam" %}: {{ invoice.total_amount }} TL
+{% translate "Ödenen" %}: {{ invoice.total_paid }} TL
+{% translate "Kalan" %}: {{ invoice.balance_due }} TL
+
+{{ brand }}

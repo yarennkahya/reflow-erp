@@ -1,0 +1,21 @@
+{% if pages %}
+<div class="o-notebook">
+  <div class="o-notebook-tabs" role="tablist">
+    {% for page in pages %}
+      <button type="button" role="tab" class="o-notebook-tab{% if page.is_first %} active{% endif %}"
+              id="tab-{{ page.slug }}" data-bs-toggle="tab" data-bs-target="#pane-{{ page.slug }}"
+              aria-controls="pane-{{ page.slug }}" aria-selected="{% if page.is_first %}true{% else %}false{% endif %}">
+        {{ page.title }}{% if page.badge %}<span class="o-notebook-count">{{ page.badge }}</span>{% endif %}
+      </button>
+    {% endfor %}
+  </div>
+  <div class="o-notebook-panes tab-content">
+    {% for page in pages %}
+      <div class="o-notebook-pane tab-pane fade{% if page.is_first %} show active{% endif %}"
+           id="pane-{{ page.slug }}" role="tabpanel" aria-labelledby="tab-{{ page.slug }}">
+        {{ page.content }}
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}

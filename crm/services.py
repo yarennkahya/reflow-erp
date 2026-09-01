@@ -56,3 +56,36 @@ def set_sale_activity(opportunity, status):
     opportunity.status = status
     opportunity.save(update_fields=['status', 'updated_at'])
     return opportunity
+
+
+def set_opportunity_stage(opportunity, stage):
+    """
+    Kanban surukle-birak icin: firsati DOGRUDAN hedef asamaya tasir.
+
+    advance_stage() tek adim ilerletir; burada kullanici karti herhangi bir
+    kolona birakabilir. Yine de is kurallari atlanmaz:
+      - KAZANILDI  -> advance_stage'in kazanma dali (taslak siparis + bildirim)
+      - KAYBEDILDI -> mark_as_lost()
+      - digerleri  -> yalnizca ACIK kayitlarda duz atama
+    """
+    if stage not in Opportunity.Stage.values:
+        raise ValueError('Geçersiz aşama.')
+    if stage == opportunity.stage:
+        return opportunity
+
+    if stage == Opportunity.Stage.LOST:
+        return mark_as_lost(opportunity)
+
+    if not opportunity.is_open:
+        raise ValueError('Kapanmış bir satış kaydının aşaması değiştirilemez.')
+
+    if stage == Opportunity.Stage.WON:
+        # advance_stage'i KAZANILDI'ya kadar tekrar tekrar cagirmak yerine
+        # ayni yan etkileri tek seferde uretiyoruz.
+        while opportunity.stage != Opportunity.Stage.WON:
+            advance_stage(opportunity)
+        return opportunity
+
+    opportunity.stage = stage
+    opportunity.save(update_fields=['stage', 'updated_at'])
+    return opportunity

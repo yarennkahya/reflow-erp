@@ -1,0 +1,6 @@
+{% if url %}<a href="{{ url }}" class="o-stat{% if variant %} o-stat--{{ variant }}{% endif %}">
+{% else %}<div class="o-stat{% if variant %} o-stat--{{ variant }}{% endif %}">{% endif %}
+  {% if icon %}<i class="bi {{ icon }} o-stat-icon" aria-hidden="true"></i>{% endif %}
+  <span class="o-stat-value">{{ value }}</span>
+  <span class="o-stat-label">{{ label }}</span>
+{% if url %}</a>{% else %}</div>{% endif %}

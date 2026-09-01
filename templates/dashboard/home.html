@@ -1,273 +1,62 @@
 {% extends 'base.html' %}
-{% block title %}Dashboard — ERP Platform{% endblock %}
-{% block nav_dashboard %}active{% endblock %}
-{% block page_title %}Dashboard{% endblock %}
+{% block title %}{% translate "Genel Bakış" %}{% endblock %}
 
 {% block content %}
-
-<div class="g-page-header">
-  <div>
-    <h1 class="g-page-title" data-i18n="erp-modules">ERP Modülleri</h1>
-    <p class="g-page-sub" data-i18n="operational-overview">Operasyonel metriklere genel bakış</p>
+  <div class="o-dash-kpis">
+    {% if inventory %}
+      {% translate "Aktif lot" as k1 %}{% ui_stat value=inventory.total_lots label=k1 icon="bi-boxes" %}
+    {% endif %}
+    {% if purchasing %}
+      {% translate "Açık satın alma" as k2 %}{% ui_stat value=purchasing.open_orders label=k2 icon="bi-basket3" variant="warning" %}
+    {% endif %}
+    {% if sales %}
+      {% translate "Toplam gelir" as k3 %}{% ui_stat value=sales.total_revenue|money label=k3 icon="bi-cash-stack" variant="success" %}
+    {% endif %}
+    {% if finance %}
+      {% translate "Kâr marjı" as k4 %}
+      {% ui_stat value=finance.margin_percent|stringformat:"s"|add:"%" label=k4 icon="bi-percent" %}
+    {% endif %}
   </div>
-</div>
 
-<!-- KPI stats row -->
-<div class="g-dash-kpis">
+  <h2 class="o-section-title">{% translate "Modüller" %}</h2>
 
-  {% if module_access.inventory %}<div class="g-stat g-stat-accent-blue">
-    <div class="g-stat-top">
-      <div>
-        <div class="g-stat-label" data-i18n="active-lots">Aktif Lot</div>
-        <div class="g-stat-value">{{ inventory.total_lots }}</div>
-        <div class="g-stat-sub" data-i18n="inventory-management">Stok Yönetimi</div>
-      </div>
-      <div class="g-stat-icon" style="background:var(--g-brand-light); color:var(--g-brand);">
-        <i class="bi bi-boxes"></i>
-      </div>
-    </div>
-    <div class="g-stat-rows">
-      <div class="g-stat-row">
-        <span data-i18n="critical-stock">Kritik stok</span>
-        <strong style="color:var(--g-danger);">{{ inventory.critical_lots }}</strong>
-      </div>
-    </div>
-  </div>{% endif %}
-
-  {% if module_access.purchasing %}<div class="g-stat g-stat-accent-amber">
-    <div class="g-stat-top">
-      <div>
-        <div class="g-stat-label" data-i18n="open-orders">Açık Sipariş</div>
-        <div class="g-stat-value">{{ purchasing.open_orders }}</div>
-        <div class="g-stat-sub" data-i18n="purchasing">Satın Alma</div>
-      </div>
-      <div class="g-stat-icon" style="background:var(--g-warning-lt); color:var(--g-warning);">
-        <i class="bi bi-basket3"></i>
-      </div>
-    </div>
-    <div class="g-stat-rows">
-      <div class="g-stat-row">
-        <span data-i18n="total-orders">Toplam sipariş</span>
-        <strong>{{ purchasing.total_orders }}</strong>
-      </div>
-    </div>
-  </div>{% endif %}
-
-  {% if module_access.sales %}<div class="g-stat g-stat-accent-green">
-    <div class="g-stat-top">
-      <div>
-        <div class="g-stat-label" data-i18n="total-revenue">Toplam Gelir</div>
-        <div class="g-stat-value">₺{{ sales.total_revenue }}</div>
-        <div class="g-stat-sub" data-i18n="sales">Satış</div>
-      </div>
-      <div class="g-stat-icon" style="background:var(--g-success-lt); color:var(--g-success);">
-        <i class="bi bi-cart3"></i>
-      </div>
-    </div>
-    <div class="g-stat-rows">
-      <div class="g-stat-row">
-        <span data-i18n="fulfilled-orders">Tamamlanan</span>
-        <strong>{{ sales.fulfilled_orders }}</strong>
-      </div>
-    </div>
-  </div>{% endif %}
-
-  {% if module_access.finance %}<div class="g-stat g-stat-accent-green">
-    <div class="g-stat-top">
-      <div>
-        <div class="g-stat-label" data-i18n="net-profit">Net Kâr</div>
-        <div class="g-stat-value" style="color:var(--g-success);">₺{{ finance.total_profit }}</div>
-        <div class="g-stat-sub" data-i18n="finance">Finans</div>
-      </div>
-      <div class="g-stat-icon" style="background:var(--g-success-lt); color:var(--g-success);">
-        <i class="bi bi-graph-up-arrow"></i>
-      </div>
-    </div>
-    <div class="g-stat-rows">
-      <div class="g-stat-row">
-        <span data-i18n="profit-margin">Kâr marjı</span>
-        <strong style="color:var(--g-success);">%{{ finance.margin_percent }}</strong>
-      </div>
-    </div>
-  </div>{% endif %}
-
-</div>
-
-<!-- Module cards -->
-<div class="g-dash-modules">
-
-  <!-- Stok -->
-  {% if module_access.inventory %}<div class="g-module-card">
-    <div class="g-module-card-head">
-      <div>
-        <div class="g-module-label" data-i18n="inventory-management">Stok Yönetimi</div>
-        <div class="g-module-value">{{ inventory.total_lots }}</div>
-        <div class="g-module-sub" data-i18n="active-lots">Aktif Lot</div>
-      </div>
-      <div class="g-module-icon" style="background:var(--g-brand-light); color:var(--g-brand);">
-        <i class="bi bi-boxes"></i>
-      </div>
-    </div>
-    <div class="g-stat-rows">
-      <div class="g-stat-row">
-        <span data-i18n="warehouse-count">Depo sayısı</span>
-        <strong>{{ inventory.warehouses }}</strong>
-      </div>
-      <div class="g-stat-row">
-        <span data-i18n="critical-stock">Kritik stok</span>
-        <strong style="color:var(--g-danger);">{{ inventory.critical_lots }}</strong>
-      </div>
-    </div>
-  </div>{% endif %}
-
-  <!-- Satın Alma -->
-  {% if module_access.purchasing %}<div class="g-module-card">
-    <div class="g-module-card-head">
-      <div>
-        <div class="g-module-label" data-i18n="purchasing">Satın Alma</div>
-        <div class="g-module-value">{{ purchasing.total_orders }}</div>
-        <div class="g-module-sub" data-i18n="total-orders">Toplam Sipariş</div>
-      </div>
-      <div class="g-module-icon" style="background:var(--g-warning-lt); color:var(--g-warning);">
-        <i class="bi bi-basket3"></i>
-      </div>
-    </div>
-    <div class="g-stat-rows">
-      <div class="g-stat-row">
-        <span data-i18n="open-orders">Açık sipariş</span>
-        <strong style="color:var(--g-warning);">{{ purchasing.open_orders }}</strong>
-      </div>
-    </div>
-  </div>{% endif %}
-
-  <!-- Üretim -->
-  {% if module_access.production %}<div class="g-module-card">
-    <div class="g-module-card-head">
-      <div>
-        <div class="g-module-label" data-i18n="production">Üretim</div>
-        <div class="g-module-value">{{ production.total_batches }}</div>
-        <div class="g-module-sub" data-i18n="roast-batches">Kavurma Partisi</div>
-      </div>
-      <div class="g-module-icon" style="background:#FEF7EB; color:#A05E0A;">
-        <i class="bi bi-fire"></i>
-      </div>
-    </div>
-    <div class="g-stat-rows">
-      <div class="g-stat-row">
-        <span data-i18n="recipe-bom">Reçete (BOM)</span>
-        <strong>—</strong>
-      </div>
-    </div>
-  </div>{% endif %}
-
-  <!-- Satış -->
-  {% if module_access.sales %}<div class="g-module-card" style="border-left:3px solid var(--g-brand);">
-    <div class="g-module-card-head">
-      <div>
-        <div class="g-module-label" data-i18n="sales">Satış</div>
-        <div class="g-module-value">₺{{ sales.total_revenue }}</div>
-        <div class="g-module-sub" data-i18n="total-revenue">Toplam Gelir</div>
-      </div>
-      <div class="g-module-icon" style="background:var(--g-brand-light); color:var(--g-brand);">
-        <i class="bi bi-cart3"></i>
-      </div>
-    </div>
-    <div class="g-stat-rows">
-      <div class="g-stat-row">
-        <span data-i18n="customer-count">Müşteri sayısı</span>
-        <strong>{{ sales.total_customers }}</strong>
-      </div>
-      <div class="g-stat-row">
-        <span data-i18n="fulfilled-orders">Tamamlanan sipariş</span>
-        <strong>{{ sales.fulfilled_orders }}</strong>
-      </div>
-    </div>
-  </div>{% endif %}
-
-  <!-- CRM -->
-  {% if module_access.crm %}<div class="g-module-card">
-    <div class="g-module-card-head">
-      <div>
-        <div class="g-module-label" data-i18n="crm">CRM</div>
-        <div class="g-module-value">{{ crm.active_sales }}</div>
-        <div class="g-module-sub" data-i18n="active-sales">Aktif Satış</div>
-      </div>
-      <div class="g-module-icon" style="background:var(--g-success-lt); color:var(--g-success);">
-        <i class="bi bi-building"></i>
-      </div>
-    </div>
-    <div class="g-stat-rows">
-      <div class="g-stat-row">
-        <span data-i18n="won-sales">Kazanılan satış</span>
-        <strong style="color:var(--g-success);">{{ crm.won_sales }}</strong>
-      </div>
-    </div>
-  </div>{% endif %}
-
-  <!-- İnsan Kaynakları -->
-  {% if module_access.hr %}<div class="g-module-card">
-    <div class="g-module-card-head">
-      <div>
-        <div class="g-module-label" data-i18n="human-resources">İnsan Kaynakları</div>
-        <div class="g-module-value">{{ hr.total_employees }}</div>
-        <div class="g-module-sub" data-i18n="total-staff">Toplam Personel</div>
-      </div>
-      <div class="g-module-icon" style="background:#F5F0FF; color:#6D28D9;">
-        <i class="bi bi-people"></i>
-      </div>
-    </div>
-    <div class="g-stat-rows">
-      <div class="g-stat-row">
-        <span data-i18n="pending-leaves">Bekleyen izin</span>
-        <strong>{{ hr.pending_leaves }}</strong>
-      </div>
-      <div class="g-stat-row" style="margin-top:6px; gap:8px; flex-wrap:wrap; justify-content:flex-start;">
-        <a href="/hr/employees/" style="font-size:12px; color:#6D28D9; text-decoration:none;" data-i18n="employees">Çalışanlar</a>
-        <span style="color:var(--g-border);">·</span>
-        <a href="/hr/leave/" style="font-size:12px; color:#6D28D9; text-decoration:none;" data-i18n="leaves">İzinler</a>
-        <span style="color:var(--g-border);">·</span>
-        <a href="/hr/recruitment/" style="font-size:12px; color:#6D28D9; text-decoration:none;" data-i18n="recruitment">İşe Alım</a>
-      </div>
-    </div>
-  </div>{% endif %}
-
-  <!-- Finans -->
-  {% if module_access.finance %}<div class="g-module-card" style="border-left:3px solid var(--g-success-mid, #15693C);">
-    <div class="g-module-card-head">
-      <div>
-        <div class="g-module-label" data-i18n="finance">Finans</div>
-        <div class="g-module-value" style="color:var(--g-success);">₺{{ finance.total_profit }}</div>
-        <div class="g-module-sub" data-i18n="net-profit">Net Kâr</div>
-      </div>
-      <div class="g-module-icon" style="background:var(--g-success-lt); color:var(--g-success);">
-        <i class="bi bi-graph-up-arrow"></i>
-      </div>
-    </div>
-    <div class="g-stat-rows">
-      <div class="g-stat-row">
-        <span data-i18n="profit-margin">Kâr marjı</span>
-        <strong style="color:var(--g-success);">%{{ finance.margin_percent }}</strong>
-      </div>
-    </div>
-  </div>{% endif %}
-
-  <!-- AI Asistan -->
-  {% if module_access.ai_layer %}<div class="g-module-card" style="background:var(--g-sb-bg); border-color:transparent;">
-    <div class="g-module-card-head">
-      <div>
-        <div class="g-module-label" style="color:#4A5568;" data-i18n="ai-assistant">AI Asistan</div>
-        <div class="g-module-value" style="color:#E8E4DE;">RAG + GPT</div>
-        <div class="g-module-sub" style="color:#4A5568;" data-i18n="function-calling-active">Function Calling Aktif</div>
-      </div>
-      <div class="g-module-icon" style="background:rgba(27,58,92,0.4); color:#6B9BC8;">
-        <i class="bi bi-robot"></i>
-      </div>
-    </div>
-    <a href="/chat/" class="g-btn g-btn-primary" style="font-size:13px; padding:6px 14px; height:auto; margin-top:4px;">
-      <i class="bi bi-chat-dots"></i> <span data-i18n="start-chat">Sohbet Başlat</span>
-    </a>
-  </div>{% endif %}
-
-</div>
-
+  <div class="o-apps-grid o-dash-apps">
+    {% for app in nav_apps %}
+      {% if app.key != 'dashboard' %}
+        {% if app.allowed %}
+          <a class="o-apps-tile" href="{{ app.url }}">
+            <span class="o-apps-icon" style="--o-tile: var({{ app.color }});">
+              <i class="bi {{ app.icon }}" aria-hidden="true"></i>
+            </span>
+            <span class="o-apps-label">{{ app.label }}</span>
+            <span class="o-apps-metric">
+              {% if app.key == 'inventory' and inventory %}
+                {{ inventory.total_lots }} {% translate "lot" %} · {{ inventory.critical_lots }} {% translate "kritik" %}
+              {% elif app.key == 'purchasing' and purchasing %}
+                {{ purchasing.open_orders }} / {{ purchasing.total_orders }} {% translate "açık" %}
+              {% elif app.key == 'production' and production %}
+                {{ production.total_batches }} {% translate "üretim emri" %}
+              {% elif app.key == 'sales' and sales %}
+                {{ sales.fulfilled_orders }} {% translate "karşılandı" %} · {{ sales.total_customers }} {% translate "müşteri" %}
+              {% elif app.key == 'crm' and crm %}
+                {{ crm.active_sales }} {% translate "aktif" %} · {{ crm.won_sales }} {% translate "kazanıldı" %}
+              {% elif app.key == 'hr' and hr %}
+                {{ hr.total_employees }} {% translate "çalışan" %} · {{ hr.pending_leaves }} {% translate "izin" %}
+              {% elif app.key == 'finance' and finance %}
+                {{ finance.total_profit|money }}
+              {% endif %}
+            </span>
+          </a>
+        {% else %}
+          <span class="o-apps-tile o-locked" title="{% translate 'Bu modüle erişim izniniz yok' %}">
+            <span class="o-apps-icon" style="--o-tile: var(--o-n-400);">
+              <i class="bi {{ app.icon }}" aria-hidden="true"></i>
+            </span>
+            <span class="o-apps-label">{{ app.label }}</span>
+            <i class="bi bi-lock-fill o-apps-lock" aria-hidden="true"></i>
+          </span>
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+  </div>
 {% endblock %}

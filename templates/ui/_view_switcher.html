@@ -1,0 +1,11 @@
+{% if items|length > 1 %}
+<div class="o-view-switcher" role="group">
+  {% for item in items %}
+    <a class="o-view-btn{% if item.is_current %} o-active{% endif %}"
+       href="{{ item.url }}" title="{{ item.title }}" aria-label="{{ item.title }}"
+       {% if item.is_current %}aria-current="true"{% endif %}>
+      <i class="bi {{ item.icon }}" aria-hidden="true"></i>
+    </a>
+  {% endfor %}
+</div>
+{% endif %}

@@ -155,3 +155,35 @@ def scan_defective_return_patterns():
         )
         flagged.append(product.pk)
     return {'flagged_products': flagged}
+
+
+def cancel_order(order, user=None):
+    """
+    Bir siparisi iptal eder.
+
+    YALNIZCA beklemedeki siparisler iptal edilebilir: karsilanmis bir siparis
+    zaten stok hareketi uretmistir, onu iptal etmek hareketlerin geri
+    alinmasini gerektirir -- bu is iade akisinin (ReturnRequest) konusudur.
+    """
+    if order.status != Order.Status.PENDING:
+        raise ValueError(
+            'Yalnızca beklemedeki siparişler iptal edilebilir. '
+            'Karşılanmış bir sipariş için iade akışını kullanın.'
+        )
+    order.status = Order.Status.CANCELLED
+    order.save(update_fields=['status'])
+    log_action(user, 'Sipariş iptal edildi', order)
+    return order
+
+
+def set_order_status(order, status, user=None):
+    """Kanban surukle-birak + detay sayfasi aksiyonlari icin tek giris."""
+    if status not in Order.Status.values:
+        raise ValueError('Geçersiz sipariş durumu.')
+    if status == order.status:
+        return order
+    if status == Order.Status.FULFILLED:
+        return fulfill_order(order, user=user)
+    if status == Order.Status.CANCELLED:
+        return cancel_order(order, user=user)
+    raise ValueError('Karşılanmış veya iptal edilmiş bir sipariş beklemeye alınamaz.')

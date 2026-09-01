@@ -1,0 +1,36 @@
+<div class="o-list"><div class="o-list-scroll">
+  <table class="o-table">
+    <thead>
+      <tr>
+        <th>{% translate "Çalışan" %}</th>
+        <th>{% translate "Pozisyon" %}</th>
+        <th>{% translate "Departman" %}</th>
+        <th>{% translate "Yönetici" %}</th>
+        <th>{% translate "İşe giriş" %}</th>
+        <th>{% translate "Durum" %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for emp in employees %}
+        <tr>
+          <td>
+            <div class="o-row">
+              {% ui_avatar emp.name size="sm" %}
+              <div>
+                <a class="o-table-link" href="{% url 'hr-employee-detail' emp.pk %}">{{ emp.name }}</a>
+                {% if emp.email %}<span class="o-table-sub">{{ emp.email }}</span>{% endif %}
+              </div>
+            </div>
+          </td>
+          <td>{{ emp.position.title|default:"—" }}</td>
+          <td class="o-muted">{{ emp.department.name|default:"—" }}</td>
+          <td class="o-muted">{{ emp.manager.name|default:"—" }}</td>
+          <td class="o-nowrap o-sm">{{ emp.hire_date|date:"d M Y" }}</td>
+          <td>{% ui_badge emp "employment_status" %}</td>
+        </tr>
+      {% empty %}
+        {% translate "Gösterilecek çalışan yok" as t %}{% ui_empty icon="bi-people" title=t colspan=6 %}
+      {% endfor %}
+    </tbody>
+  </table>
+</div></div>

@@ -1,19 +1,63 @@
 {% extends 'base.html' %}
-{% block title %}Depolar — Reflow Coffee ERP{% endblock %}
-{% block nav_inventory %}active{% endblock %}
-{% block nav_inventory_warehouses %}active{% endblock %}
-{% block page_title %}Stok / Depolar{% endblock %}
+{% block title %}{% translate "Depolar" %}{% endblock %}
+{% block region_attr %} data-ajax-region{% endblock %}
 
-{% block extra_head %}
-<style>
-  .warehouse-stat, .data-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:12px; }.warehouse-stat { height:100%; padding:16px; display:flex; align-items:center; gap:12px; }.warehouse-stat-icon { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto; }.warehouse-stat-value { color:var(--g-text); font-size:22px; font-weight:700; line-height:1.1; }.warehouse-stat-label { color:var(--g-text-2); font-size:11px; font-weight:600; letter-spacing:.6px; margin-top:3px; text-transform:uppercase; }
-  .data-card { overflow:hidden; }.data-card .table { margin:0; font-size:13px; }.data-card .table thead th { background:var(--g-n-50); border-bottom:1px solid var(--g-border); color:var(--g-text-2); font-size:11px; font-weight:700; letter-spacing:.65px; padding:11px 16px; text-transform:uppercase; white-space:nowrap; }.data-card .table tbody td { border-color:var(--g-border-sub); color:var(--g-text); padding:13px 16px; vertical-align:middle; }.data-card .table tbody tr:hover { background:var(--g-n-50); }
-  .warehouse-icon { width:38px; height:38px; border-radius:10px; background:#eff6ff; color:#2563eb; display:inline-flex; align-items:center; justify-content:center; font-size:16px; flex:0 0 auto; }.warehouse-link { color:var(--g-text); font-weight:600; text-decoration:none; }.warehouse-link:hover { color:#2563eb; }.warehouse-sub { color:var(--g-text-2); font-size:12px; margin-top:2px; }.status-dot { width:7px; height:7px; display:inline-block; border-radius:50%; margin-right:5px; }.empty-state { color:var(--g-text-3); padding:52px 24px; text-align:center; }.empty-state i { display:block; font-size:34px; margin-bottom:8px; }
-</style>
+{% block cp_buttons %}
+  <a href="{% url 'warehouse-create' %}" class="o-btn o-btn--primary">
+    <i class="bi bi-plus-lg" aria-hidden="true"></i> {% translate "Yeni" %}
+  </a>
+  <a href="{% url 'inventory-list' %}" class="o-btn">
+    <i class="bi bi-boxes" aria-hidden="true"></i> {% translate "Stoklar" %}
+  </a>
+{% endblock %}
+
+{% block cp_pager %}{% ui_pager page_obj %}{% endblock %}
+
+{% block cp_search %}
+  <div class="o-cp-search-row">
+    {% translate "Depo adı veya şehir ara" as ph %}
+    {% ui_search target="#o-view" placeholder=ph filters=status_options filter_param="status" selected=selected_status %}
+  </div>
 {% endblock %}
 
 {% block content %}
-<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4"><div><h4 class="fw-bold mb-1 text-dark"><i class="bi bi-buildings me-2" style="color:#2563eb;"></i><span data-i18n="warehouse-management">Depo Yönetimi</span></h4><p class="mb-0 text-muted" style="font-size:13px;" data-i18n="warehouse-management-desc">Depoları, içlerindeki lotları ve dikkat gerektiren stokları tek yerden takip edin.</p></div><div class="d-flex gap-2"><a href="{% url 'inventory-list' %}" class="btn btn-outline-primary" data-i18n="stocks"><i class="bi bi-boxes me-1"></i>Stoklar</a><a href="{% url 'warehouse-create' %}" class="btn btn-primary" data-i18n="new-warehouse"><i class="bi bi-plus-lg me-1"></i>Yeni Depo</a></div></div>
+  <div class="o-button-box o-po-kpis">
+    {% translate "Toplam depo" as l1 %}{% ui_stat value=warehouse_count label=l1 icon="bi-buildings" %}
+    {% translate "Aktif depo" as l2 %}{% ui_stat value=active_warehouse_count label=l2 icon="bi-check2-circle" variant="success" %}
+  </div>
 
-{% include 'inventory/partials/warehouse_results.html' %}
+  <div class="o-list">
+    <div class="o-list-scroll">
+      <table class="o-table">
+        <thead>
+          <tr>
+            <th>{% translate "Depo" %}</th>
+            <th>{% translate "Şehir" %}</th>
+            <th class="o-num">{% translate "Lot" %}</th>
+            <th>{% translate "Durum" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for warehouse in warehouses %}
+            <tr>
+              <td>
+                <div class="o-row">
+                  {% ui_avatar warehouse.name size="sm" %}
+                  <a class="o-table-link" href="{% url 'warehouse-detail' warehouse.pk %}">{{ warehouse.name }}</a>
+                </div>
+              </td>
+              <td class="o-muted">{{ warehouse.city|default:"—" }}</td>
+              <td class="o-num">{{ warehouse.lot_count }}</td>
+              <td>{% ui_badge warehouse "is_active" %}</td>
+            </tr>
+          {% empty %}
+            {% translate "Gösterilecek depo yok" as t %}
+            {% translate "İlk depoyu ekle" as cta %}
+            {% url 'warehouse-create' as create_url %}
+            {% ui_empty icon="bi-buildings" title=t action_url=create_url action_label=cta colspan=4 %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 {% endblock %}

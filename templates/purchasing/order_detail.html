@@ -1,26 +1,224 @@
 {% extends 'base.html' %}
-{% block title %}PO #{{ order.pk }} — Reflow Coffee ERP{% endblock %}
-{% block nav_purchasing %}active{% endblock %}
-{% block nav_purchasing_orders %}active{% endblock %}
-{% block page_title %}Satın Alma / Sipariş Detayı{% endblock %}
+{% block title %}PO #{{ order.pk }}{% endblock %}
 
-{% block extra_head %}
-<style>
-  .data-card, .stat-card, .timeline-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:12px; }.stat-card { padding:15px; height:100%; }.stat-label { color:var(--g-text-2); font-size:11px; font-weight:600; letter-spacing:.6px; text-transform:uppercase; }.stat-value { color:var(--g-text); font-size:20px; font-weight:700; margin-top:3px; }.data-card { overflow:hidden; }.data-card .table { margin:0; font-size:13px; }.data-card .table thead th { background:var(--g-n-50); border-bottom:1px solid var(--g-border); color:var(--g-text-2); font-size:11px; font-weight:700; letter-spacing:.65px; padding:11px 16px; text-transform:uppercase; white-space:nowrap; }.data-card .table tbody td { border-color:var(--g-border-sub); color:var(--g-text); padding:12px 16px; vertical-align:middle; }.data-card .table tbody tr:hover { background:var(--g-n-50); }.status-pill { border-radius:20px; display:inline-block; font-size:11.5px; font-weight:600; padding:4px 8px; white-space:nowrap; }.status-draft { background:var(--g-border-sub); color:var(--g-text-2); }.status-sent { background:#e0f2fe; color:#0369a1; }.status-confirmed { background:#eff6ff; color:#1d4ed8; }.status-partially_received { background:#fff7ed; color:#c2410c; }.status-received { background:#f0fdf4; color:#15803d; }.status-cancelled { background:#fef2f2; color:#b91c1c; }.order-flow { display:flex; align-items:flex-start; gap:0; overflow-x:auto; padding:18px 20px; }.flow-step { color:var(--g-text-3); font-size:11px; min-width:116px; position:relative; text-align:center; }.flow-step:not(:last-child)::after { content:""; background:var(--g-border); height:2px; left:58%; position:absolute; right:-42%; top:10px; }.flow-dot { background:var(--g-border); border-radius:50%; display:flex; align-items:center; justify-content:center; height:22px; margin:0 auto 7px; position:relative; width:22px; z-index:1; }.flow-step.done, .flow-step.current { color:var(--g-text); font-weight:600; }.flow-step.done .flow-dot { background:#16a34a; color:#fff; }.flow-step.current .flow-dot { background:#ea580c; color:#fff; }.flow-step.done:not(:last-child)::after { background:#16a34a; }.line-total { font-weight:600; color:var(--g-text); }.progress { height:7px; min-width:92px; }.empty { color:var(--g-text-3); padding:35px; text-align:center; }.receipt-lot { color:var(--g-text-2); font-family:monospace; font-size:12px; }.notes-box { background:var(--g-n-50); border-radius:8px; color:var(--g-text-2); font-size:13px; padding:12px; white-space:pre-line; }
-</style>
+{% comment %}
+  add filtresi string+int'te sessizce boş döner; pk önce stringformat'tan geçmeli.
+{% endcomment %}
+{% block cp_breadcrumb %}
+  {% with pk=order.pk|stringformat:"s" %}{% ui_breadcrumb record="PO #"|add:pk %}{% endwith %}
 {% endblock %}
 
+{% block cp_buttons %}
+  {% if can_advance %}
+    <form method="post" action="{% url 'purchase-order-advance' order.pk %}">
+      {% csrf_token %}
+      <button type="submit" class="o-btn o-btn--primary">
+        {% if order.status == 'draft' %}
+          <i class="bi bi-send" aria-hidden="true"></i> {% translate "Tedarikçiye Gönder" %}
+        {% else %}
+          <i class="bi bi-check2-circle" aria-hidden="true"></i> {% translate "Teyit Edildi" %}
+        {% endif %}
+      </button>
+    </form>
+  {% endif %}
+
+  {% if order.is_editable %}
+    <a href="{% url 'purchase-order-item-create' order.pk %}" class="o-btn">
+      <i class="bi bi-plus-lg" aria-hidden="true"></i> {% translate "Kalem Ekle" %}
+    </a>
+    <a href="{% url 'purchase-order-edit' order.pk %}" class="o-btn">
+      <i class="bi bi-pencil" aria-hidden="true"></i> {% translate "Düzenle" %}
+    </a>
+  {% endif %}
+
+  {% if can_cancel %}
+    {% url 'purchase-order-cancel' order.pk as cancel_url %}
+    {% translate "İptal Et" as cancel_label %}
+    {% translate "Bu siparişi iptal etmek istiyor musunuz?" as cancel_msg %}
+    {% ui_confirm url=cancel_url label=cancel_label message=cancel_msg icon="bi-x-lg" variant="danger" %}
+  {% endif %}
+
+  {% if order.is_editable %}
+    {% url 'purchase-order-delete' order.pk as delete_url %}
+    {% translate "Sil" as delete_label %}
+    {% translate "Taslak siparişi silmek istediğinize emin misiniz?" as delete_msg %}
+    {% ui_confirm url=delete_url label=delete_label message=delete_msg icon="bi-trash" variant="danger" %}
+  {% endif %}
+{% endblock %}
+
+{% block content_class %} o-content--sheet{% endblock %}
+
 {% block content %}
-<div class="mb-3"><a href="{% url 'purchasing-list' %}" class="text-decoration-none" style="font-size:13px;"><i class="bi bi-arrow-left me-1"></i>Siparişlere dön</a></div>
-<div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4"><div><div class="d-flex align-items-center gap-2"><h4 class="fw-bold mb-0">Satın Alma Siparişi #{{ order.pk }}</h4><span class="status-pill {{ status_class }}">{{ order.get_status_display }}</span></div><div class="text-muted mt-1" style="font-size:13px;"><a href="{% url 'supplier-detail' order.supplier_id %}" class="text-decoration-none">{{ order.supplier.name }}</a> · {{ order.created_at|date:"d M Y, H:i" }}</div></div><div class="d-flex flex-wrap gap-2">{% if order.is_editable %}<a href="{% url 'purchase-order-item-create' order.pk %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Kalem Ekle</a><a href="{% url 'purchase-order-edit' order.pk %}" class="btn btn-outline-primary"><i class="bi bi-pencil me-1"></i>Düzenle</a>{% endif %}{% if can_advance %}<form method="post" action="{% url 'purchase-order-advance' order.pk %}">{% csrf_token %}<button class="btn btn-outline-success" type="submit">{% if order.status == 'draft' %}<i class="bi bi-send me-1"></i>Tedarikçiye Gönder{% else %}<i class="bi bi-check2-circle me-1"></i>Teyit Edildi{% endif %}</button></form>{% endif %}{% if can_cancel %}<form method="post" action="{% url 'purchase-order-cancel' order.pk %}" onsubmit="return confirm('Bu siparişi iptal etmek istiyor musunuz?');">{% csrf_token %}<button class="btn btn-outline-danger" type="submit"><i class="bi bi-x-lg me-1"></i>İptal Et</button></form>{% endif %}{% if order.is_editable %}<form method="post" action="{% url 'purchase-order-delete' order.pk %}" onsubmit="return confirm('Taslak siparişi silmek istediğinize emin misiniz?');">{% csrf_token %}<button class="btn btn-outline-danger" title="Taslağı sil"><i class="bi bi-trash"></i></button></form>{% endif %}</div></div>
+{% ui_sheet %}
+  {% ui_statusbar order "status" hide="cancelled" %}
 
-<div class="row g-3 mb-4"><div class="col-lg-3 col-sm-6"><div class="stat-card"><div class="stat-label">Tedarikçi</div><div class="stat-value" style="font-size:16px;">{{ order.supplier.name }}</div></div></div><div class="col-lg-3 col-sm-6"><div class="stat-card"><div class="stat-label">Beklenen teslimat</div><div class="stat-value" style="font-size:16px;">{{ order.expected_delivery_date|date:"d M Y"|default:"—" }}</div></div></div><div class="col-lg-3 col-sm-6"><div class="stat-card"><div class="stat-label">Sipariş kalemi</div><div class="stat-value">{{ item_count }}</div></div></div><div class="col-lg-3 col-sm-6"><div class="stat-card"><div class="stat-label">Sipariş toplamı</div><div class="stat-value">₺{{ total|floatformat:2 }}</div></div></div></div>
+  <div class="o-form-head">
+    <div>
+      <h1 class="o-form-title o-mono">PO #{{ order.pk }}</h1>
+      <p class="o-form-subtitle">
+        <a href="{% url 'supplier-detail' order.supplier_id %}">{{ order.supplier.name }}</a>
+        · {{ order.created_at|date:"d M Y, H:i" }}
+      </p>
+    </div>
 
-{% if order.status != 'cancelled' %}<div class="timeline-card mb-4"><div class="order-flow"><div class="flow-step {% if order.status != 'draft' %}done{% else %}current{% endif %}"><div class="flow-dot"><i class="bi bi-file-earmark"></i></div>Taslak</div><div class="flow-step {% if order.status == 'confirmed' or order.status == 'partially_received' or order.status == 'received' %}done{% elif order.status == 'sent' %}current{% endif %}"><div class="flow-dot"><i class="bi bi-send"></i></div>Gönderildi</div><div class="flow-step {% if order.status == 'partially_received' or order.status == 'received' %}done{% elif order.status == 'confirmed' %}current{% endif %}"><div class="flow-dot"><i class="bi bi-check2-circle"></i></div>Teyit edildi</div><div class="flow-step {% if order.status == 'received' %}done{% elif order.status == 'partially_received' %}current{% endif %}"><div class="flow-dot"><i class="bi bi-box-seam"></i></div>Teslim alındı</div></div></div>{% endif %}
+    {% ui_button_box %}
+      {% translate "Kalem" as l1 %}{% ui_stat value=item_count label=l1 icon="bi-list-ul" %}
+      {% translate "Teslim alma" as l2 %}{% ui_stat value=receipts|length label=l2 icon="bi-box-seam" %}
+      {% translate "Sipariş toplamı" as l3 %}{% ui_stat value=total|money label=l3 icon="bi-cash-stack" %}
+    {% endui_button_box %}
+  </div>
 
-{% if order.notes %}<div class="notes-box mb-4"><span class="fw-semibold text-dark">Sipariş notu</span><br>{{ order.notes }}</div>{% endif %}
+  {% translate "Sipariş bilgileri" as g1 %}
+  {% ui_group g1 %}
+    {% translate "Tedarikçi" as f1 %}
+    {% url 'supplier-detail' order.supplier_id as supplier_url %}
+    {% ui_field_value f1 order.supplier.name url=supplier_url icon="bi-truck" cols=4 %}
 
-<div class="data-card mb-4"><div class="p-3 border-bottom d-flex align-items-center justify-content-between"><div><h6 class="mb-0 fw-bold">Sipariş kalemleri</h6><small class="text-muted">Taslakta kalemleri düzenleyebilir; gönderimden sonra yalnız teslim alabilirsiniz.</small></div>{% if order.is_editable %}<a class="btn btn-sm btn-outline-primary" href="{% url 'purchase-order-item-create' order.pk %}">Kalem ekle</a>{% endif %}</div><div class="table-responsive"><table class="table table-borderless"><thead><tr><th>Ürün</th><th class="text-end">Sipariş</th><th class="text-end">Teslim alınan</th><th class="text-end">Kalan</th><th class="text-end">Birim fiyat</th><th class="text-end">Tutar</th><th>İlerleme</th><th class="text-end"></th></tr></thead><tbody>{% for row in items %}<tr><td class="fw-semibold">{{ row.item.product.name }}<div class="text-muted" style="font-size:11px;">{{ row.item.product.get_unit_display }}</div></td><td class="text-end">{{ row.item.quantity_ordered|floatformat:3 }}</td><td class="text-end text-success">{{ row.received|floatformat:3 }}</td><td class="text-end {% if row.remaining > 0 %}text-warning fw-semibold{% else %}text-success{% endif %}">{{ row.remaining|floatformat:3 }}</td><td class="text-end">₺{{ row.item.unit_price|floatformat:2 }}</td><td class="text-end line-total">₺{{ row.item.line_total|floatformat:2 }}</td><td><div class="d-flex align-items-center gap-2"><div class="progress flex-grow-1"><div class="progress-bar bg-success" style="width:{{ row.progress }}%"></div></div><span class="text-muted" style="font-size:11px;">%{{ row.progress }}</span></div></td><td class="text-end"><div class="d-inline-flex gap-1">{% if order.is_editable %}<a href="{% url 'purchase-order-item-edit' order.pk row.item.pk %}" class="btn btn-sm btn-light" title="Düzenle"><i class="bi bi-pencil"></i></a><form method="post" action="{% url 'purchase-order-item-delete' order.pk row.item.pk %}" onsubmit="return confirm('Bu sipariş kalemini silmek istiyor musunuz?');">{% csrf_token %}<button class="btn btn-sm btn-light text-danger" title="Sil"><i class="bi bi-trash"></i></button></form>{% endif %}</div></td></tr>{% if row.receive_form %}<tr><td colspan="8" class="pt-0 pb-3"><form method="post" action="{% url 'purchase-order-item-receive' order.pk row.item.pk %}" class="row g-2 align-items-end rounded border bg-light p-2 mx-0">{% csrf_token %}<div class="col-lg-2 col-md-3"><label class="form-label mb-1" for="{{ row.receive_form.quantity_received.id_for_label }}" style="font-size:11px;">Miktar</label>{{ row.receive_form.quantity_received }}</div><div class="col-lg-3 col-md-3"><label class="form-label mb-1" for="{{ row.receive_form.lot_code.id_for_label }}" style="font-size:11px;">Lot kodu</label>{{ row.receive_form.lot_code }}</div><div class="col-lg-2 col-md-3"><label class="form-label mb-1" for="{{ row.receive_form.expiry_date.id_for_label }}" style="font-size:11px;">SKT</label>{{ row.receive_form.expiry_date }}</div><div class="col-lg-3 col-md-3"><label class="form-label mb-1" for="{{ row.receive_form.warehouse.id_for_label }}" style="font-size:11px;">Depo</label>{{ row.receive_form.warehouse }}</div><div class="col-lg-2 col-md-12"><button type="submit" class="btn btn-sm btn-outline-success w-100"><i class="bi bi-box-arrow-in-down me-1"></i>Teslim al</button></div></form></td></tr>{% endif %}{% empty %}<tr><td colspan="8" class="empty"><i class="bi bi-list-ul d-block fs-3 mb-2"></i>Henüz sipariş kalemi eklenmedi.{% if order.is_editable %}<br><a href="{% url 'purchase-order-item-create' order.pk %}" class="btn btn-sm btn-primary mt-3">İlk kalemi ekle</a>{% endif %}</td></tr>{% endfor %}</tbody></table></div></div>
+    {% translate "Beklenen teslimat" as f2 %}
+    {% ui_field_value f2 order.expected_delivery_date|date:"d M Y" icon="bi-calendar3" cols=4 %}
 
-<div class="data-card"><div class="p-3 border-bottom"><h6 class="mb-0 fw-bold">Teslim alma geçmişi</h6></div><div class="table-responsive"><table class="table table-borderless"><thead><tr><th>Ürün</th><th>Lot kodu</th><th>Depo</th><th class="text-end">Miktar</th><th>SKT</th><th>Teslim alma zamanı</th></tr></thead><tbody>{% for receipt in receipts %}<tr><td class="fw-semibold">{{ receipt.purchase_order_item.product.name }}</td><td><span class="receipt-lot">{{ receipt.lot.lot_code }}</span></td><td>{{ receipt.lot.warehouse.name|default:"—" }}</td><td class="text-end">{{ receipt.quantity_received|floatformat:3 }} {{ receipt.purchase_order_item.product.get_unit_display }}</td><td>{{ receipt.lot.expiry_date|date:"d M Y" }}</td><td class="text-muted" style="font-size:12px;">{{ receipt.received_at|date:"d M Y, H:i" }}</td></tr>{% empty %}<tr><td colspan="6" class="empty">Henüz teslim alma kaydı yok.</td></tr>{% endfor %}</tbody></table></div></div>
+    {% translate "Oluşturulma" as f3 %}
+    {% ui_field_value f3 order.created_at|date:"d M Y, H:i" icon="bi-clock" cols=4 %}
+
+    {% if order.notes %}
+      {% translate "Sipariş notu" as f4 %}
+      {% ui_field_value f4 order.notes cols=12 %}
+    {% endif %}
+  {% endui_group %}
+
+  {% ui_notebook %}
+    {% translate "Kalemler" as t1 %}
+    {% ui_page t1 badge=item_count %}
+      <div class="o-list">
+        <div class="o-list-scroll">
+          <table class="o-table">
+            <thead>
+              <tr>
+                <th>{% translate "Ürün" %}</th>
+                <th class="o-num">{% translate "Sipariş" %}</th>
+                <th class="o-num">{% translate "Teslim alınan" %}</th>
+                <th class="o-num">{% translate "Kalan" %}</th>
+                <th class="o-num">{% translate "Birim fiyat" %}</th>
+                <th class="o-num">{% translate "Tutar" %}</th>
+                <th>{% translate "İlerleme" %}</th>
+                {% if order.is_editable %}<th></th>{% endif %}
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in items %}
+                <tr>
+                  <td>
+                    <span class="o-strong">{{ row.item.product.name }}</span>
+                    <span class="o-table-sub">{{ row.item.product.get_unit_display }}</span>
+                  </td>
+                  <td class="o-num">{{ row.item.quantity_ordered|qty }}</td>
+                  <td class="o-num o-ok">{{ row.received|qty }}</td>
+                  <td class="o-num{% if row.remaining > 0 %} o-attention{% endif %}">{{ row.remaining|qty }}</td>
+                  <td class="o-num">{{ row.item.unit_price|money }}</td>
+                  <td class="o-num o-strong">{{ row.item.line_total|money }}</td>
+                  <td>
+                    <div class="o-row">
+                      <div class="progress o-grow"><div class="progress-bar" style="width:{{ row.progress }}%"></div></div>
+                      <span class="o-xs o-muted o-nowrap">%{{ row.progress }}</span>
+                    </div>
+                  </td>
+                  {% if order.is_editable %}
+                    <td class="o-actions">
+                      <div class="o-row">
+                        <a href="{% url 'purchase-order-item-edit' order.pk row.item.pk %}"
+                           class="o-btn o-btn--sm o-btn--ghost" title="{% translate 'Düzenle' %}">
+                          <i class="bi bi-pencil" aria-hidden="true"></i></a>
+                        {% url 'purchase-order-item-delete' order.pk row.item.pk as del_url %}
+                        {% translate "Bu sipariş kalemini silmek istiyor musunuz?" as del_msg %}
+                        {% ui_confirm url=del_url label="" message=del_msg icon="bi-trash" variant="danger" %}
+                      </div>
+                    </td>
+                  {% endif %}
+                </tr>
+
+                {% if row.receive_form %}
+                  <tr class="o-receive-row">
+                    <td colspan="{% if order.is_editable %}8{% else %}7{% endif %}">
+                      <form method="post" action="{% url 'purchase-order-item-receive' order.pk row.item.pk %}"
+                            class="o-receive-form">
+                        {% csrf_token %}
+                        <div class="o-group-body">
+                          {% ui_field row.receive_form.quantity_received cols=2 %}
+                          {% ui_field row.receive_form.lot_code cols=3 %}
+                          {% ui_field row.receive_form.expiry_date cols=2 %}
+                          {% ui_field row.receive_form.warehouse cols=3 %}
+                          <div class="o-field o-col-2">
+                            <span class="o-label">&nbsp;</span>
+                            <button type="submit" class="o-btn o-btn--primary">
+                              <i class="bi bi-box-arrow-in-down" aria-hidden="true"></i> {% translate "Teslim al" %}
+                            </button>
+                          </div>
+                        </div>
+                      </form>
+                    </td>
+                  </tr>
+                {% endif %}
+              {% empty %}
+                {% translate "Henüz sipariş kalemi eklenmedi" as e1 %}
+                {% translate "İlk kalemi ekle" as e2 %}
+                {% url 'purchase-order-item-create' order.pk as add_url %}
+                {% if order.is_editable %}
+                  {% ui_empty icon="bi-list-ul" title=e1 action_url=add_url action_label=e2 colspan=8 %}
+                {% else %}
+                  {% ui_empty icon="bi-list-ul" title=e1 colspan=7 %}
+                {% endif %}
+              {% endfor %}
+            </tbody>
+            {% if items %}
+              <tfoot>
+                <tr>
+                  <td colspan="5" class="o-num">{% translate "Toplam" %}</td>
+                  <td class="o-num">{{ total|money }}</td>
+                  <td{% if order.is_editable %} colspan="2"{% endif %}></td>
+                </tr>
+              </tfoot>
+            {% endif %}
+          </table>
+        </div>
+      </div>
+    {% endui_page %}
+
+    {% translate "Teslim Almalar" as t2 %}
+    {% ui_page t2 badge=receipts|length %}
+      <div class="o-list">
+        <div class="o-list-scroll">
+          <table class="o-table">
+            <thead>
+              <tr>
+                <th>{% translate "Ürün" %}</th>
+                <th>{% translate "Lot kodu" %}</th>
+                <th>{% translate "Depo" %}</th>
+                <th class="o-num">{% translate "Miktar" %}</th>
+                <th>{% translate "SKT" %}</th>
+                <th>{% translate "Teslim alma zamanı" %}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for receipt in receipts %}
+                <tr>
+                  <td class="o-strong">{{ receipt.purchase_order_item.product.name }}</td>
+                  <td><a href="{% url 'lot-detail' receipt.lot_id %}" class="o-mono o-table-link">{{ receipt.lot.lot_code }}</a></td>
+                  <td>{{ receipt.lot.warehouse.name|default:"—" }}</td>
+                  <td class="o-num">{{ receipt.quantity_received|qty:receipt.purchase_order_item.product.get_unit_display }}</td>
+                  <td class="o-nowrap">{{ receipt.lot.expiry_date|date:"d M Y" }}</td>
+                  <td class="o-nowrap o-muted o-sm">{{ receipt.received_at|date:"d M Y, H:i" }}</td>
+                </tr>
+              {% empty %}
+                {% translate "Henüz teslim alma kaydı yok" as e3 %}
+                {% ui_empty icon="bi-box-seam" title=e3 colspan=6 %}
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {% endui_page %}
+  {% endui_notebook %}
+{% endui_sheet %}
+
+{% ui_chatter order related=receipts %}
 {% endblock %}

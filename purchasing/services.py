@@ -167,3 +167,37 @@ def check_and_create_reorder(product):
             url=f'/purchasing/orders/{po.pk}/',
         )
     return po
+
+
+def set_purchase_order_status(purchase_order, status):
+    """
+    Kanban surukle-birak icin.
+
+    Satin alma akisi ileri dogrudur ve TESLIM ALINDI durumu mal kabulunden
+    (receive_goods) doger -- kart surukleyerek "tam teslim alindi" yapmak
+    stok olmadan siparisi kapatirdi. Bu yuzden yalnizca:
+      - bir sonraki adima ilerletme (advance_order_status)
+      - iptal (cancel_purchase_order)
+    kabul edilir.
+    """
+    if status not in PurchaseOrder.Status.values:
+        raise ValueError('Geçersiz sipariş durumu.')
+    if status == purchase_order.status:
+        return purchase_order
+
+    if status == PurchaseOrder.Status.CANCELLED:
+        return cancel_purchase_order(purchase_order)
+
+    flow = [
+        PurchaseOrder.Status.DRAFT,
+        PurchaseOrder.Status.SENT,
+        PurchaseOrder.Status.CONFIRMED,
+    ]
+    if purchase_order.status in flow and status in flow:
+        if flow.index(status) == flow.index(purchase_order.status) + 1:
+            return advance_order_status(purchase_order)
+
+    raise ValueError(
+        'Bu geçiş kart sürükleyerek yapılamaz. Teslim alma durumu, '
+        'sipariş detayındaki mal kabul adımından oluşur.'
+    )

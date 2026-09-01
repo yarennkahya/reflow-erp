@@ -13,4 +13,12 @@ urlpatterns = [
     path('recruitment/openings/new/', views.job_opening_create_view, name='job-opening-create'),
     path('recruitment/candidates/new/', views.candidate_create_view, name='candidate-create'),
     path('recruitment/applications/new/', views.application_create_view, name='application-create'),
+    path('recruitment/applications/<int:pk>/advance/',
+         views.application_advance_view, name='application-advance'),
+    path('recruitment/applications/<int:pk>/reject/',
+         views.application_reject_view, name='application-reject'),
+    path('recruitment/applications/<int:pk>/set-stage/', views.application_set_stage_view,
+         name='application-set-stage'),
+    path('employees/<int:pk>/set-status/', views.employee_set_status_view,
+         name='employee-set-status'),
 ]
