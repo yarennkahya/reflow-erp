@@ -193,6 +193,16 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'sales.tasks.scan_defective_returns',
         'schedule': crontab(hour=3, minute=0),
     },
+    # Her Pazartesi 09:00 — vadesi geçmiş faturası olan müşterilere hatırlatma
+    'weekly-overdue-reminders': {
+        'task': 'finance.tasks.send_overdue_invoice_reminders',
+        'schedule': crontab(hour=9, minute=0, day_of_week='monday'),
+    },
+    # Her Pazartesi 09:30 — yöneticilere haftalık finans özeti
+    'weekly-finance-summary': {
+        'task': 'finance.tasks.send_weekly_finance_summary',
+        'schedule': crontab(hour=9, minute=30, day_of_week='monday'),
+    },
 }
 
 

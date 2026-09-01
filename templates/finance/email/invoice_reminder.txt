@@ -1,0 +1,13 @@
+Sayın {{ customer.name }},
+
+Aşağıdaki faturalarınızın ödeme vadesi geçmiş bulunmaktadır.
+Lütfen en kısa sürede ödeme yapmanızı rica ederiz.
+
+{% for inv in invoices %}  {{ inv.invoice_number }}  |  Vade: {{ inv.due_date|date:"d.m.Y" }}  |  Kalan: {{ inv.balance_due }} TL
+{% endfor %}
+Toplam kalan bakiye: {{ total_due }} TL
+
+Ödeme gerçekleştirdiyseniz lütfen bu maili dikkate almayınız.
+Sorularınız için bizimle iletişime geçebilirsiniz.
+
+{{ brand }}

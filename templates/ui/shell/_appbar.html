@@ -1,17 +1,4 @@
 <header class="o-appbar" role="banner">
-  <button class="o-appbar-apps" type="button" data-o-apps-toggle
-          aria-controls="o-apps-overlay" aria-expanded="false"
-          aria-label="{% translate 'Uygulamalar' %}">
-    <span class="o-appbar-apps-grid" aria-hidden="true">
-      <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
-    </span>
-  </button>
-
-  <a class="o-appbar-brand" href="{% url 'dashboard-home' %}" title="{{ site_brand }}">
-    <span class="o-appbar-brand-mark" aria-hidden="true">{{ site_brand_mark }}</span>
-    <span class="o-sr-only">{{ site_brand }}</span>
-  </a>
-
   {% if nav_current_app %}
     <span class="o-appbar-app">{{ nav_current_app.label }}</span>
     <nav class="o-appbar-menus" data-o-menu-overflow aria-label="{% translate 'Modül menüsü' %}">

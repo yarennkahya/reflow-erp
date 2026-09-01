@@ -1,0 +1,13 @@
+Haftalık Finans Özeti — {{ week_label }}
+
+─── FATURA DURUMU ───────────────────────────────
+Toplam açık fatura     : {{ unpaid_count }} adet  ({{ unpaid_total }} TL)
+Vadesi geçmiş           : {{ overdue_count }} adet  ({{ overdue_total }} TL)
+Bu hafta ödenen         : {{ paid_this_week_count }} adet  ({{ paid_this_week_total }} TL)
+Kısmen ödenen           : {{ partial_count }} adet
+
+─── VADESİ GEÇEN FATURALAR ─────────────────────
+{% if overdue_invoices %}{% for inv in overdue_invoices %}  {{ inv.invoice_number }}  |  {{ inv.order.customer.name }}  |  {{ inv.due_date|date:"d.m.Y" }}  |  {{ inv.balance_due }} TL
+{% endfor %}{% else %}  Vadesi geçen fatura yok.
+{% endif %}
+{{ brand }}
