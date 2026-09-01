@@ -133,7 +133,7 @@ APPS = (
         menus=(
             MenuItem('finance.invoices', _('Faturalar'), 'invoice-list',
                      ('invoice-list', 'invoice-detail', 'invoice-create',
-                      'invoice-preview', 'invoice-send')),
+                      'invoice-preview', 'invoice-pdf', 'invoice-send')),
             MenuItem('finance.report', _('Kârlılık Raporu'), 'finance-report',
                      ('finance-report',), section=_('Raporlama')),
         ),
@@ -144,7 +144,8 @@ APPS = (
         menus=(
             MenuItem('hr.overview', _('Genel Bakış'), 'hr-list', ('hr-list',)),
             MenuItem('hr.employees', _('Çalışanlar'), 'hr-employees',
-                     ('hr-employees', 'hr-employee-detail', 'employee-set-status')),
+                     ('hr-employees', 'hr-employee-detail', 'employee-set-status',
+                      'employee-create', 'employee-edit')),
             MenuItem('hr.leave', _('İzinler'), 'hr-leave',
                      ('hr-leave', 'leave-request-create', 'leave-approve',
                       'leave-reject')),

@@ -14,8 +14,9 @@
 {% block cp_search %}
   <div class="o-cp-search-row">
     {% translate "İzin ara" as ph %}
-    {% ui_search target="#o-view" placeholder=ph filters=status_choices filter_param="status" selected=selected_status %}
+    {% ui_search target="#o-view" placeholder=ph %}
   </div>
+  {% ui_filter_chips choices=status_choices param="status" selected=selected_status %}
 {% endblock %}
 
 {% block content %}

@@ -1,0 +1,34 @@
+<div class="o-person-grid">
+  {% for emp in employees %}
+    <a class="o-person-card" href="{% url 'hr-employee-detail' emp.pk %}"
+       data-status="{{ emp.employment_status }}">
+      <div class="o-person-card-head">
+        {% ui_avatar emp.name size="xl" %}
+      </div>
+      <div class="o-person-card-body">
+        <p class="o-person-card-name">{{ emp.name }}</p>
+        <p class="o-person-card-pos">{{ emp.position.title|default:"—" }}</p>
+        <p class="o-person-card-dept">
+          <i class="bi bi-diagram-3" aria-hidden="true"></i> {{ emp.department.name|default:"—" }}
+        </p>
+        {% if emp.email %}
+          <p class="o-person-card-meta">
+            <i class="bi bi-envelope" aria-hidden="true"></i>
+            <span>{{ emp.email }}</span>
+          </p>
+        {% endif %}
+        {% if emp.phone %}
+          <p class="o-person-card-meta">
+            <i class="bi bi-telephone" aria-hidden="true"></i>
+            <span>{{ emp.phone }}</span>
+          </p>
+        {% endif %}
+        <div class="o-person-card-foot">
+          {% ui_badge emp "employment_status" %}
+        </div>
+      </div>
+    </a>
+  {% empty %}
+    {% translate "Gösterilecek çalışan yok" as t %}{% ui_empty icon="bi-people" title=t %}
+  {% endfor %}
+</div>

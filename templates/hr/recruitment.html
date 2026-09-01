@@ -15,6 +15,10 @@
 
 {% block cp_views %}{% ui_view_switcher "kanban,list" current=view %}{% endblock %}
 
+{% block cp_search %}
+  {% ui_filter_chips choices=dept_choices param="department" selected=selected_dept %}
+{% endblock %}
+
 {% block content %}
   <div class="o-button-box o-po-kpis">
     {% translate "Açık pozisyon" as l1 %}{% ui_stat value=open_count label=l1 icon="bi-briefcase" %}

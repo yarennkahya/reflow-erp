@@ -1,6 +1,42 @@
 from django import forms
 
-from .models import Application, Candidate, JobOpening, LeaveRequest
+from .models import Application, Candidate, Department, Employee, JobOpening, LeaveRequest, Position
+
+
+class EmployeeForm(forms.ModelForm):
+    class Meta:
+        model = Employee
+        fields = ('name', 'email', 'phone', 'department', 'position',
+                  'manager', 'hire_date', 'employment_status', 'salary')
+        labels = {
+            'name': 'Ad Soyad',
+            'email': 'E-posta',
+            'phone': 'Telefon',
+            'department': 'Departman',
+            'position': 'Pozisyon',
+            'manager': 'Yönetici',
+            'hire_date': 'İşe giriş tarihi',
+            'employment_status': 'Durum',
+            'salary': 'Maaş (TL)',
+        }
+        widgets = {
+            'hire_date': forms.DateInput(attrs={'type': 'date'}),
+            'salary': forms.NumberInput(attrs={'step': '0.01', 'min': '0'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['manager'].queryset = Employee.objects.order_by('name')
+        self.fields['manager'].required = False
+        self.fields['salary'].required = False
+
+    def clean(self):
+        cleaned_data = super().clean()
+        department = cleaned_data.get('department')
+        position = cleaned_data.get('position')
+        if department and position and position.department_id != department.pk:
+            self.add_error('position', 'Pozisyon seçili departmana ait olmalıdır.')
+        return cleaned_data
 
 
 class LeaveRequestForm(forms.ModelForm):

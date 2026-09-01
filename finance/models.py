@@ -30,8 +30,13 @@ class Invoice(models.Model):
     def balance_due(self):
         return self.total_amount - self.total_paid
 
+    @property
+    def invoice_number(self):
+        year = self.issued_at.year if self.issued_at else ''
+        return f'INV-{year}-{self.pk:05d}'
+
     def __str__(self):
-        return f'Fatura #{self.pk} - {self.order.customer.name}'
+        return f'{self.invoice_number} - {self.order.customer.name}'
 
 
 class Payment(models.Model):

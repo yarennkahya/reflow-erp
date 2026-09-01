@@ -10,6 +10,7 @@ veya veritabanı erişimi YAPMA.
 from decimal import Decimal, InvalidOperation
 
 from django import forms, template
+from django.http import QueryDict
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 from django.utils.text import slugify
@@ -233,6 +234,32 @@ def ui_pager(context, page_obj=None):
     return {'page_obj': page_obj, 'base_qs': base_qs}
 
 
+@register.inclusion_tag('ui/_filter_chips.html', takes_context=True)
+def ui_filter_chips(context, choices, param, selected=''):
+    """Tıklanabilir filtre yongaları.
+    {% ui_filter_chips choices=status_choices param="status" selected=selected_status %}
+    """
+    request = context.get('request')
+    base = request.GET.copy() if request else QueryDict(mutable=True)
+    base.pop('page', None)
+
+    def make_url(value):
+        p = base.copy()
+        if value:
+            p[param] = value
+        else:
+            p.pop(param, None)
+        qs = p.urlencode()
+        return f'?{qs}' if qs else '?'
+
+    items = [{'label': str(_('Tümü')), 'url': make_url(''),
+              'is_active': not selected or selected == 'all'}]
+    for value, label in choices:
+        items.append({'label': str(label), 'url': make_url(value),
+                      'is_active': str(selected) == str(value)})
+    return {'items': items}
+
+
 @register.inclusion_tag('ui/_view_switcher.html', takes_context=True)
 def ui_view_switcher(context, views, current='list'):
     """{% ui_view_switcher "list,kanban,graph" current=view %}"""
@@ -241,6 +268,7 @@ def ui_view_switcher(context, views, current='list'):
         'kanban':   ('bi-kanban',      _('Kanban')),
         'calendar': ('bi-calendar3',   _('Takvim')),
         'graph':    ('bi-bar-chart',   _('Grafik')),
+        'card':     ('bi-person-vcard',_('Kartlar')),
     }
     request = context.get('request')
     params = request.GET.copy() if request else None

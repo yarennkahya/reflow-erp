@@ -1,16 +1,25 @@
 {% extends 'base.html' %}
-{% block title %}INV #{{ invoice.pk }}{% endblock %}
+{% block title %}{{ invoice.invoice_number }}{% endblock %}
 
 {% block cp_breadcrumb %}
-  {% with pk=invoice.pk|stringformat:"s" %}{% ui_breadcrumb record="INV #"|add:pk %}{% endwith %}
+  {% ui_breadcrumb record=invoice.invoice_number %}
 {% endblock %}
 
 {% block cp_buttons %}
+  <a class="o-btn o-btn--primary" href="{% url 'invoice-pdf' invoice.pk %}?preview=1" target="_blank">
+    <i class="bi bi-eye" aria-hidden="true"></i> {% translate "Önizle" %}
+  </a>
+  <a class="o-btn" href="{% url 'invoice-pdf' invoice.pk %}">
+    <i class="bi bi-file-earmark-pdf" aria-hidden="true"></i> {% translate "PDF İndir" %}
+  </a>
+  <form method="post" action="{% url 'invoice-send' invoice.pk %}" style="display:inline">
+    {% csrf_token %}<input type="hidden" name="next" value="{% url 'invoice-detail' invoice.pk %}">
+    <button type="submit" class="o-btn" {% if not invoice.order.customer.contact_email %}disabled title="E-posta tanımlı değil"{% endif %}>
+      <i class="bi bi-envelope" aria-hidden="true"></i> {% translate "E-posta Gönder" %}
+    </button>
+  </form>
   <a class="o-btn" href="{% url 'order-detail' invoice.order_id %}">
     <i class="bi bi-cart3" aria-hidden="true"></i> SO #{{ invoice.order_id }}
-  </a>
-  <a class="o-btn" href="{% url 'customer-detail' invoice.order.customer_id %}">
-    <i class="bi bi-person" aria-hidden="true"></i> {{ invoice.order.customer.name }}
   </a>
 {% endblock %}
 
@@ -22,7 +31,7 @@
 
   <div class="o-form-head">
     <div>
-      <h1 class="o-form-title o-mono">INV #{{ invoice.pk }}</h1>
+      <h1 class="o-form-title o-mono">{{ invoice.invoice_number }}</h1>
       <p class="o-form-subtitle">
         <a href="{% url 'customer-detail' invoice.order.customer_id %}">{{ invoice.order.customer.name }}</a>
         · {{ invoice.issued_at|date:"d M Y" }}

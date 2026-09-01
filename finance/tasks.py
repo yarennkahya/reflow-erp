@@ -1,6 +1,6 @@
 from celery import shared_task
 from django.conf import settings
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from django.utils.translation import gettext as _
 
@@ -8,10 +8,8 @@ from django.utils.translation import gettext as _
 @shared_task
 def send_invoice_email_task(invoice_id):
     """
-    Faturayı müşterinin iletişim adresine gönderir.
-
-    notifications.send_notification_email_task ile aynı desen: görev sessizce
-    çıkar (fail_silently) — e-posta gönderimi sipariş akışını bloklamamalı.
+    Faturayı PDF ek olarak müşterinin e-posta adresine gönderir.
+    Celery ile async çalışır; hata sessizce yutulur.
     """
     from .models import Invoice
 
@@ -19,7 +17,7 @@ def send_invoice_email_task(invoice_id):
         invoice = (
             Invoice.objects
             .select_related('order__customer')
-            .prefetch_related('order__items__product')
+            .prefetch_related('order__items__product', 'payments')
             .get(pk=invoice_id)
         )
     except Invoice.DoesNotExist:
@@ -36,10 +34,23 @@ def send_invoice_email_task(invoice_id):
         'brand': settings.SITE_BRAND,
     })
 
-    send_mail(
-        subject=f'{settings.SITE_BRAND} — {_("Fatura")} #{invoice.pk}',
-        message=body,
+    try:
+        from weasyprint import HTML
+        html_str = render_to_string('finance/invoice_pdf.html', {'invoice': invoice})
+        pdf_bytes = HTML(string=html_str).write_pdf()
+    except Exception:
+        pdf_bytes = None
+
+    email = EmailMessage(
+        subject=f'{settings.SITE_BRAND} — {_("Fatura")} {invoice.invoice_number}',
+        body=body,
         from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[recipient],
-        fail_silently=True,
+        to=[recipient],
     )
+    if pdf_bytes:
+        email.attach(f'{invoice.invoice_number}.pdf', pdf_bytes, 'application/pdf')
+
+    try:
+        email.send()
+    except Exception:
+        pass

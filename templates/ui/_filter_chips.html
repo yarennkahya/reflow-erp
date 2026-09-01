@@ -1,0 +1,6 @@
+<div class="o-filter-chips">
+  {% for chip in items %}
+    <a class="o-filter-chip{% if chip.is_active %} is-active{% endif %}"
+       href="{{ chip.url }}">{{ chip.label }}</a>
+  {% endfor %}
+</div>

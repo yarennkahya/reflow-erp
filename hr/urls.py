@@ -4,7 +4,9 @@ from . import views
 urlpatterns = [
     path('', views.hr_list, name='hr-list'),
     path('employees/', views.employee_list_view, name='hr-employees'),
+    path('employees/new/', views.employee_create_view, name='employee-create'),
     path('employees/<int:pk>/', views.employee_detail_view, name='hr-employee-detail'),
+    path('employees/<int:pk>/edit/', views.employee_edit_view, name='employee-edit'),
     path('leave/', views.leave_list_view, name='hr-leave'),
     path('leave/new/', views.leave_request_create_view, name='leave-request-create'),
     path('leave/<int:pk>/approve/', views.leave_approve_view, name='leave-approve'),

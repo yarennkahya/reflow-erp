@@ -15,8 +15,9 @@
 {% block cp_search %}
   <div class="o-cp-search-row">
     {% translate "Müşteri, e-posta veya telefon ara" as ph %}
-    {% ui_search target="#o-view" placeholder=ph filters=type_choices filter_param="customer_type" selected=selected_type %}
+    {% ui_search target="#o-view" placeholder=ph %}
   </div>
+  {% ui_filter_chips choices=type_choices param="customer_type" selected=selected_type %}
 {% endblock %}
 
 {% block content %}

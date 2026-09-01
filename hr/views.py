@@ -1,3 +1,5 @@
+import json
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q
@@ -9,8 +11,8 @@ from dashboard.calendars import month_grid_spans, normalize_period, period_nav
 from dashboard.grouping import group_by_choice
 from dashboard.views_helpers import is_ajax, paginate, pick_view
 
-from .forms import ApplicationForm, CandidateForm, JobOpeningForm, LeaveRequestForm
-from .models import Application, Candidate, Department, Employee, JobOpening, LeaveRequest
+from .forms import ApplicationForm, CandidateForm, EmployeeForm, JobOpeningForm, LeaveRequestForm
+from .models import Application, Candidate, Department, Employee, JobOpening, LeaveRequest, Position
 from .services import (
     advance_application_stage,
     set_application_stage,
@@ -48,6 +50,7 @@ def employee_list_view(request):
     departments = Department.objects.order_by('name')
     dept_id = request.GET.get('department')
     manager_id = request.GET.get('manager')
+    selected_status = request.GET.get('status', '')
 
     if manager_id:
         manager = Employee.objects.filter(pk=manager_id).first()
@@ -57,8 +60,12 @@ def employee_list_view(request):
         )
     if dept_id:
         qs = qs.filter(department_id=dept_id)
+    if selected_status in Employee.EmploymentStatus.values:
+        qs = qs.filter(employment_status=selected_status)
+    else:
+        selected_status = ''
 
-    view = pick_view(request, ('list', 'kanban'))
+    view = pick_view(request, ('list', 'kanban', 'card'))
     employees = list(qs)
     page_obj = paginate(request, employees) if view == 'list' else None
 
@@ -77,8 +84,9 @@ def employee_list_view(request):
         'managers': Employee.objects.filter(direct_reports__isnull=False).distinct().order_by('name'),
         'selected_dept': dept_id,
         'selected_manager': manager_id,
+        'status_choices': Employee.EmploymentStatus.choices,
+        'selected_status': selected_status,
     }
-    # AJAX bölgesi base.html'deki #o-view.
     return render(request, 'hr/employee_list.html', context)
 
 
@@ -94,6 +102,40 @@ def employee_detail_view(request, pk):
         'emp': emp,
         'leaves': leaves,
         'reports': reports,
+    })
+
+
+def _positions_json():
+    """Departman → pozisyon listesi; form şablonlarındaki cascade için."""
+    data = {}
+    for pos in Position.objects.select_related('department').order_by('title'):
+        key = str(pos.department_id)
+        data.setdefault(key, []).append({'id': pos.pk, 'title': pos.title})
+    return json.dumps(data)
+
+
+@login_required
+def employee_create_view(request):
+    form = EmployeeForm(request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        emp = form.save()
+        messages.success(request, f'{emp.name} çalışan olarak eklendi.')
+        return redirect('hr-employee-detail', pk=emp.pk)
+    return render(request, 'hr/employee_form.html', {
+        'form': form, 'positions_json': _positions_json(),
+    })
+
+
+@login_required
+def employee_edit_view(request, pk):
+    emp = get_object_or_404(Employee, pk=pk)
+    form = EmployeeForm(request.POST or None, instance=emp)
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        messages.success(request, f'{emp.name} güncellendi.')
+        return redirect('hr-employee-detail', pk=emp.pk)
+    return render(request, 'hr/employee_form.html', {
+        'form': form, 'employee': emp, 'positions_json': _positions_json(),
     })
 
 
@@ -188,7 +230,8 @@ def leave_reject_view(request, pk):
 
 @login_required
 def recruitment_view(request):
-    openings = (
+    selected_dept = request.GET.get('department', '')
+    openings_qs = (
         JobOpening.objects.select_related('department', 'position')
         .annotate(
             hired_count=Count(
@@ -199,6 +242,9 @@ def recruitment_view(request):
         .prefetch_related('applications__candidate')
         .order_by('-opened_at')
     )
+    if selected_dept:
+        openings_qs = openings_qs.filter(department_id=selected_dept)
+    openings = openings_qs
     openings_data = [
         {
             'opening': opening,
@@ -218,6 +264,7 @@ def recruitment_view(request):
 
     view = pick_view(request, ('kanban', 'list'), default='kanban')
 
+    dept_choices = [(str(d.pk), d.name) for d in Department.objects.order_by('name')]
     return render(request, 'hr/recruitment.html', {
         'view': view,
         'view_template': f'hr/_recruitment_{view}.html',
@@ -230,6 +277,8 @@ def recruitment_view(request):
         'open_count': JobOpening.objects.filter(status=JobOpening.Status.OPEN).count(),
         'candidate_count': Candidate.objects.count(),
         'application_count': len(active_applications),
+        'dept_choices': dept_choices,
+        'selected_dept': selected_dept,
     })
 
 
@@ -240,7 +289,9 @@ def job_opening_create_view(request):
         opening = form.save()
         messages.success(request, f'{opening.title} pozisyonu açık olarak oluşturuldu.')
         return redirect('hr-recruitment')
-    return render(request, 'hr/job_opening_form.html', {'form': form})
+    return render(request, 'hr/job_opening_form.html', {
+        'form': form, 'positions_json': _positions_json(),
+    })
 
 
 @login_required

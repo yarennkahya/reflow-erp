@@ -3,7 +3,12 @@
 {% block region_attr %} data-ajax-region{% endblock %}
 
 {% block cp_pager %}{% ui_pager page_obj %}{% endblock %}
-{% block cp_views %}{% ui_view_switcher "list,kanban" current=view %}{% endblock %}
+{% block cp_buttons %}
+  <a href="{% url 'employee-create' %}" class="o-btn o-btn--primary">
+    <i class="bi bi-plus-lg" aria-hidden="true"></i> {% translate "Yeni Çalışan" %}
+  </a>
+{% endblock %}
+{% block cp_views %}{% ui_view_switcher "list,kanban,card" current=view %}{% endblock %}
 
 {% block cp_search %}
   <div class="o-cp-search-row">
@@ -26,6 +31,7 @@
       </div>
     </form>
   </div>
+  {% ui_filter_chips choices=status_choices param="status" selected=selected_status %}
 {% endblock %}
 
 {% block content %}

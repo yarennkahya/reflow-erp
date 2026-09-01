@@ -2,7 +2,9 @@ from collections import defaultdict
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
 
@@ -137,6 +139,29 @@ def invoice_preview_view(request, pk):
         pk=pk,
     )
     return render(request, 'finance/_invoice_preview.html', {'invoice': invoice})
+
+
+def _render_invoice_pdf(invoice):
+    from weasyprint import HTML
+    html_str = render_to_string('finance/invoice_pdf.html', {'invoice': invoice})
+    return HTML(string=html_str).write_pdf()
+
+
+@login_required
+def invoice_pdf_view(request, pk):
+    """Faturayı PDF olarak indirir (?preview=1 → tarayıcıda inline açar)."""
+    invoice = get_object_or_404(
+        Invoice.objects
+        .select_related('order__customer')
+        .prefetch_related('order__items__product', 'payments'),
+        pk=pk,
+    )
+    pdf = _render_invoice_pdf(invoice)
+    filename = f'{invoice.invoice_number}.pdf'
+    disposition = 'inline' if request.GET.get('preview') else 'attachment'
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'{disposition}; filename="{filename}"'
+    return response
 
 
 @login_required
