@@ -210,9 +210,9 @@ CELERY_BEAT_SCHEDULE = {
 # Marka adı TEK yerden beslenir. Önceden üç farklı yerde üç farklı
 # değer vardı: sayfa başlıklarında 'Reflow Coffee ERP', kabukta
 # 'ERP Platform', landing sayfasında '[TBD]'.
-SITE_BRAND = 'Reflow Coffee ERP'
-SITE_BRAND_SHORT = 'Reflow'
-SITE_BRAND_MARK = 'R'
+SITE_BRAND = 'Flowify'
+SITE_BRAND_SHORT = 'Flowify'
+SITE_BRAND_MARK = 'F'
 SITE_VERSION = '0.2.0'
 
 

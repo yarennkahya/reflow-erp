@@ -30,7 +30,7 @@
 /* ─── SIDEBAR ──────────────────────────────────────────────────────────── */
 .o-sidebar {
   position: fixed;
-  top: var(--o-appbar-h);
+  top: 0;
   left: 0;
   bottom: 0;
   z-index: var(--o-z-sidebar);
@@ -62,16 +62,12 @@
 .o-sidebar-brand:hover { color: var(--o-appbar-fg); text-decoration: none; }
 
 .o-sidebar-brand-mark {
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
   width: 28px;
   height: 28px;
-  background: var(--o-accent);
-  border-radius: var(--o-radius);
-  color: #fff;
-  font-size: 13px;
-  font-weight: 700;
 }
 .o-sidebar-brand-name {
   font-weight: 700;
@@ -88,6 +84,7 @@
   display: flex;
   flex-direction: column;
   padding: var(--o-sp-1) 0;
+  padding-top: calc(var(--o-appbar-h) + var(--o-sp-1));
   scrollbar-width: none;
 }
 .o-sidebar-nav::-webkit-scrollbar { display: none; }
@@ -140,15 +137,15 @@
 }
 .o-sidebar:hover .o-sidebar-lock { opacity: 1; }
 
-/* Push all page content right to make room for the collapsed sidebar */
+/* Appbar ve sidebar ikisi de tam köşeden başlar; içerik her ikisinin altında kalır */
 body { margin-left: var(--o-sidebar-w); }
-.o-appbar { margin-left: var(--o-sidebar-w); width: calc(100% - var(--o-sidebar-w)); }
 
 .o-app {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   background: var(--o-surface-2);
+  margin-top: var(--o-appbar-h);
 }
 
 .o-content {
@@ -161,8 +158,10 @@ body { margin-left: var(--o-sidebar-w); }
 
 /* ─── 2. APP BAR ───────────────────────────────────────────────────────── */
 .o-appbar {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: var(--o-z-appbar);
   display: flex;
   align-items: stretch;
@@ -206,6 +205,34 @@ body { margin-left: var(--o-sidebar-w); }
   color: #fff;
   font-size: var(--o-font-size-sm);
   font-weight: 700;
+}
+
+.o-appbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 var(--o-sp-4) 0 var(--o-sp-3);
+  text-decoration: none;
+  flex-shrink: 0;
+  border-right: 1px solid var(--o-appbar-border);
+}
+.o-appbar-brand:hover { text-decoration: none; }
+
+.o-appbar-logo-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.o-appbar-wordmark {
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.02em;
+  color: #fff;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .o-appbar-app {

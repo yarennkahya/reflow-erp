@@ -1,15 +1,24 @@
 {% extends 'public/base_public.html' %}
-{% block title %}{{ site_brand }} — {% translate "Kahve kavurma ve dağıtım ERP'si" %}{% endblock %}
+{% block title %}{{ site_brand }} — {% translate "Akıllı ERP Platformu" %}{% endblock %}
+{% block meta_description %}{% translate "Tedarikten üretime, satıştan finansa — operasyonunuzu tek platformda yönetin. Lot bazlı stok, BOM üretim, AI karar desteği." %}{% endblock %}
 
 {% block body %}
 <header class="p-nav">
   <a class="p-brand" href="{% url 'landing' %}">
-    <span class="p-brand-mark" aria-hidden="true">{{ site_brand_mark }}</span>
-    <span>{{ site_brand }}</span>
+    <span class="p-brand-mark" aria-hidden="true">
+      <svg width="30" height="30" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M10 44 A22 22 0 1 1 42 44" stroke="#6B4632" stroke-width="5.5" stroke-linecap="round"/>
+        <rect x="13" y="32" width="5" height="8" rx="2.5" fill="#6B4632" opacity=".55"/>
+        <rect x="21" y="26" width="5" height="14" rx="2.5" fill="#6B4632"/>
+        <rect x="29" y="20" width="5" height="20" rx="2.5" fill="#C87941"/>
+        <circle cx="26" cy="7" r="4" fill="#C87941"/>
+      </svg>
+    </span>
+    <span class="p-brand-wordmark">Flowify</span>
   </a>
   <nav class="p-nav-links" aria-label="{% translate 'Bölümler' %}">
     <a class="p-nav-link" href="#moduller">{% translate "Modüller" %}</a>
-    <a class="p-nav-link" href="#akis">{% translate "Nasıl çalışır" %}</a>
+    <a class="p-nav-link" href="#neden">{% translate "Neden Reflow?" %}</a>
     <a class="p-nav-link" href="#ai">{% translate "AI katmanı" %}</a>
     <a class="p-nav-link" href="#sss">{% translate "SSS" %}</a>
   </nav>
@@ -27,14 +36,15 @@
   </div>
 </header>
 
+{# ─── HERO ──────────────────────────────────────────────────────────────────── #}
 <section class="p-hero">
   <div class="p-hero-inner">
     <div>
-      <span class="p-eyebrow">{% translate "Kahve kavurma & dağıtım" %}</span>
-      <h1 class="p-title">{% translate "Yeşil kahveden fincana, tek sistemde." %}</h1>
+      <span class="p-eyebrow">{% translate "Akıllı ERP Platformu" %}</span>
+      <h1 class="p-title">{% translate "Operasyonunuzu tek platformda yönetin." %}</h1>
       <p class="p-sub">
-        {% blocktranslate %}Tedarikçi alımından harman reçetesine, kavurma partisinden toptan siparişe kadar
-        tüm operasyonu tek kayıt defterinde toplayın. Stok asla doğrudan değişmez — her hareket izlenebilir.{% endblocktranslate %}
+        {% blocktranslate %}Tedarikçiden müşteriye, hammaddeden bitmiş ürüne kadar tüm süreci
+        tek bir kayıt defterinde toplayın. Her hareket izlenir, her karar veriye dayanır.{% endblocktranslate %}
       </p>
       <div class="p-hero-actions">
         <a class="p-btn p-btn--primary" href="{% url 'login' %}">
@@ -44,7 +54,7 @@
       </div>
       <p class="p-hero-note">
         <i class="bi bi-info-circle" aria-hidden="true"></i>
-        {% translate "Demo hesabı: root / root — rol bazlı hesaplar giriş sayfasında listeli." %}
+        {% translate "Demo hesabı: root / root — rol bazlı hesaplar giriş sayfasında listeli. Demo verileri bir kahve kavurma işletmesine aittir." %}
       </p>
     </div>
 
@@ -84,102 +94,163 @@
   </div>
 </section>
 
+{# ─── STATS BAR ─────────────────────────────────────────────────────────────── #}
+<div class="p-stats-bar">
+  <div class="p-stats-inner">
+    <div class="p-stat">
+      <strong>7</strong>
+      <span>{% translate "Entegre modül" %}</span>
+    </div>
+    <div class="p-stat-sep" aria-hidden="true"></div>
+    <div class="p-stat">
+      <strong>100%</strong>
+      <span>{% translate "İzlenebilir stok hareketi" %}</span>
+    </div>
+    <div class="p-stat-sep" aria-hidden="true"></div>
+    <div class="p-stat">
+      <strong>AI</strong>
+      <span>{% translate "Doğal dil karar desteği" %}</span>
+    </div>
+    <div class="p-stat-sep" aria-hidden="true"></div>
+    <div class="p-stat">
+      <strong>RBAC</strong>
+      <span>{% translate "Rol bazlı erişim kontrolü" %}</span>
+    </div>
+  </div>
+</div>
+
+{# ─── MODULES ───────────────────────────────────────────────────────────────── #}
 <section class="p-section p-section--alt" id="moduller">
   <div class="p-inner">
     <span class="p-eyebrow">{% translate "Modüller" %}</span>
     <h2 class="p-h2">{% translate "Operasyonun tamamı, tek platformda" %}</h2>
-    <p class="p-sub">{% translate "Her modül aynı veritabanını paylaşır; bir yerde oluşan hareket diğer her yerde görünür." %}</p>
+    <p class="p-sub">{% translate "Her modül aynı veritabanını paylaşır; bir yerde oluşan hareket diğer her yerde anında görünür." %}</p>
 
     <div class="p-grid">
       <article class="p-card">
         <span class="p-card-icon"><i class="bi bi-boxes" aria-hidden="true"></i></span>
         <h3>{% translate "Stok & Lot" %}</h3>
-        <p>{% translate "Lot bazlı tazelik takibi, depo yerleşimi ve hareket defteri. Stok hiçbir zaman doğrudan güncellenmez." %}</p>
+        <p>{% translate "Lot bazlı takip, hareket defteri (ledger). Stok asla doğrudan değişmez; her hareket kayıt altındadır ve geçmiş geriye dönük bozulamaz." %}</p>
       </article>
       <article class="p-card">
         <span class="p-card-icon"><i class="bi bi-basket3" aria-hidden="true"></i></span>
         <h3>{% translate "Satın Alma" %}</h3>
-        <p>{% translate "Taslaktan teslim almaya sipariş akışı; teslim alma adımı lot ve maliyeti otomatik oluşturur." %}</p>
+        <p>{% translate "Taslaktan teslim almaya tam sipariş akışı. Teslim alma adımı lotu ve birim maliyeti otomatik oluşturur, stok anında güncellenir." %}</p>
       </article>
       <article class="p-card">
-        <span class="p-card-icon"><i class="bi bi-thermometer-high" aria-hidden="true"></i></span>
+        <span class="p-card-icon"><i class="bi bi-gear" aria-hidden="true"></i></span>
         <h3>{% translate "Üretim" %}</h3>
-        <p>{% translate "Reçete tabanlı harman: yeşil kahve lotları düşer, kavrulmuş çıktı lotu oluşur." %}</p>
+        <p>{% translate "BOM (malzeme listesi) tabanlı üretim emirleri. Girdi lotları düşülür, çıktı lotu oluşturulur; reçete sürümleme desteklenir." %}</p>
       </article>
       <article class="p-card">
         <span class="p-card-icon"><i class="bi bi-cart3" aria-hidden="true"></i></span>
         <h3>{% translate "Satış" %}</h3>
-        <p>{% translate "Toptan ve perakende siparişler, iade akışı ve talep tahmini." %}</p>
+        <p>{% translate "B2B toptan ve B2C perakende siparişler, iade akışı, müşteri segmentasyonu ve talep tahmini tek ekranda." %}</p>
       </article>
       <article class="p-card">
         <span class="p-card-icon"><i class="bi bi-graph-up-arrow" aria-hidden="true"></i></span>
         <h3>{% translate "Finans" %}</h3>
-        <p>{% translate "Lot maliyetinden sipariş kârına gerçek kârlılık; fatura ve ödeme takibi." %}</p>
+        <p>{% translate "Lot maliyetinden sipariş kârına gerçek kârlılık hesabı; fatura ve ödeme takibi, gecikme uyarıları." %}</p>
+      </article>
+      <article class="p-card">
+        <span class="p-card-icon"><i class="bi bi-people" aria-hidden="true"></i></span>
+        <h3>{% translate "İnsan Kaynakları" %}</h3>
+        <p>{% translate "Çalışan yönetimi, departman & pozisyon hiyerarşisi, izin talepleri ve işe alım panosu tek yerden." %}</p>
       </article>
       <article class="p-card">
         <span class="p-card-icon"><i class="bi bi-building" aria-hidden="true"></i></span>
-        <h3>{% translate "CRM & İK" %}</h3>
-        <p>{% translate "Fırsat pipeline'ı, müşteri kartları, çalışan ve izin yönetimi, işe alım panosu." %}</p>
+        <h3>{% translate "CRM" %}</h3>
+        <p>{% translate "Müşteri ve tedarikçi kartları, fırsat pipeline'ı, toplantı ve görev yönetimi ile 360° ilişki görünümü." %}</p>
+      </article>
+      <article class="p-card">
+        <span class="p-card-icon"><i class="bi bi-robot" aria-hidden="true"></i></span>
+        <h3>{% translate "AI Asistan" %}</h3>
+        <p>{% translate "RAG + fonksiyon çağırma ile çalışan asistan. Verinize doğal dille soru sorun, anında yanıt alın." %}</p>
       </article>
     </div>
   </div>
 </section>
 
-<section class="p-section" id="akis">
+{# ─── WHY REFLOW ────────────────────────────────────────────────────────────── #}
+<section class="p-section" id="neden">
+  <div class="p-inner">
+    <span class="p-eyebrow">{% translate "Neden Reflow?" %}</span>
+    <h2 class="p-h2">{% translate "Doğru veri, doğru kararlar" %}</h2>
+    <p class="p-sub">{% translate "Pek çok ERP veriyi depolar ama izlenebilirliği ihmal eder. Reflow'da her işlem kayıt altındadır." %}</p>
+
+    <div class="p-grid">
+      <article class="p-card">
+        <span class="p-card-icon"><i class="bi bi-journal-check" aria-hidden="true"></i></span>
+        <h3>{% translate "Ledger tabanlı stok" %}</h3>
+        <p>{% translate "Stok hiçbir zaman doğrudan güncellenmez. Her giriş ve çıkış bir hareket satırıdır; bakiye bu satırların toplamından hesaplanır ve geçmiş asla bozulamaz." %}</p>
+      </article>
+      <article class="p-card">
+        <span class="p-card-icon"><i class="bi bi-shield-lock" aria-hidden="true"></i></span>
+        <h3>{% translate "Rol bazlı erişim (RBAC)" %}</h3>
+        <p>{% translate "Her modül Django grup izinlerine bağlıdır. Yetkisi olmayan kullanıcı modülü kilitli görür ve URL doğrudan girilse bile erişemez." %}</p>
+      </article>
+      <article class="p-card">
+        <span class="p-card-icon"><i class="bi bi-cpu" aria-hidden="true"></i></span>
+        <h3>{% translate "Kontrollü AI" %}</h3>
+        <p>{% translate "AI modeli veritabanına asla doğrudan yazmaz. Yalnızca tanımlı fonksiyonları çağırabilir; her aksiyon uygulama servis katmanından geçer." %}</p>
+      </article>
+      <article class="p-card">
+        <span class="p-card-icon"><i class="bi bi-boxes" aria-hidden="true"></i></span>
+        <h3>{% translate "Modüler monolit" %}</h3>
+        <p>{% translate "Tüm modüller aynı PostgreSQL veritabanını paylaşır. Bir yerde oluşan veri diğer her modülde anında görünür, servis karmaşıklığı yoktur." %}</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+{# ─── HOW IT WORKS ──────────────────────────────────────────────────────────── #}
+<section class="p-section p-section--alt">
   <div class="p-inner">
     <span class="p-eyebrow">{% translate "Nasıl çalışır" %}</span>
-    <h2 class="p-h2">{% translate "Çekirdekten fincana izlenebilir zincir" %}</h2>
+    <h2 class="p-h2">{% translate "Tedarikten teslimata izlenebilir zincir" %}</h2>
 
     <div class="p-flow">
       <article class="p-step">
         <h3>{% translate "Tedarik" %}</h3>
-        <p>{% translate "Tedarikçiye sipariş açılır, teslim alındığında lot ve birim maliyet kaydedilir." %}</p>
+        <p>{% translate "Tedarikçiye sipariş açılır; teslim alındığında lot ve birim maliyet otomatik kaydedilir." %}</p>
       </article>
       <article class="p-step">
-        <h3>{% translate "Kavurma" %}</h3>
-        <p>{% translate "Reçete oranlarına göre yeşil lotlar tüketilir, çıktı lotu üretilir." %}</p>
+        <h3>{% translate "Üretim" %}</h3>
+        <p>{% translate "BOM reçetesine göre girdi lotları tüketilir, çıktı lotu stoka eklenir." %}</p>
       </article>
       <article class="p-step">
-        <h3>{% translate "Kalite" %}</h3>
-        <p>{% translate "Kupa puanı ve sonuç kaydedilir; parti geçmişi kalıcı olur." %}</p>
+        <h3>{% translate "Kalite & Stok" %}</h3>
+        <p>{% translate "Lot bazlı takip sayesinde hangi ürünün nereden geldiği her zaman bilinir." %}</p>
       </article>
       <article class="p-step">
         <h3>{% translate "Satış" %}</h3>
-        <p>{% translate "Tazelik penceresine göre eski lotlar öncelikli sevk edilir." %}</p>
+        <p>{% translate "Sipariş alındığında stok rezerve edilir, sevkiyatla birlikte hareket kaydı oluşur." %}</p>
       </article>
       <article class="p-step">
         <h3>{% translate "Finans" %}</h3>
-        <p>{% translate "Fatura ve ödeme kaydedilir, kârlılık lot maliyetinden hesaplanır." %}</p>
+        <p>{% translate "Lot maliyetinden gerçek kâr hesaplanır; fatura ve ödeme otomatik takip edilir." %}</p>
       </article>
     </div>
   </div>
 </section>
 
+{# ─── AI SECTION ────────────────────────────────────────────────────────────── #}
 <section class="p-section p-section--dark" id="ai">
   <div class="p-inner">
     <span class="p-eyebrow">{% translate "AI katmanı" %}</span>
     <h2 class="p-h2">{% translate "Verinize doğal dille soru sorun" %}</h2>
     <p class="p-sub">
-      {% blocktranslate %}RAG ve fonksiyon çağırma ile çalışan asistan veritabanına asla doğrudan yazmaz;
-      yalnızca tanımlı ve yetkilendirilmiş fonksiyonları çağırır.{% endblocktranslate %}
+      {% blocktranslate %}RAG ve fonksiyon çağırma ile desteklenen asistan operasyonel verinizi anlar.
+      Karmaşık raporlar yerine sade bir soru yeterli.{% endblocktranslate %}
     </p>
 
-    <div class="p-grid">
-      <article class="p-card">
-        <span class="p-card-icon"><i class="bi bi-search" aria-hidden="true"></i></span>
-        <h3>{% translate "Kritik stok durumu nedir?" %}</h3>
-        <p>{% translate "Tazelik penceresi daralan lotları önceliklendirir." %}</p>
-      </article>
-      <article class="p-card">
-        <span class="p-card-icon"><i class="bi bi-people" aria-hidden="true"></i></span>
-        <h3>{% translate "En kârlı müşterilerim kimler?" %}</h3>
-        <p>{% translate "Sipariş kalemlerinden gerçek kâr hesabıyla yanıtlar." %}</p>
-      </article>
-      <article class="p-card">
-        <span class="p-card-icon"><i class="bi bi-graph-up" aria-hidden="true"></i></span>
-        <h3>{% translate "Satış trendini özetle" %}</h3>
-        <p>{% translate "Talep tahminini geçmiş satışlarla birlikte yorumlar." %}</p>
-      </article>
+    <div class="p-ai-examples">
+      <div class="p-ai-bubble p-ai-bubble--user">{% translate "Geçen ay en çok satan 5 ürün hangileri?" %}</div>
+      <div class="p-ai-bubble p-ai-bubble--bot">{% translate "Satış verinize göre en yüksek ciroyu sağlayan 5 ürün sıralanıyor…" %}</div>
+      <div class="p-ai-bubble p-ai-bubble--user">{% translate "Vadesi geçmiş faturalar ne kadar?" %}</div>
+      <div class="p-ai-bubble p-ai-bubble--bot">{% translate "Finans modülünden vadesi geçmiş 12 fatura sorgulanıyor, toplam bakiye hesaplanıyor…" %}</div>
+      <div class="p-ai-bubble p-ai-bubble--user">{% translate "Hangi tedarikçide teslimat gecikmesi var?" %}</div>
+      <div class="p-ai-bubble p-ai-bubble--bot">{% translate "Satın alma siparişleri taranıyor, beklenen teslim tarihi geçenler listeleniyor…" %}</div>
     </div>
 
     <div class="p-tech">
@@ -189,6 +260,7 @@
   </div>
 </section>
 
+{# ─── FAQ ───────────────────────────────────────────────────────────────────── #}
 <section class="p-section p-section--alt" id="sss">
   <div class="p-inner">
     <span class="p-eyebrow">{% translate "SSS" %}</span>
@@ -196,49 +268,74 @@
 
     <div class="p-faq">
       <details open>
+        <summary>{% translate "Hangi sektörler için uygundur?" %}</summary>
+        <p>{% blocktranslate %}Temel tasarım üretim yapan her işletmeye uyarlanabilir: gıda, tekstil, elektronik,
+        kimya, imalat. Demo verisi bir kahve kavurma işletmesine aittir; iş akışları ve veri modeli
+        sektörden bağımsız biçimde kurgulanmıştır.{% endblocktranslate %}</p>
+      </details>
+      <details>
         <summary>{% translate "Stok neden doğrudan güncellenmiyor?" %}</summary>
-        <p>{% blocktranslate %}Her değişiklik bir stok hareketi olarak eklenir. Böylece bakiye her zaman
-        hareketlerin toplamıdır ve geçmiş geriye dönük bozulmaz.{% endblocktranslate %}</p>
+        <p>{% blocktranslate %}Her değişiklik bir stok hareketi (ledger) kaydı olarak eklenir. Böylece bakiye
+        her zaman hareketlerin toplamıdır, geçmiş geriye dönük asla bozulmaz ve tam denetim izi mevcuttur.{% endblocktranslate %}</p>
       </details>
       <details>
-        <summary>{% translate "Tazelik nasıl hesaplanıyor?" %}</summary>
-        <p>{% blocktranslate %}Lotun son kullanma tarihine kalan gün sayısına göre üç durum üretilir:
-        normal, öncelikli kullanım ve SKT geçti. Hiçbir alan veritabanında tutulmaz, anlık hesaplanır.{% endblocktranslate %}</p>
-      </details>
-      <details>
-        <summary>{% translate "Rol bazlı erişim var mı?" %}</summary>
-        <p>{% blocktranslate %}Evet. Her modül Django grup izinlerine bağlıdır; yetkisi olmayan kullanıcı
-        modülü kilitli görür ve doğrudan URL ile de erişemez.{% endblocktranslate %}</p>
+        <summary>{% translate "Rol bazlı erişim nasıl çalışıyor?" %}</summary>
+        <p>{% blocktranslate %}Her modül Django grup izinlerine bağlıdır. Yetkisi olmayan kullanıcı
+        modülü kilitli görür ve doğrudan URL ile de erişemez. Demo ortamında farklı rol
+        hesaplarıyla bunu test edebilirsiniz.{% endblocktranslate %}</p>
       </details>
       <details>
         <summary>{% translate "AI katmanı veritabanına yazabilir mi?" %}</summary>
         <p>{% blocktranslate %}Hayır. Model yalnızca tanımlı fonksiyonları çağırabilir; yazma işlemleri
-        her zaman uygulamanın kendi servis katmanından geçer.{% endblocktranslate %}</p>
+        her zaman uygulamanın kendi servis katmanından geçer. Böylece AI hiçbir zaman
+        doğrudan veri değiştiremez.{% endblocktranslate %}</p>
+      </details>
+      <details>
+        <summary>{% translate "Teknoloji yığını nedir?" %}</summary>
+        <p>{% blocktranslate %}Backend Django 5.1, veritabanı PostgreSQL (pgvector ile), önbellek ve kuyruk
+        Redis + Celery, konteynerleştirme Docker, web sunucusu NGINX + Gunicorn, AI için OpenAI API.{% endblocktranslate %}</p>
       </details>
     </div>
   </div>
 </section>
 
+{# ─── CTA ───────────────────────────────────────────────────────────────────── #}
 <section class="p-section">
   <div class="p-inner p-center">
     <h2 class="p-h2">{% translate "Demoyu şimdi deneyin" %}</h2>
     <p class="p-sub p-sub--center">
-      {% translate "Örnek veriyle dolu bir ortam sizi bekliyor — rol bazlı hesaplarla farklı görünümleri karşılaştırın." %}
+      {% translate "Gerçek demo verisiyle dolu bir ortam sizi bekliyor — rol bazlı hesaplarla farklı kullanıcı deneyimlerini karşılaştırın." %}
     </p>
-    <a class="p-btn p-btn--primary" href="{% url 'login' %}">
-      <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i> {% translate "Giriş Yap" %}
-    </a>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <a class="p-btn p-btn--primary" href="{% url 'login' %}">
+        <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i> {% translate "Giriş Yap" %}
+      </a>
+      <a class="p-btn" href="#moduller">{% translate "Modülleri incele" %}</a>
+    </div>
+    <p class="p-hero-note" style="margin-top:16px;">
+      <i class="bi bi-info-circle" aria-hidden="true"></i>
+      {% translate "Demo hesabı: root / root · Demo verisi: Reflow Coffee kavurma işletmesi" %}
+    </p>
   </div>
 </section>
 
 <footer class="p-footer">
   <div class="p-footer-inner">
     <a class="p-brand" href="{% url 'landing' %}">
-      <span class="p-brand-mark" aria-hidden="true">{{ site_brand_mark }}</span>
-      <span>{{ site_brand }}</span>
+      <span class="p-brand-mark" aria-hidden="true">
+        <svg width="28" height="28" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M40 8 C26 2 8 8 5 24 C2 38 13 48 29 47" stroke="#6B4632" stroke-width="5.5" stroke-linecap="round"/>
+          <path d="M40 22 C40 32 34 40 26 40 C18 40 13 34 13 26" stroke="#6B4632" stroke-width="4" stroke-linecap="round" opacity=".45"/>
+          <rect x="19" y="20" width="5" height="14" rx="2.5" fill="#6B4632"/>
+          <rect x="27" y="14" width="5" height="20" rx="2.5" fill="#3A2A20"/>
+          <rect x="35" y="24" width="5" height="10" rx="2.5" fill="#C87941"/>
+          <circle cx="34" cy="9" r="4" fill="#3A2A20"/>
+        </svg>
+      </span>
+      <span class="p-brand-wordmark">Flowify</span>
     </a>
     <p class="p-footer-copy">
-      {% blocktranslate with version=site_version %}Sürüm {{ version }} · Kahve kavurma & dağıtım ERP + AI karar desteği{% endblocktranslate %}
+      {% blocktranslate with version=site_version %}Sürüm {{ version }} · Üretim & dağıtım ERP + AI karar desteği{% endblocktranslate %}
     </p>
   </div>
 </footer>

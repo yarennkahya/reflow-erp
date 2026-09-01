@@ -1,9 +1,4 @@
 <nav class="o-sidebar" aria-label="{% translate 'Uygulama gezintisi' %}">
-  <a class="o-sidebar-brand" href="{% url 'dashboard-home' %}" title="{{ site_brand }}">
-    <span class="o-sidebar-brand-mark" aria-hidden="true">{{ site_brand_mark }}</span>
-    <span class="o-sidebar-brand-name">{{ site_brand_short }}</span>
-  </a>
-
   <div class="o-sidebar-nav">
     {% for app in nav_apps %}
       {% if app.allowed %}

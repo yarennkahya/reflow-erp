@@ -4,41 +4,49 @@
 {% block body %}
 <div class="p-login">
   <section class="p-login-brand">
-    <a class="p-brand" href="{% url 'landing' %}">
-      <span class="p-brand-mark" aria-hidden="true">{{ site_brand_mark }}</span>
-      <span>{{ site_brand }}</span>
+    <a class="p-brand p-brand--hero" href="{% url 'landing' %}">
+      <span class="p-brand-mark p-brand-mark--lg" aria-hidden="true">
+        <svg width="44" height="44" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M10 44 A22 22 0 1 1 42 44" stroke="rgba(255,255,255,.85)" stroke-width="5.5" stroke-linecap="round"/>
+          <rect x="13" y="32" width="5" height="8" rx="2.5" fill="rgba(255,255,255,.65)"/>
+          <rect x="21" y="26" width="5" height="14" rx="2.5" fill="rgba(255,255,255,.85)"/>
+          <rect x="29" y="20" width="5" height="20" rx="2.5" fill="#C87941"/>
+          <circle cx="26" cy="7" r="4" fill="#C87941"/>
+        </svg>
+      </span>
+      <span class="p-brand-wordmark p-brand-wordmark--hero">Flowify</span>
     </a>
 
-    <h1>{% translate "Yeşil kahveden fincana, tek sistemde." %}</h1>
-    <p>{% translate "Tedarik, kavurma, satış ve finansı aynı kayıt defterinde birleştirin; kararları AI ile destekleyin." %}</p>
+    <h1>{% translate "İşletmenizi tek platformda yönetin." %}</h1>
+    <p>{% translate "Tedarikten üretime, satıştan finansa — her hareket kayıt altında, her karar veriye dayanır." %}</p>
 
     <div class="p-pillars">
       <div class="p-pillar">
-        <i class="bi bi-boxes" aria-hidden="true"></i>
+        <i class="bi bi-journal-check" aria-hidden="true"></i>
         <div>
-          <b>{% translate "Lot bazlı tazelik takibi" %}</b>
-          <span>{% translate "Kavurma sonrası tazelik penceresini kaçırmayın." %}</span>
+          <b>{% translate "Ledger tabanlı stok" %}</b>
+          <span>{% translate "Her hareket kayıt altında; geçmiş asla bozulamaz." %}</span>
         </div>
       </div>
       <div class="p-pillar">
-        <i class="bi bi-thermometer-high" aria-hidden="true"></i>
+        <i class="bi bi-gear" aria-hidden="true"></i>
         <div>
-          <b>{% translate "Reçete tabanlı üretim" %}</b>
-          <span>{% translate "Harman oranları stok hareketlerine otomatik yansır." %}</span>
+          <b>{% translate "BOM tabanlı üretim" %}</b>
+          <span>{% translate "Girdi lotları düşülür, çıktı lotu otomatik oluşturulur." %}</span>
         </div>
       </div>
       <div class="p-pillar">
         <i class="bi bi-graph-up-arrow" aria-hidden="true"></i>
         <div>
           <b>{% translate "Gerçek kârlılık" %}</b>
-          <span>{% translate "Lot maliyetinden sipariş kârına kadar izlenebilir." %}</span>
+          <span>{% translate "Lot maliyetinden sipariş kârına izlenebilir analiz." %}</span>
         </div>
       </div>
       <div class="p-pillar">
         <i class="bi bi-robot" aria-hidden="true"></i>
         <div>
           <b>{% translate "AI karar desteği" %}</b>
-          <span>{% translate "Verilerinize doğal dille soru sorun." %}</span>
+          <span>{% translate "Verilerinize doğal dille soru sorun, anında yanıt alın." %}</span>
         </div>
       </div>
     </div>
