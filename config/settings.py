@@ -30,10 +30,10 @@ ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',')
 
 CSRF_TRUSTED_ORIGINS = [
     'http://185.22.187.18',
-    'http://185.22.187.18:8001',
+    'http://185.22.187.18:8060',
     'http://185.22.187.18:8000',
     'http://localhost',
-    'http://localhost:8001',
+    'http://localhost:8060',
 ]
 
 
