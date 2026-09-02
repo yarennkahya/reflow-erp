@@ -21,7 +21,18 @@
 
   <div class="o-chat-main">
     <header class="o-chat-header">
-      <span class="o-chat-avatar"><i class="bi bi-robot" aria-hidden="true"></i></span>
+      <span class="o-chat-avatar o-chat-avatar--ai" aria-hidden="true">
+        <svg width="34" height="34" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="18" cy="18" r="18" fill="#3A2A20"/>
+          <line x1="18" y1="10" x2="11" y2="25" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
+          <line x1="18" y1="10" x2="25" y2="25" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
+          <line x1="11" y1="25" x2="25" y2="25" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
+          <circle cx="18" cy="10" r="2.8" fill="rgba(255,255,255,.85)"/>
+          <circle cx="11" cy="25" r="2.8" fill="rgba(255,255,255,.75)"/>
+          <circle cx="25" cy="25" r="3.2" fill="#C87941"/>
+          <circle cx="25" cy="25" r="5.5" stroke="#C87941" stroke-width="1" fill="none" opacity=".45"/>
+        </svg>
+      </span>
       <div>
         <p class="o-strong">{% translate "AI Asistan" %}</p>
         <p class="o-xs o-muted">
@@ -33,7 +44,18 @@
 
     <div class="o-chat-feed" id="o-chat-feed" aria-live="polite">
       <div class="o-chat-welcome" id="o-chat-welcome">
-        <span class="o-chat-welcome-icon"><i class="bi bi-chat-square-dots" aria-hidden="true"></i></span>
+        <span class="o-chat-welcome-icon" aria-hidden="true">
+          <svg width="52" height="52" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="18" cy="18" r="18" fill="#3A2A20"/>
+            <line x1="18" y1="10" x2="11" y2="25" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
+            <line x1="18" y1="10" x2="25" y2="25" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
+            <line x1="11" y1="25" x2="25" y2="25" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
+            <circle cx="18" cy="10" r="2.8" fill="rgba(255,255,255,.85)"/>
+            <circle cx="11" cy="25" r="2.8" fill="rgba(255,255,255,.75)"/>
+            <circle cx="25" cy="25" r="3.2" fill="#C87941"/>
+            <circle cx="25" cy="25" r="5.5" stroke="#C87941" stroke-width="1" fill="none" opacity=".45"/>
+          </svg>
+        </span>
         <h1 class="o-form-title">{% translate "Size nasıl yardımcı olabilirim?" %}</h1>
         <p class="o-muted">{% translate "Stok, satış, üretim ve finans verilerinize doğal dille soru sorun." %}</p>
         <div class="o-chat-chips">

@@ -118,7 +118,7 @@
   flex-shrink: 0;
   width: 28px;
   text-align: center;
-  font-size: 18px;
+  font-size: 20px;
 }
 
 .o-sidebar-label {
@@ -1514,11 +1514,13 @@ a.o-stat:hover { border-color: var(--o-primary); background: var(--o-primary-sub
 .o-chat-header p { margin: 0; }
 .o-chat-avatar {
   display: grid; place-items: center;
-  width: 30px; height: 30px; flex: 0 0 auto;
-  background: var(--o-primary-subtle);
+  width: 34px; height: 34px; flex: 0 0 auto;
   border-radius: var(--o-radius-pill);
+  overflow: hidden;
+  background: var(--o-primary-subtle);
   color: var(--o-primary-emphasis);
 }
+.o-chat-avatar svg { display: block; }
 .o-chat-msg--user .o-chat-avatar { background: var(--o-accent-subtle); color: var(--o-accent-emphasis); }
 .o-chat-dot { color: var(--o-success); font-size: 7px; vertical-align: middle; }
 .o-chat-welcome { display: flex; flex-direction: column; align-items: center; gap: var(--o-sp-3); padding: var(--o-sp-6) var(--o-sp-4); text-align: center; }

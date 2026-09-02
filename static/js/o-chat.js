@@ -35,7 +35,8 @@
     var avatar = document.createElement('span');
     avatar.className = 'o-chat-avatar';
     avatar.innerHTML = role === 'user'
-      ? '<i class="bi bi-person-fill"></i>' : '<i class="bi bi-robot"></i>';
+      ? '<i class="bi bi-person-fill" aria-hidden="true"></i>'
+      : '<svg width="34" height="34" viewBox="0 0 36 36" fill="none" aria-hidden="true"><circle cx="18" cy="18" r="18" fill="#3A2A20"/><line x1="18" y1="10" x2="11" y2="25" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/><line x1="18" y1="10" x2="25" y2="25" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/><line x1="11" y1="25" x2="25" y2="25" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/><circle cx="18" cy="10" r="2.8" fill="rgba(255,255,255,.85)"/><circle cx="11" cy="25" r="2.8" fill="rgba(255,255,255,.75)"/><circle cx="25" cy="25" r="3.2" fill="#C87941"/><circle cx="25" cy="25" r="5.5" stroke="#C87941" stroke-width="1" fill="none" opacity=".45"/></svg>';
 
     var bubble = document.createElement('div');
     bubble.className = 'o-chat-bubble';

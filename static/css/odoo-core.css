@@ -84,15 +84,15 @@
   --o-text-invert:   #FFFFFF;
 
   /* Ölçüler — GERÇEK Odoo yoğunluğu */
-  --o-font-size:    13px;
-  --o-font-size-sm: 12px;
-  --o-font-size-xs: 11px;
-  --o-font-size-lg: 15px;
+  --o-font-size:    14px;
+  --o-font-size-sm: 13px;
+  --o-font-size-xs: 12px;
+  --o-font-size-lg: 16px;
   --o-line-height:  1.45;
 
   --o-row-h:     30px;
   --o-control-h: 28px;
-  --o-appbar-h:  38px;
+  --o-appbar-h:  46px;
   --o-cp-h:      40px;
 
   --o-radius:    3px;
@@ -470,9 +470,9 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
   line-height: 1.3;
 }
-h1 { font-size: 20px; }
-h2 { font-size: 17px; }
-h3 { font-size: 15px; }
+h1 { font-size: 22px; }
+h2 { font-size: 19px; }
+h3 { font-size: 16px; }
 h4, h5, h6 { font-size: var(--o-font-size); }
 
 p { margin: 0 0 var(--o-sp-2); }
