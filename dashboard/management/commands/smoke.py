@@ -30,7 +30,7 @@ POST_ONLY = {
     'opportunity-advance', 'opportunity-lose', 'crm-sale-activity',
     'leave-approve', 'leave-reject', 'application-advance', 'application-reject',
     'opportunity-set-stage', 'order-set-status', 'purchase-order-set-status',
-    'application-set-stage', 'employee-set-status',
+    'application-set-stage', 'employee-set-status', 'candidate-doc-upload',
     'meeting-cancel', 'invoice-create', 'invoice-send', 'ai-chat',
 }
 

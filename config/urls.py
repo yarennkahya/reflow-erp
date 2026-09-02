@@ -1,6 +1,8 @@
 """URL configuration for config project."""
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, re_path
+from django.views.static import serve
+from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -18,4 +20,5 @@ urlpatterns = [
     path('notifications/', include('notifications.urls')),
     path('meetings/', include('meetings.urls')),
     path('', include('dashboard.urls')),
+    re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
 ]

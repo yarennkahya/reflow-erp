@@ -147,6 +147,24 @@ class Candidate(models.Model):
         return self.name
 
 
+class CandidateDocument(models.Model):
+    candidate = models.ForeignKey(
+        Candidate, on_delete=models.CASCADE, related_name='documents'
+    )
+    file = models.FileField(upload_to='candidates/cvs/')
+    label = models.CharField(max_length=255, blank=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-uploaded_at']
+
+    def __str__(self):
+        return f'{self.candidate.name} – {self.label or self.file.name}'
+
+    def filename(self):
+        return self.file.name.split('/')[-1]
+
+
 class Application(models.Model):
     class Stage(models.TextChoices):
         APPLIED = 'applied', _('Başvurdu')

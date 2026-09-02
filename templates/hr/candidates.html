@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% block title %}{% translate "Aday Havuzu" %}{% endblock %}
+
+{% block cp_buttons %}
+  <a href="{% url 'candidate-create' %}" class="o-btn o-btn--primary">
+    <i class="bi bi-person-plus" aria-hidden="true"></i> {% translate "Yeni Aday" %}
+  </a>
+  <a href="{% url 'application-create' %}" class="o-btn">
+    <i class="bi bi-file-earmark-text" aria-hidden="true"></i> {% translate "Başvuru" %}
+  </a>
+{% endblock %}
+
+{% block content %}
+<div class="o-button-box">
+  {% translate "Aktif aday" as l1 %}{% ui_stat value=active_count label=l1 icon="bi-person-check" %}
+  {% translate "İşe alınan" as l2 %}{% ui_stat value=hired_count label=l2 icon="bi-person-fill-check" %}
+  {% translate "Reddedilen" as l3 %}{% ui_stat value=rejected_count label=l3 icon="bi-person-x" %}
+</div>
+
+<div class="o-filter-chips" style="margin-bottom: var(--o-sp-4);">
+  <a href="?stage=active" class="o-filter-chip{% if stage_filter == 'active' %} is-active{% endif %}">
+    <i class="bi bi-hourglass-split" aria-hidden="true"></i> {% translate "Adaylar" %}
+  </a>
+  <a href="?stage=hired" class="o-filter-chip{% if stage_filter == 'hired' %} is-active{% endif %}">
+    <i class="bi bi-person-fill-check" aria-hidden="true"></i> {% translate "İşe Alınanlar" %}
+  </a>
+  <a href="?stage=rejected" class="o-filter-chip{% if stage_filter == 'rejected' %} is-active{% endif %}">
+    <i class="bi bi-person-x" aria-hidden="true"></i> {% translate "Reddedilenler" %}
+  </a>
+</div>
+
+{% if applications %}
+<div class="o-list-view">
+  <table class="o-table">
+    <thead>
+      <tr>
+        <th>{% translate "Aday" %}</th>
+        <th>{% translate "Pozisyon" %}</th>
+        <th>{% translate "Aşama" %}</th>
+        <th>{% translate "CV" %}</th>
+        <th>{% translate "Başvuru Tarihi" %}</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for app in applications %}
+      <tr>
+        <td>
+          <div class="o-row o-row--sm">
+            {% ui_avatar app.candidate.name %}
+            <div>
+              <a href="{% url 'hr-candidate-detail' app.candidate.pk %}" class="o-link o-strong">
+                {{ app.candidate.name }}
+              </a>
+              {% if app.candidate.email %}
+                <p class="o-xs o-muted">{{ app.candidate.email }}</p>
+              {% endif %}
+            </div>
+          </div>
+        </td>
+        <td>{{ app.job_opening.title }}</td>
+        <td>{% ui_badge app "stage" %}</td>
+        <td>
+          {% with docs=app.candidate.documents.all %}
+            {% if docs %}
+              <div class="o-row o-row--sm">
+                {% for doc in docs|slice:":3" %}
+                  <span class="o-row o-row--sm" style="gap: 2px;">
+                    <a href="{{ doc.file.url }}" target="_blank" rel="noopener"
+                       class="o-btn o-btn--sm o-btn--ghost"
+                       title="{% translate 'Aç' %}: {{ doc.label|default:doc.filename }}">
+                      <i class="bi bi-file-earmark-text" aria-hidden="true"></i>
+                      {{ doc.label|default:"CV" }}
+                    </a>
+                    <a href="{{ doc.file.url }}" download="{{ doc.filename }}"
+                       class="o-btn o-btn--sm o-btn--ghost"
+                       title="{% translate 'İndir' %}">
+                      <i class="bi bi-download" aria-hidden="true"></i>
+                    </a>
+                  </span>
+                {% endfor %}
+              </div>
+            {% else %}
+              <span class="o-muted o-xs">—</span>
+            {% endif %}
+          {% endwith %}
+        </td>
+        <td class="o-muted">{{ app.applied_at|date:"d M Y" }}</td>
+        <td>
+          <a href="{% url 'hr-candidate-detail' app.candidate.pk %}" class="o-btn o-btn--sm o-btn--ghost">
+            <i class="bi bi-eye" aria-hidden="true"></i>
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+  {% if stage_filter == 'hired' %}
+    {% translate "Henüz işe alınan aday yok." as empty_msg %}
+  {% elif stage_filter == 'rejected' %}
+    {% translate "Henüz reddedilen aday yok." as empty_msg %}
+  {% else %}
+    {% translate "Aktif aday yok." as empty_msg %}
+  {% endif %}
+  {% ui_empty title=empty_msg %}
+{% endif %}
+{% endblock %}

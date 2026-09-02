@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Application, Candidate, Department, Employee, JobOpening, LeaveRequest, Position
+from .models import Application, Candidate, CandidateDocument, Department, Employee, JobOpening, LeaveRequest, Position
 
 
 class EmployeeForm(forms.ModelForm):
@@ -70,7 +70,25 @@ class LeaveRequestForm(forms.ModelForm):
         return cleaned_data
 
 
+_CV_ALLOWED = {'.pdf', '.doc', '.docx'}
+_CV_ACCEPT  = '.pdf,.doc,.docx'
+
+
+def _validate_cv(file):
+    ext = '.' + file.name.rsplit('.', 1)[-1].lower() if '.' in file.name else ''
+    if ext not in _CV_ALLOWED:
+        raise forms.ValidationError('Yalnızca PDF, DOC veya DOCX dosyaları kabul edilir.')
+
+
 class CandidateForm(forms.ModelForm):
+    cv_file = forms.FileField(
+        required=False,
+        label='CV Dosyası',
+        help_text='PDF, DOC veya DOCX yükleyin.',
+        validators=[_validate_cv],
+        widget=forms.ClearableFileInput(attrs={'accept': _CV_ACCEPT}),
+    )
+
     class Meta:
         model = Candidate
         fields = ('name', 'email', 'phone', 'resume_note')
@@ -78,16 +96,33 @@ class CandidateForm(forms.ModelForm):
             'name': 'Ad Soyad',
             'email': 'E-posta',
             'phone': 'Telefon',
-            'resume_note': 'Özgeçmiş Notu',
+            'resume_note': 'Notlar',
         }
         widgets = {
             'resume_note': forms.Textarea(
-                attrs={'rows': 4, 'placeholder': 'Aday hakkında kısa bir not ekleyin'}
+                attrs={'rows': 3, 'placeholder': 'Aday hakkında kısa bir not ekleyin'}
             ),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+
+class CandidateDocumentForm(forms.ModelForm):
+    class Meta:
+        model = CandidateDocument
+        fields = ('file', 'label')
+        labels = {'file': 'Dosya', 'label': 'Etiket (opsiyonel)'}
+        widgets = {
+            'label': forms.TextInput(attrs={'placeholder': 'Örn. CV 2026, Portfolyo…'}),
+            'file': forms.ClearableFileInput(attrs={'accept': _CV_ACCEPT}),
+        }
+
+    def clean_file(self):
+        file = self.cleaned_data.get('file')
+        if file:
+            _validate_cv(file)
+        return file
 
 
 class ApplicationForm(forms.ModelForm):

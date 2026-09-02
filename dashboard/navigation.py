@@ -151,6 +151,7 @@ APPS = (
                       'leave-reject')),
             MenuItem('hr.recruitment', _('İşe Alım'), 'hr-recruitment',
                      ('hr-recruitment', 'job-opening-create', 'candidate-create',
+                      'hr-candidates', 'hr-candidate-detail', 'candidate-doc-upload',
                       'application-create', 'application-advance',
                       'application-reject', 'application-set-stage')),
         ),

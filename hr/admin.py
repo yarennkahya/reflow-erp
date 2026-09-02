@@ -3,6 +3,7 @@ from django.contrib import admin
 from .models import (
     Application,
     Candidate,
+    CandidateDocument,
     Department,
     Employee,
     JobOpening,
@@ -55,6 +56,13 @@ class JobOpeningAdmin(admin.ModelAdmin):
 class CandidateAdmin(admin.ModelAdmin):
     list_display = ('name', 'email', 'phone')
     search_fields = ('name', 'email')
+
+
+@admin.register(CandidateDocument)
+class CandidateDocumentAdmin(admin.ModelAdmin):
+    list_display = ('candidate', 'label', 'uploaded_at')
+    list_filter = ('candidate',)
+    ordering = ('-uploaded_at',)
 
 
 @admin.register(Application)

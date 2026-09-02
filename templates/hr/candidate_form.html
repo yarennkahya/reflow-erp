@@ -6,22 +6,26 @@
   <button type="submit" form="o-form" class="o-btn o-btn--primary">
     <i class="bi bi-check-lg" aria-hidden="true"></i> {% translate "Kaydet" %}
   </button>
-  <a class="o-btn" href="{% url 'hr-recruitment' %}">{% translate "Vazgeç" %}</a>
+  <a class="o-btn" href="{% url 'hr-candidates' %}">{% translate "Vazgeç" %}</a>
 {% endblock %}
 
 {% block content_class %} o-content--sheet{% endblock %}
 
 {% block content %}
 {% ui_sheet %}
-  <form method="post" id="o-form">
+  <form method="post" id="o-form" enctype="multipart/form-data">
     {% csrf_token %}
     {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
     <h1 class="o-form-title">{% translate "Yeni aday" %}</h1>
-    {% translate "Aday bilgileri" as g %}
-    {% ui_group g %}
+    {% translate "Kişisel bilgiler" as g1 %}
+    {% ui_group g1 %}
       {% ui_field form.name cols=12 %}
       {% ui_field form.email cols=6 %}
       {% ui_field form.phone cols=6 %}
+    {% endui_group %}
+    {% translate "CV ve Notlar" as g2 %}
+    {% ui_group g2 %}
+      {% ui_field form.cv_file cols=12 %}
       {% ui_field form.resume_note cols=12 %}
     {% endui_group %}
   </form>

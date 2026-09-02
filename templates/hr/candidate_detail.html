@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% block title %}{{ candidate.name }}{% endblock %}
+{% block cp_breadcrumb %}{% ui_breadcrumb record=candidate.name %}{% endblock %}
+
+{% block cp_buttons %}
+  <a href="{% url 'hr-candidates' %}" class="o-btn">
+    <i class="bi bi-arrow-left" aria-hidden="true"></i> {% translate "Geri" %}
+  </a>
+{% endblock %}
+
+{% block content %}
+<div class="o-row o-row--gap o-row--top" style="align-items: flex-start;">
+
+  {% comment %}Left column: candidate info + CV upload{% endcomment %}
+  <div style="flex: 0 0 320px; display: flex; flex-direction: column; gap: var(--o-sp-4);">
+
+    {% ui_sheet %}
+      <div style="display: flex; gap: var(--o-sp-3); align-items: center; margin-bottom: var(--o-sp-4);">
+        {% ui_avatar candidate.name size="lg" %}
+        <div>
+          <p class="o-strong">{{ candidate.name }}</p>
+          {% if candidate.email %}<p class="o-sm o-muted">{{ candidate.email }}</p>{% endif %}
+          {% if candidate.phone %}<p class="o-sm o-muted">{{ candidate.phone }}</p>{% endif %}
+        </div>
+      </div>
+      {% if candidate.resume_note %}
+        <p class="o-sm">{{ candidate.resume_note }}</p>
+      {% endif %}
+    {% endui_sheet %}
+
+    {% ui_sheet %}
+      <h2 class="o-section-title" style="margin-bottom: var(--o-sp-3);">
+        <i class="bi bi-file-earmark-person" aria-hidden="true"></i>
+        {% translate "CV Havuzu" %}
+      </h2>
+
+      {% for doc in documents %}
+        <div class="o-row o-row--sm" style="padding: var(--o-sp-2) 0; border-bottom: 1px solid var(--o-border-color);">
+          <i class="bi bi-file-earmark-text o-muted" aria-hidden="true" style="font-size: 18px;"></i>
+          <div class="o-grow">
+            <p class="o-sm o-strong">{{ doc.label|default:"CV" }}</p>
+            <p class="o-xs o-muted">{{ doc.uploaded_at|date:"d M Y" }}</p>
+          </div>
+          <a href="{{ doc.file.url }}" target="_blank" rel="noopener"
+             class="o-btn o-btn--sm o-btn--ghost" title="{% translate 'Aç' %}">
+            <i class="bi bi-box-arrow-up-right" aria-hidden="true"></i>
+          </a>
+          <a href="{{ doc.file.url }}" download="{{ doc.filename }}"
+             class="o-btn o-btn--sm o-btn--ghost" title="{% translate 'İndir' %}">
+            <i class="bi bi-download" aria-hidden="true"></i>
+          </a>
+        </div>
+      {% empty %}
+        <p class="o-muted o-sm">{% translate "Henüz CV yüklenmedi." %}</p>
+      {% endfor %}
+
+      <form method="post" enctype="multipart/form-data"
+            action="{% url 'candidate-doc-upload' candidate.pk %}"
+            style="margin-top: var(--o-sp-4);">
+        {% csrf_token %}
+        <p class="o-xs o-muted" style="margin-bottom: var(--o-sp-2);">{% translate "Yeni CV ekle" %}</p>
+        {% ui_field doc_form.label cols=12 %}
+        {% ui_field doc_form.file cols=12 %}
+        <button type="submit" class="o-btn o-btn--primary o-btn--sm" style="margin-top: var(--o-sp-2);">
+          <i class="bi bi-upload" aria-hidden="true"></i> {% translate "Yükle" %}
+        </button>
+      </form>
+    {% endui_sheet %}
+
+  </div>
+
+  {% comment %}Right column: application history{% endcomment %}
+  <div class="o-grow">
+    {% ui_sheet %}
+      <h2 class="o-section-title" style="margin-bottom: var(--o-sp-3);">
+        <i class="bi bi-journal-text" aria-hidden="true"></i>
+        {% translate "Başvuru Geçmişi" %}
+      </h2>
+
+      {% if applications %}
+        <table class="o-table">
+          <thead>
+            <tr>
+              <th>{% translate "Pozisyon" %}</th>
+              <th>{% translate "Departman" %}</th>
+              <th>{% translate "Aşama" %}</th>
+              <th>{% translate "Başvuru Tarihi" %}</th>
+              <th>{% translate "Güncelleme" %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for app in applications %}
+            <tr>
+              <td class="o-strong">{{ app.job_opening.title }}</td>
+              <td class="o-muted">{{ app.job_opening.department }}</td>
+              <td>{% ui_badge app "stage" %}</td>
+              <td class="o-muted">{{ app.applied_at|date:"d M Y" }}</td>
+              <td class="o-muted">{{ app.updated_at|date:"d M Y" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p class="o-muted o-sm">{% translate "Henüz başvuru yok." %}</p>
+      {% endif %}
+    {% endui_sheet %}
+  </div>
+
+</div>
+{% endblock %}

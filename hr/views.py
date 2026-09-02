@@ -11,8 +11,8 @@ from dashboard.calendars import month_grid_spans, normalize_period, period_nav
 from dashboard.grouping import group_by_choice
 from dashboard.views_helpers import is_ajax, paginate, pick_view
 
-from .forms import ApplicationForm, CandidateForm, EmployeeForm, JobOpeningForm, LeaveRequestForm
-from .models import Application, Candidate, Department, Employee, JobOpening, LeaveRequest, Position
+from .forms import ApplicationForm, CandidateDocumentForm, CandidateForm, EmployeeForm, JobOpeningForm, LeaveRequestForm
+from .models import Application, Candidate, CandidateDocument, Department, Employee, JobOpening, LeaveRequest, Position
 from .services import (
     advance_application_stage,
     set_application_stage,
@@ -295,12 +295,74 @@ def job_opening_create_view(request):
 
 
 @login_required
+def candidates_pool_view(request):
+    stage_filter = request.GET.get('stage', 'active')
+
+    terminal_hired = Application.Stage.HIRED
+    terminal_rejected = Application.Stage.REJECTED
+    active_stages = [
+        Application.Stage.APPLIED, Application.Stage.SCREENING,
+        Application.Stage.INTERVIEW, Application.Stage.OFFER,
+    ]
+
+    if stage_filter == 'hired':
+        apps = Application.objects.filter(stage=terminal_hired)
+    elif stage_filter == 'rejected':
+        apps = Application.objects.filter(stage=terminal_rejected)
+    else:
+        stage_filter = 'active'
+        apps = Application.objects.filter(stage__in=active_stages)
+
+    apps = apps.select_related('candidate', 'job_opening').order_by('-updated_at')
+
+    return render(request, 'hr/candidates.html', {
+        'applications': apps,
+        'stage_filter': stage_filter,
+        'active_count': Application.objects.filter(stage__in=active_stages).count(),
+        'hired_count': Application.objects.filter(stage=terminal_hired).count(),
+        'rejected_count': Application.objects.filter(stage=terminal_rejected).count(),
+    })
+
+
+@login_required
+def candidate_detail_view(request, pk):
+    candidate = get_object_or_404(Candidate, pk=pk)
+    documents = candidate.documents.all()
+    applications = candidate.applications.select_related('job_opening').order_by('-applied_at')
+    doc_form = CandidateDocumentForm()
+    return render(request, 'hr/candidate_detail.html', {
+        'candidate': candidate,
+        'documents': documents,
+        'applications': applications,
+        'doc_form': doc_form,
+    })
+
+
+@login_required
+@require_POST
+def candidate_document_upload_view(request, pk):
+    candidate = get_object_or_404(Candidate, pk=pk)
+    form = CandidateDocumentForm(request.POST, request.FILES)
+    if form.is_valid():
+        doc = form.save(commit=False)
+        doc.candidate = candidate
+        doc.save()
+        messages.success(request, 'Dosya yüklendi.')
+    else:
+        messages.error(request, 'Dosya yüklenemedi.')
+    return redirect('hr-candidate-detail', pk=pk)
+
+
+@login_required
 def candidate_create_view(request):
-    form = CandidateForm(request.POST or None)
+    form = CandidateForm(request.POST or None, request.FILES or None)
     if request.method == 'POST' and form.is_valid():
         candidate = form.save()
+        cv_file = form.cleaned_data.get('cv_file')
+        if cv_file:
+            CandidateDocument.objects.create(candidate=candidate, file=cv_file, label='CV')
         messages.success(request, f'{candidate.name} adayı oluşturuldu.')
-        return redirect('hr-recruitment')
+        return redirect('hr-candidate-detail', pk=candidate.pk)
     return render(request, 'hr/candidate_form.html', {'form': form})
 
 
