@@ -5,14 +5,29 @@ ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
+# gettext: {% translate %} kataloglarını derlemek için (compilemessages)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libpq-dev \
+    gettext \
+    libpango-1.0-0 \
+    libpangoft2-1.0-0 \
+    libharfbuzz0b \
+    libgdk-pixbuf-xlib-2.0-0 \
+    libcairo2 \
+    libffi-dev \
+    fonts-liberation \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
+
+# NGINX /static/'i staticfiles/ volume'undan servis ediyor; bu adım olmadan
+# eklenen her CSS/JS dosyası 404 döner ve sayfa sessizce stilsiz açılır.
+# Veritabanı gerektirmez: DATABASES tembel, SECRET_KEY None olabilir.
+RUN python manage.py collectstatic --noinput \
+    && python manage.py compilemessages
 
 EXPOSE 8000

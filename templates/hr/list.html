@@ -1,122 +1,68 @@
 {% extends 'base.html' %}
-{% block title %}İnsan Kaynakları — Reflow Coffee ERP{% endblock %}
-{% block nav_hr %}active{% endblock %}
-{% block nav_hr_overview %}active{% endblock %}
-{% block page_title %}İnsan Kaynakları{% endblock %}
+{% block title %}{% translate "Genel Bakış" %}{% endblock %}
 
-{% block extra_head %}
-<style>
-  .data-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:10px; overflow:hidden; }
-  .data-card .table { margin-bottom:0; font-size:13.5px; }
-  .data-card .table thead th { background:var(--g-n-50); color:var(--g-text-2); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.7px; border-bottom:1px solid var(--g-border); padding:10px 16px; white-space:nowrap; }
-  .data-card .table tbody td { padding:11px 16px; vertical-align:middle; color:var(--g-text); border-color:var(--g-border-sub); }
-  .data-card .table tbody tr:last-child td { border-bottom:none; }
-  .data-card .table tbody tr:hover { background:var(--g-n-50); }
-  .empty-state { padding:48px 24px; text-align:center; color:var(--g-text-3); }
-  .empty-state i { font-size:36px; display:block; margin-bottom:8px; }
-  .section-head { font-size:13px; font-weight:600; color:var(--g-text-2); padding:12px 16px; background:var(--g-n-50); border-bottom:1px solid var(--g-border); display:flex; align-items:center; gap:8px; }
-  .hr-subnav { display:flex; gap:4px; margin-bottom:20px; border-bottom:1px solid var(--g-border); padding-bottom:0; }
-  .hr-subnav a { padding:8px 14px; font-size:13px; font-weight:500; color:var(--g-text-2); text-decoration:none; border-bottom:2px solid transparent; margin-bottom:-1px; white-space:nowrap; }
-  .hr-subnav a:hover { color:var(--g-text); }
-  .hr-subnav a.active { color:#9333ea; border-bottom-color:#9333ea; font-weight:600; }
-</style>
+{% block cp_buttons %}
+  <a href="{% url 'hr-employees' %}" class="o-btn"><i class="bi bi-people" aria-hidden="true"></i> {% translate "Çalışanlar" %}</a>
+  <a href="{% url 'hr-leave' %}" class="o-btn"><i class="bi bi-calendar-check" aria-hidden="true"></i> {% translate "İzinler" %}</a>
+  <a href="{% url 'hr-recruitment' %}" class="o-btn"><i class="bi bi-person-plus" aria-hidden="true"></i> {% translate "İşe Alım" %}</a>
 {% endblock %}
 
 {% block content %}
-<div class="hr-subnav">
-  <a href="{% url 'hr-list' %}" class="active">Genel Bakış</a>
-  <a href="{% url 'hr-employees' %}">Çalışanlar</a>
-  <a href="{% url 'hr-leave' %}">İzin & Devamsızlık</a>
-  <a href="{% url 'hr-recruitment' %}">İşe Alım</a>
-</div>
-
-<div class="d-flex align-items-baseline gap-3 mb-4">
-  <h4 class="fw-bold mb-0 text-dark"><i class="bi bi-people me-2" style="color:#9333ea;"></i>İnsan Kaynakları</h4>
-</div>
-
-<!-- Personel tablosu -->
-<div class="data-card mb-4">
-  <div class="section-head">
-    <i class="bi bi-person-badge" style="color:#9333ea;"></i>
-    Personel — {{ employees|length }} kayıt
+  <div class="o-button-box o-po-kpis">
+    {% translate "Çalışan" as l1 %}{% ui_stat value=employee_count label=l1 icon="bi-people" %}
+    {% translate "Aktif" as l2 %}{% ui_stat value=active_count label=l2 icon="bi-person-check" variant="success" %}
+    {% translate "Bekleyen izin" as l3 %}{% ui_stat value=pending_leaves label=l3 icon="bi-hourglass-split" variant="warning" %}
+    {% translate "Açık pozisyon" as l4 %}{% ui_stat value=open_positions label=l4 icon="bi-person-plus" %}
   </div>
-  <table class="table table-borderless">
-    <thead>
-      <tr>
-        <th>İsim</th>
-        <th>Departman</th>
-        <th>Pozisyon</th>
-        <th>Yönetici</th>
-        <th>İşe Giriş</th>
-        <th>Durum</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for row in employees %}
-      <tr>
-        <td class="fw-medium">{{ row.emp.name }}</td>
-        <td>{{ row.emp.department.name }}</td>
-        <td>{{ row.emp.position.title }}</td>
-        <td>{{ row.emp.manager.name|default:"—" }}</td>
-        <td style="font-size:12.5px; color:var(--g-text-2);">{{ row.emp.hire_date }}</td>
-        <td>
-          <span class="badge {{ row.badge_cls }} fw-medium" style="font-size:11.5px; padding:4px 9px;">
-            {{ row.emp.get_employment_status_display }}
-          </span>
-        </td>
-      </tr>
-      {% empty %}
-      <tr>
-        <td colspan="6" class="empty-state">
-          <i class="bi bi-inbox"></i>
-          Henüz hiç personel kaydı yok.
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
 
-<!-- Bekleyen izin talepleri -->
-<div class="data-card">
-  <div class="section-head">
-    <i class="bi bi-calendar-check" style="color:#f97316;"></i>
-    Bekleyen İzin Talepleri — {{ leaves|length }} kayıt
+  <div class="o-split">
+    <section class="o-list">
+      <header class="o-list-head"><h2 class="o-list-title">{% translate "Çalışanlar" %}</h2></header>
+      <div class="o-list-scroll">
+        <table class="o-table">
+          <thead><tr>
+            <th>{% translate "Çalışan" %}</th><th>{% translate "Departman" %}</th><th>{% translate "Durum" %}</th>
+          </tr></thead>
+          <tbody>
+            {% for emp in employees %}
+              <tr>
+                <td>
+                  <div class="o-row">
+                    {% ui_avatar emp.name size="sm" %}
+                    <a class="o-table-link" href="{% url 'hr-employee-detail' emp.pk %}">{{ emp.name }}</a>
+                  </div>
+                </td>
+                <td class="o-muted">{{ emp.department.name|default:"—" }}</td>
+                <td>{% ui_badge emp "employment_status" %}</td>
+              </tr>
+            {% empty %}
+              {% translate "Çalışan kaydı yok" as e %}{% ui_empty icon="bi-people" title=e colspan=3 %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="o-list">
+      <header class="o-list-head"><h2 class="o-list-title">{% translate "Bekleyen İzinler" %}</h2></header>
+      <div class="o-list-scroll">
+        <table class="o-table">
+          <thead><tr>
+            <th>{% translate "Çalışan" %}</th><th>{% translate "Tarih" %}</th><th>{% translate "Durum" %}</th>
+          </tr></thead>
+          <tbody>
+            {% for leave in leaves %}
+              <tr>
+                <td class="o-strong">{{ leave.employee.name }}</td>
+                <td class="o-nowrap o-sm">{{ leave.start_date|date:"d M" }} – {{ leave.end_date|date:"d M Y" }}</td>
+                <td>{% ui_badge leave "status" %}</td>
+              </tr>
+            {% empty %}
+              {% translate "Bekleyen izin talebi yok" as e2 %}{% ui_empty icon="bi-calendar-check" title=e2 colspan=3 %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
   </div>
-  <table class="table table-borderless">
-    <thead>
-      <tr>
-        <th>Personel</th>
-        <th>İzin Türü</th>
-        <th>Başlangıç</th>
-        <th>Bitiş</th>
-        <th>Talep Tarihi</th>
-        <th>Durum</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for row in leaves %}
-      <tr>
-        <td class="fw-medium">{{ row.leave.employee.name }}</td>
-        <td>{{ row.leave.leave_type.name }}</td>
-        <td>{{ row.leave.start_date }}</td>
-        <td>{{ row.leave.end_date }}</td>
-        <td style="font-size:12.5px; color:var(--g-text-2);">{{ row.leave.requested_at|date:"d M Y" }}</td>
-        <td>
-          <span class="badge {{ row.badge_cls }} fw-medium" style="font-size:11.5px; padding:4px 9px;">
-            {{ row.leave.get_status_display }}
-          </span>
-        </td>
-      </tr>
-      {% empty %}
-      <tr>
-        <td colspan="6" class="empty-state">
-          <i class="bi bi-check-circle"></i>
-          Bekleyen izin talebi yok.
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
 {% endblock %}

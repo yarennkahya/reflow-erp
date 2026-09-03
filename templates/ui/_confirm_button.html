@@ -1,0 +1,8 @@
+<form method="post" action="{{ url }}" class="o-confirm-form"
+      data-o-confirm="{{ message }}">
+  <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+  {% if name %}<input type="hidden" name="{{ name }}" value="{{ value }}">{% endif %}
+  <button type="submit" class="o-btn o-btn--{{ variant }} o-btn--sm">
+    {% if icon %}<i class="bi {{ icon }}" aria-hidden="true"></i>{% endif %}{{ label }}
+  </button>
+</form>

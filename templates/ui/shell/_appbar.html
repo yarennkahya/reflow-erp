@@ -1,0 +1,83 @@
+<header class="o-appbar" role="banner">
+  <a class="o-appbar-brand" href="{% url 'dashboard-home' %}" title="{{ site_brand }}">
+    <span class="o-appbar-logo-mark" aria-hidden="true">
+      <svg width="26" height="26" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M10 44 A22 22 0 1 1 42 44" stroke="rgba(255,255,255,.85)" stroke-width="5.5" stroke-linecap="round"/>
+        <rect x="13" y="32" width="5" height="8" rx="2.5" fill="rgba(255,255,255,.65)"/>
+        <rect x="21" y="26" width="5" height="14" rx="2.5" fill="rgba(255,255,255,.85)"/>
+        <rect x="29" y="20" width="5" height="20" rx="2.5" fill="#C87941"/>
+        <circle cx="26" cy="7" r="4" fill="#C87941"/>
+      </svg>
+    </span>
+    <span class="o-appbar-wordmark">Flowify</span>
+  </a>
+
+  {% if nav_current_app %}
+    <span class="o-appbar-app">{{ nav_current_app.label }}</span>
+    <nav class="o-appbar-menus" data-o-menu-overflow aria-label="{% translate 'Modül menüsü' %}">
+      {% for menu in nav_menus %}
+        <a class="o-appbar-menu{% if menu.is_current %} o-active{% endif %}"
+           href="{{ menu.url }}"{% if menu.is_current %} aria-current="page"{% endif %}>{{ menu.label }}</a>
+      {% endfor %}
+      <div class="dropdown o-appbar-more d-none">
+        <button class="o-appbar-menu" type="button" data-bs-toggle="dropdown"
+                aria-expanded="false" aria-label="{% translate 'Diğer menüler' %}">&hellip;</button>
+        <ul class="dropdown-menu"></ul>
+      </div>
+    </nav>
+  {% endif %}
+
+  <div class="o-appbar-right">
+    <form method="post" action="{% url 'set_language' %}" class="o-appbar-lang">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <input type="hidden" name="language" value="{% if LANGUAGE_CODE == 'tr' %}en{% else %}tr{% endif %}">
+      <button type="submit" class="o-appbar-btn" title="{% translate 'Dil' %}">
+        {% if LANGUAGE_CODE == 'tr' %}EN{% else %}TR{% endif %}
+      </button>
+    </form>
+
+    <button type="button" class="o-appbar-btn" data-o-theme-toggle
+            title="{% translate 'Tema' %}" aria-label="{% translate 'Tema değiştir' %}">
+      <i class="bi bi-moon" aria-hidden="true"></i>
+    </button>
+
+    <div class="dropdown">
+      <button type="button" class="o-appbar-btn o-appbar-bell" data-bs-toggle="dropdown"
+              data-notification-feed-url="{% url 'notification-feed' %}"
+              aria-expanded="false" aria-label="{% translate 'Bildirimler' %}">
+        <i class="bi bi-bell" aria-hidden="true"></i>
+        {% if nav_notification_count %}<span class="o-appbar-badge">{{ nav_notification_count }}</span>{% endif %}
+      </button>
+      <div class="dropdown-menu dropdown-menu-end o-notif-menu" data-notification-menu>
+        {% include 'notifications/_dropdown_items.html' %}
+      </div>
+    </div>
+
+    <div class="dropdown">
+      <button type="button" class="o-appbar-user" data-bs-toggle="dropdown" aria-expanded="false">
+        {% ui_avatar request.user.username size="sm" %}
+        <span class="o-appbar-user-name">{{ request.user.username }}</span>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end">
+        <li><h6 class="dropdown-header">{{ request.user.email|default:request.user.username }}</h6></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item" href="{% url 'account-settings' %}">
+          <i class="bi bi-gear" aria-hidden="true"></i> {% translate "Hesap Ayarları" %}</a></li>
+        <li><a class="dropdown-item" href="{% url 'notification-list' %}">
+          <i class="bi bi-bell" aria-hidden="true"></i> {% translate "Bildirimler" %}</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li>
+          <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="dropdown-item">
+              <i class="bi bi-box-arrow-left" aria-hidden="true"></i> {% translate "Çıkış Yap" %}
+            </button>
+          </form>
+        </li>
+        <li><hr class="dropdown-divider"></li>
+        <li><span class="dropdown-item-text o-xs o-faint">{{ site_brand }} · v{{ site_version }}</span></li>
+      </ul>
+    </div>
+  </div>
+</header>

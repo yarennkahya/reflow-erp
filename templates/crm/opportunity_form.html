@@ -1,54 +1,29 @@
 {% extends 'base.html' %}
-{% block title %}Yeni Fırsat — Reflow Coffee ERP{% endblock %}
-{% block nav_crm %}active{% endblock %}
-{% block nav_crm_sales %}active{% endblock %}
-{% block page_title %}CRM / Satış Takibi{% endblock %}
+{% block title %}{% translate "Yeni Fırsat" %}{% endblock %}
+{% block cp_breadcrumb %}{% translate "Yeni fırsat" as rec %}{% ui_breadcrumb record=rec %}{% endblock %}
 
+{% block cp_buttons %}
+  <button type="submit" form="o-form" class="o-btn o-btn--primary">
+    <i class="bi bi-check-lg" aria-hidden="true"></i> {% translate "Oluştur" %}
+  </button>
+  <a class="o-btn" href="{% url 'crm-sale-list' %}">{% translate "Vazgeç" %}</a>
+{% endblock %}
+
+{% block content_class %} o-content--sheet{% endblock %}
 {% block content %}
-<div class="d-flex align-items-center justify-content-between gap-3 mb-4">
-  <div>
-    <h4 class="fw-bold mb-1 text-dark"><i class="bi bi-plus-circle me-2" style="color:#2563eb;"></i>Yeni Fırsat</h4>
-    <p class="mb-0 text-muted" style="font-size:13px;">Fırsat ilk aşamada otomatik olarak “Yeni” durumunda oluşturulur.</p>
-  </div>
-  <a href="{% url 'crm-sale-list' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Satış Takibine Dön</a>
-</div>
-
-<div class="card border-0 shadow-sm" style="max-width:760px;">
-  <div class="card-body p-4">
-    <form method="post" novalidate>
-      {% csrf_token %}
-      {% if form.non_field_errors %}
-      <div class="alert alert-danger">{{ form.non_field_errors }}</div>
-      {% endif %}
-
-      <div class="row g-3">
-        <div class="col-md-6">
-          <label for="{{ form.customer.id_for_label }}" class="form-label fw-medium">{{ form.customer.label }}</label>
-          {{ form.customer }}
-          {% for error in form.customer.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
-        </div>
-        <div class="col-md-6">
-          <label for="{{ form.title.id_for_label }}" class="form-label fw-medium">{{ form.title.label }}</label>
-          {{ form.title }}
-          {% for error in form.title.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
-        </div>
-        <div class="col-md-6">
-          <label for="{{ form.estimated_value.id_for_label }}" class="form-label fw-medium">{{ form.estimated_value.label }}</label>
-          {{ form.estimated_value }}
-          {% for error in form.estimated_value.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
-        </div>
-        <div class="col-12">
-          <label for="{{ form.notes.id_for_label }}" class="form-label fw-medium">{{ form.notes.label }}</label>
-          {{ form.notes }}
-          {% for error in form.notes.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
-        </div>
-      </div>
-
-      <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
-        <a href="{% url 'crm-sale-list' %}" class="btn btn-outline-secondary">İptal</a>
-        <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i>Fırsatı Oluştur</button>
-      </div>
-    </form>
-  </div>
-</div>
+{% ui_sheet %}
+  <form method="post" id="o-form">
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+    <h1 class="o-form-title">{% translate "Yeni fırsat" %}</h1>
+    <p class="o-form-subtitle">{% translate "Fırsat 'İlk temas' aşamasında ve aktif olarak oluşturulur." %}</p>
+    {% translate "Fırsat bilgileri" as g %}
+    {% ui_group g %}
+      {% ui_field form.customer cols=6 %}
+      {% ui_field form.title cols=6 %}
+      {% ui_field form.estimated_value cols=4 %}
+      {% ui_field form.notes cols=12 %}
+    {% endui_group %}
+  </form>
+{% endui_sheet %}
 {% endblock %}

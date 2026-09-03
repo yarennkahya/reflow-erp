@@ -1,0 +1,54 @@
+<div class="o-list"><div class="o-list-scroll">
+  <table class="o-table">
+    <thead>
+      <tr>
+        <th>{% translate "Çalışan" %}</th>
+        <th>{% translate "İzin türü" %}</th>
+        <th>{% translate "Başlangıç" %}</th>
+        <th>{% translate "Bitiş" %}</th>
+        <th>{% translate "Durum" %}</th>
+        <th>{% translate "Onaylayan" %}</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for leave in leaves %}
+        <tr>
+          <td>
+            <div class="o-row">
+              {% ui_avatar leave.employee.name size="sm" %}
+              <a class="o-table-link" href="{% url 'hr-employee-detail' leave.employee_id %}">{{ leave.employee.name }}</a>
+            </div>
+          </td>
+          <td>{{ leave.leave_type.name }}</td>
+          <td class="o-nowrap">{{ leave.start_date|date:"d M Y" }}</td>
+          <td class="o-nowrap">{{ leave.end_date|date:"d M Y" }}</td>
+          <td>{% ui_badge leave "status" %}</td>
+          <td class="o-muted">{{ leave.approved_by.name|default:"—" }}</td>
+          <td class="o-actions">
+            {% if leave.status == 'pending' %}
+              <form method="post" action="{% url 'leave-approve' leave.pk %}" class="o-row">
+                {% csrf_token %}
+                <select name="approver" class="o-select o-approver" required aria-label="{% translate 'Onaylayan' %}">
+                  <option value="">{% translate "Onaylayan seçin" %}</option>
+                  {% for emp in employees %}<option value="{{ emp.pk }}">{{ emp.name }}</option>{% endfor %}
+                </select>
+                <button type="submit" class="o-btn o-btn--sm" title="{% translate 'Onayla' %}">
+                  <i class="bi bi-check-lg" aria-hidden="true"></i>
+                </button>
+              </form>
+              {% url 'leave-reject' leave.pk as rej %}
+              {% translate "Bu izin talebini reddetmek istiyor musunuz?" as rej_msg %}
+              {% ui_confirm url=rej label="" message=rej_msg icon="bi-x-lg" variant="danger" %}
+            {% endif %}
+          </td>
+        </tr>
+      {% empty %}
+        {% translate "İzin talebi yok" as t %}
+        {% translate "İlk izin talebini oluştur" as cta %}
+        {% url 'leave-request-create' as create_url %}
+        {% ui_empty icon="bi-calendar-check" title=t action_url=create_url action_label=cta colspan=7 %}
+      {% endfor %}
+    </tbody>
+  </table>
+</div></div>

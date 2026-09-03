@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:'tr' }}" data-bs-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="csrf-token" content="{{ csrf_token }}">
+<meta name="description" content="{% block meta_description %}{% translate 'Kahve kavurma ve dağıtım için uçtan uca ERP: tedarik, üretim, satış, finans ve AI karar desteği.' %}{% endblock %}">
+<title>{% block title %}{{ site_brand }}{% endblock %}</title>
+<link rel="icon" type="image/svg+xml" href="{% static 'img/favicon.svg' %}">
+
+<script>
+(function () {
+  try {
+    var t = localStorage.getItem('reflow-theme');
+    if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-bs-theme', t);
+  } catch (e) {}
+})();
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/odoo-core.css' %}?v={{ asset_version }}">
+<link rel="stylesheet" href="{% static 'css/odoo-public.css' %}?v={{ asset_version }}">
+{% block head %}{% endblock %}
+</head>
+<body class="p-page">
+{% block body %}{% endblock %}
+
+<script src="{% static 'js/o-core.js' %}?v={{ asset_version }}"></script>
+<script src="{% static 'js/o-theme.js' %}?v={{ asset_version }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

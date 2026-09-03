@@ -1,18 +1,140 @@
 {% extends 'base.html' %}
-{% block title %}{{ supplier.name }} — Satın Alma{% endblock %}
-{% block nav_purchasing %}active{% endblock %}
-{% block nav_purchasing_suppliers %}active{% endblock %}
-{% block page_title %}Satın Alma / Tedarikçi Kartı{% endblock %}
-{% block extra_head %}
-<style>
-  .profile-card, .data-card, .stat-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:12px; }.profile-card { padding:20px; }.supplier-avatar-lg { width:52px; height:52px; border-radius:14px; background:#fff7ed; color:#c2410c; display:flex; align-items:center; justify-content:center; font-size:21px; font-weight:700; }.stat-card { height:100%; padding:15px; }.stat-label { color:var(--g-text-2); font-size:11px; font-weight:600; letter-spacing:.6px; text-transform:uppercase; }.stat-value { color:var(--g-text); font-size:20px; font-weight:700; margin-top:3px; }.data-card { overflow:hidden; }.data-card .table { margin:0; font-size:13px; }.data-card .table thead th { background:var(--g-n-50); border-bottom:1px solid var(--g-border); color:var(--g-text-2); font-size:11px; font-weight:700; letter-spacing:.65px; padding:11px 16px; text-transform:uppercase; white-space:nowrap; }.data-card .table tbody td { border-color:var(--g-border-sub); color:var(--g-text); padding:12px 16px; vertical-align:middle; }.data-card .table tbody tr:hover { background:var(--g-n-50); }.status-pill { border-radius:20px; display:inline-block; font-size:11.5px; font-weight:600; padding:4px 8px; white-space:nowrap; }.status-draft { background:var(--g-border-sub); color:var(--g-text-2); }.status-sent { background:#e0f2fe; color:#0369a1; }.status-confirmed { background:#eff6ff; color:#1d4ed8; }.status-partially_received { background:#fff7ed; color:#c2410c; }.status-received { background:#f0fdf4; color:#15803d; }.status-cancelled { background:#fef2f2; color:#b91c1c; }.info-row { display:flex; gap:10px; padding:11px 0; border-bottom:1px solid var(--g-border-sub); font-size:13px; }.info-row:last-child { border:0; padding-bottom:0; }.info-row i { color:#ea580c; width:16px; }.info-label { color:var(--g-text-2); min-width:92px; }.info-value { color:var(--g-text); font-weight:500; overflow-wrap:anywhere; }.product-unit { color:var(--g-text-2); font-size:12px; }.empty { color:var(--g-text-3); padding:32px; text-align:center; }
-</style>
+{% block title %}{{ supplier.name }}{% endblock %}
+
+{% block cp_breadcrumb %}{% ui_breadcrumb record=supplier.name %}{% endblock %}
+
+{% block cp_buttons %}
+  {% if supplier.is_active %}
+    <a class="o-btn o-btn--primary" href="{% url 'purchase-order-create' %}?supplier={{ supplier.pk }}">
+      <i class="bi bi-plus-lg" aria-hidden="true"></i> {% translate "Yeni Sipariş" %}
+    </a>
+  {% endif %}
+  <a class="o-btn" href="{% url 'supplier-edit' supplier.pk %}">
+    <i class="bi bi-pencil" aria-hidden="true"></i> {% translate "Düzenle" %}
+  </a>
+  <a class="o-btn" href="{% url 'supplier-product-create' supplier.pk %}">
+    <i class="bi bi-box" aria-hidden="true"></i> {% translate "Ürün Ekle" %}
+  </a>
+
+  <form method="post" action="{% url 'supplier-activity' supplier.pk %}">
+    {% csrf_token %}
+    <button type="submit" class="o-btn">
+      <i class="bi {% if supplier.is_active %}bi-pause-circle{% else %}bi-play-circle{% endif %}" aria-hidden="true"></i>
+      {% if supplier.is_active %}{% translate "Pasife al" %}{% else %}{% translate "Aktifleştir" %}{% endif %}
+    </button>
+  </form>
+
+  {% url 'supplier-delete' supplier.pk as del_url %}
+  {% translate "Sil" as del_label %}
+  {% blocktranslate asvar del_msg with name=supplier.name %}{{ name }} tedarikçisini silmek istediğinize emin misiniz?{% endblocktranslate %}
+  {% ui_confirm url=del_url label=del_label message=del_msg icon="bi-trash" variant="danger" %}
 {% endblock %}
+
+{% block content_class %} o-content--sheet{% endblock %}
+
 {% block content %}
-<div class="mb-3"><a href="{% url 'supplier-list' %}" class="text-decoration-none" style="font-size:13px;"><i class="bi bi-arrow-left me-1"></i>Tedarikçilere dön</a></div>
-<div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4"><div class="d-flex align-items-center gap-3"><div class="supplier-avatar-lg">{{ supplier.name|first|upper }}</div><div><div class="d-flex align-items-center gap-2"><h4 class="fw-bold mb-0">{{ supplier.name }}</h4>{% if supplier.is_active %}<span class="badge bg-success-subtle text-success-emphasis">Aktif</span>{% else %}<span class="badge bg-secondary-subtle text-secondary-emphasis">Pasif</span>{% endif %}</div><div class="text-muted mt-1" style="font-size:13px;">{{ supplier.created_at|date:"d M Y" }} tarihinde kaydedildi</div></div></div><div class="d-flex flex-wrap gap-2">{% if supplier.is_active %}<a class="btn btn-primary" href="{% url 'purchase-order-create' %}?supplier={{ supplier.pk }}"><i class="bi bi-plus-lg me-1"></i>Yeni Sipariş</a>{% endif %}<a class="btn btn-outline-primary" href="{% url 'supplier-edit' supplier.pk %}"><i class="bi bi-pencil me-1"></i>Düzenle</a><form method="post" action="{% url 'supplier-activity' supplier.pk %}">{% csrf_token %}<button class="btn btn-outline-secondary" type="submit"><i class="bi {% if supplier.is_active %}bi-pause-circle{% else %}bi-play-circle{% endif %} me-1"></i>{% if supplier.is_active %}Pasife al{% else %}Aktifleştir{% endif %}</button></form><form method="post" action="{% url 'supplier-delete' supplier.pk %}" onsubmit="return confirm('{{ supplier.name|escapejs }} tedarikçisini silmek istediğinize emin misiniz?');">{% csrf_token %}<button class="btn btn-outline-danger" type="submit" title="Tedarikçiyi sil"><i class="bi bi-trash"></i></button></form></div></div>
+{% ui_sheet %}
+  <div class="o-form-head">
+    <div class="o-row">
+      {% ui_avatar supplier.name size="lg" %}
+      <div>
+        <h1 class="o-form-title">{{ supplier.name }} {% ui_badge supplier "is_active" %}</h1>
+        <p class="o-form-subtitle">
+          {% blocktranslate with date=supplier.created_at|date:"d M Y" %}{{ date }} tarihinde kaydedildi{% endblocktranslate %}
+        </p>
+      </div>
+    </div>
 
-<div class="row g-3 mb-4"><div class="col-lg-3 col-sm-6"><div class="stat-card"><div class="stat-label">Toplam sipariş</div><div class="stat-value">{{ orders|length }}</div></div></div><div class="col-lg-3 col-sm-6"><div class="stat-card"><div class="stat-label">Açık sipariş</div><div class="stat-value text-primary">{{ open_order_count }}</div></div></div><div class="col-lg-3 col-sm-6"><div class="stat-card"><div class="stat-label">Katalog ürünü</div><div class="stat-value">{{ products|length }}</div></div></div><div class="col-lg-3 col-sm-6"><div class="stat-card"><div class="stat-label">Sipariş toplamı</div><div class="stat-value">₺{{ total_order_value|floatformat:0 }}</div></div></div></div>
+    {% ui_button_box %}
+      {% translate "Toplam sipariş" as l1 %}{% ui_stat value=orders|length label=l1 icon="bi-basket3" %}
+      {% translate "Açık sipariş" as l2 %}{% ui_stat value=open_order_count label=l2 icon="bi-hourglass-split" variant="warning" %}
+      {% translate "Katalog ürünü" as l3 %}{% ui_stat value=products|length label=l3 icon="bi-box" %}
+      {% translate "Sipariş toplamı" as l4 %}{% ui_stat value=total_order_value|money label=l4 icon="bi-cash-stack" %}
+    {% endui_button_box %}
+  </div>
 
-<div class="row g-4"><div class="col-xl-8"><div class="data-card mb-4"><div class="p-3 border-bottom d-flex align-items-center justify-content-between"><div><h6 class="mb-0 fw-bold">Tedarikçi ürün kataloğu</h6><small class="text-muted">Yeni siparişe eklenebilecek ürünler.</small></div>{% if supplier.is_active %}<a href="{% url 'supplier-product-create' supplier.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-plus-lg me-1"></i>Ürün ekle</a>{% endif %}</div><div class="table-responsive"><table class="table table-borderless"><thead><tr><th>Ürün</th><th>Kategori</th><th>Birim</th><th class="text-end"></th></tr></thead><tbody>{% for product in products %}<tr><td class="fw-semibold">{{ product.name }}</td><td>{{ product.category }}</td><td><span class="product-unit">{{ product.get_unit_display }}</span></td><td class="text-end"><a href="{% url 'supplier-product-edit' supplier.pk product.pk %}" class="btn btn-sm btn-light" title="Düzenle"><i class="bi bi-pencil"></i></a>{% if supplier.is_active %}<form method="post" action="{% url 'supplier-product-delete' supplier.pk product.pk %}" class="d-inline" onsubmit="return confirm('{{ product.name|escapejs }} ürününü silmek istiyor musunuz?');">{% csrf_token %}<button class="btn btn-sm btn-light text-danger" title="Sil"><i class="bi bi-trash"></i></button></form>{% endif %}</td></tr>{% empty %}<tr><td colspan="4" class="empty"><i class="bi bi-box-seam d-block fs-3 mb-2"></i>Bu tedarikçi için henüz ürün tanımlanmadı.{% if supplier.is_active %}<br><a href="{% url 'supplier-product-create' supplier.pk %}" class="btn btn-sm btn-outline-primary mt-3">İlk ürünü ekle</a>{% endif %}</td></tr>{% endfor %}</tbody></table></div></div><div class="data-card"><div class="p-3 border-bottom"><h6 class="mb-0 fw-bold">Sipariş geçmişi</h6></div><div class="table-responsive"><table class="table table-borderless"><thead><tr><th>Sipariş</th><th>Durum</th><th>Beklenen teslimat</th><th class="text-end">Toplam</th></tr></thead><tbody>{% for row in orders %}<tr><td><a class="text-decoration-none fw-semibold" href="{% url 'purchase-order-detail' row.order.pk %}">PO #{{ row.order.pk }}</a></td><td><span class="status-pill {{ row.status_class }}">{{ row.order.get_status_display }}</span></td><td>{{ row.order.expected_delivery_date|date:"d M Y"|default:"—" }}</td><td class="text-end">₺{{ row.total|floatformat:2 }}</td></tr>{% empty %}<tr><td colspan="4" class="empty">Henüz sipariş kaydı yok.</td></tr>{% endfor %}</tbody></table></div></div></div><div class="col-xl-4"><div class="profile-card"><h6 class="fw-bold mb-3">İletişim ve notlar</h6><div class="info-row"><i class="bi bi-envelope"></i><span class="info-label">E-posta</span><span class="info-value">{{ supplier.contact_email }}</span></div><div class="info-row"><i class="bi bi-telephone"></i><span class="info-label">Telefon</span><span class="info-value">{{ supplier.contact_phone }}</span></div><div class="info-row"><i class="bi bi-calendar3"></i><span class="info-label">Kayıt tarihi</span><span class="info-value">{{ supplier.created_at|date:"d F Y, H:i" }}</span></div>{% if supplier.notes %}<div class="border-top mt-3 pt-3"><div class="text-muted text-uppercase fw-semibold mb-2" style="font-size:10px;letter-spacing:.6px;">Notlar</div><p class="mb-0" style="font-size:13px;white-space:pre-line;">{{ supplier.notes }}</p></div>{% endif %}</div></div></div>
+  {% translate "İletişim bilgileri" as g %}
+  {% ui_group g %}
+    {% translate "E-posta" as f1 %}{% ui_field_value f1 supplier.contact_email icon="bi-envelope" cols=4 %}
+    {% translate "Telefon" as f2 %}{% ui_field_value f2 supplier.contact_phone icon="bi-telephone" cols=4 %}
+    {% translate "Tür" as f3 %}{% ui_field_value f3 supplier.get_business_type_display icon="bi-tag" cols=4 %}
+    {% if supplier.notes %}{% translate "Notlar" as f4 %}{% ui_field_value f4 supplier.notes cols=12 %}{% endif %}
+  {% endui_group %}
+
+  {% ui_notebook %}
+    {% translate "Siparişler" as t1 %}
+    {% ui_page t1 badge=orders|length %}
+      <div class="o-list"><div class="o-list-scroll">
+        <table class="o-table">
+          <thead>
+            <tr>
+              <th>{% translate "Sipariş" %}</th>
+              <th>{% translate "Durum" %}</th>
+              <th>{% translate "Beklenen teslimat" %}</th>
+              <th class="o-num">{% translate "Kalem" %}</th>
+              <th class="o-num">{% translate "Toplam" %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in orders %}
+              <tr>
+                <td><a href="{% url 'purchase-order-detail' row.order.pk %}" class="o-table-link o-mono">PO #{{ row.order.pk }}</a></td>
+                <td>{% ui_badge row.order "status" %}</td>
+                <td class="o-nowrap">{{ row.order.expected_delivery_date|date:"d M Y"|default:"—" }}</td>
+                <td class="o-num">{{ row.item_count }}</td>
+                <td class="o-num o-strong">{{ row.total|money }}</td>
+              </tr>
+            {% empty %}
+              {% translate "Bu tedarikçiye ait sipariş yok" as e %}
+              {% ui_empty icon="bi-bag-x" title=e colspan=5 %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div></div>
+    {% endui_page %}
+
+    {% translate "Ürün Kataloğu" as t2 %}
+    {% ui_page t2 badge=products|length %}
+      <div class="o-list"><div class="o-list-scroll">
+        <table class="o-table">
+          <thead>
+            <tr>
+              <th>{% translate "Ürün" %}</th>
+              <th>{% translate "Kategori" %}</th>
+              <th>{% translate "Birim" %}</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for product in products %}
+              <tr>
+                <td class="o-strong">{{ product.name }}</td>
+                <td class="o-muted">{{ product.category|default:"—" }}</td>
+                <td>{{ product.get_unit_display }}</td>
+                <td class="o-actions">
+                  <div class="o-row">
+                    <a class="o-btn o-btn--sm o-btn--ghost" title="{% translate 'Düzenle' %}"
+                       href="{% url 'supplier-product-edit' supplier.pk product.pk %}">
+                      <i class="bi bi-pencil" aria-hidden="true"></i></a>
+                    {% url 'supplier-product-delete' supplier.pk product.pk as pdel %}
+                    {% blocktranslate asvar pmsg with name=product.name %}{{ name }} ürününü silmek istiyor musunuz?{% endblocktranslate %}
+                    {% ui_confirm url=pdel label="" message=pmsg icon="bi-trash" variant="danger" %}
+                  </div>
+                </td>
+              </tr>
+            {% empty %}
+              {% translate "Katalog boş" as e2 %}
+              {% translate "Sipariş kalemi ekleyebilmek için önce ürün tanımlayın." as d2 %}
+              {% translate "Ürün ekle" as cta2 %}
+              {% url 'supplier-product-create' supplier.pk as padd %}
+              {% ui_empty icon="bi-box" title=e2 text=d2 action_url=padd action_label=cta2 colspan=4 %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div></div>
+    {% endui_page %}
+  {% endui_notebook %}
+{% endui_sheet %}
+
+{% ui_chatter supplier %}
 {% endblock %}

@@ -1,72 +1,33 @@
 {% extends 'base.html' %}
-{% block title %}Satış — Reflow Coffee ERP{% endblock %}
-{% block nav_sales %}active{% endblock %}
-{% block nav_sales_orders %}active{% endblock %}
-{% block page_title %}Satış{% endblock %}
+{% block title %}{% translate "Siparişler" %}{% endblock %}
+{% block region_attr %} data-ajax-region{% endblock %}
 
-{% block extra_head %}
-<style>
-  .data-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:10px; overflow:hidden; }
-  .data-card .table { margin-bottom:0; font-size:13.5px; }
-  .data-card .table thead th { background:var(--g-n-50); color:var(--g-text-2); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.7px; border-bottom:1px solid var(--g-border); padding:10px 16px; white-space:nowrap; }
-  .data-card .table tbody td { padding:11px 16px; vertical-align:middle; color:var(--g-text); border-color:var(--g-border-sub); }
-  .data-card .table tbody tr:last-child td { border-bottom:none; }
-  .data-card .table tbody tr:hover { background:var(--g-n-50); }
-  .empty-state { padding:48px 24px; text-align:center; color:var(--g-text-3); }
-  .empty-state i { font-size:36px; display:block; margin-bottom:8px; }
-</style>
+{% block cp_buttons %}
+  <a href="{% url 'order-create' %}" class="o-btn o-btn--primary">
+    <i class="bi bi-plus-lg" aria-hidden="true"></i> {% translate "Yeni" %}
+  </a>
+  <a href="{% url 'return-list' %}" class="o-btn">
+    <i class="bi bi-arrow-return-left" aria-hidden="true"></i> {% translate "İadeler" %}
+  </a>
+{% endblock %}
+
+{% block cp_pager %}{% ui_pager page_obj %}{% endblock %}
+{% block cp_views %}{% ui_view_switcher "list,kanban" current=view %}{% endblock %}
+
+{% block cp_search %}
+  <div class="o-cp-search-row">
+    {% translate "Sipariş no veya müşteri ara" as ph %}
+    {% ui_search target="#o-view" placeholder=ph filters=status_choices filter_param="status" selected=selected_status %}
+  </div>
 {% endblock %}
 
 {% block content %}
-<div class="mb-4">
-  <div class="btn-group btn-group-sm" role="group">
-    <a href="/sales/" class="btn btn-primary" data-i18n="orders">Siparişler</a>
-    <a href="/sales/customers/" class="btn btn-outline-primary" data-i18n="customers">Müşteriler</a>
-    <a href="/sales/forecast/" class="btn btn-outline-primary" data-i18n="demand-forecast">Talep Tahmini</a>
-    <a href="/sales/returns/" class="btn btn-outline-primary" data-i18n="returns">İadeler</a>
+  <div class="o-button-box o-po-kpis">
+    {% translate "Beklemede" as l1 %}{% ui_stat value=pending_count label=l1 icon="bi-hourglass-split" variant="warning" %}
+    {% translate "Karşılandı" as l2 %}{% ui_stat value=fulfilled_count label=l2 icon="bi-check2-circle" variant="success" %}
+    {% translate "İptal edildi" as l3 %}{% ui_stat value=cancelled_count label=l3 icon="bi-x-circle" %}
   </div>
-</div>
-<div class="d-flex align-items-baseline gap-3 mb-4">
-  <h4 class="fw-bold mb-0 text-dark"><i class="bi bi-cart3 me-2" style="color:#2563eb;"></i><span data-i18n="orders">Siparişler</span></h4>
-  <span class="text-muted" style="font-size:13px;">{{ orders|length }} kayıt</span>
-  <a href="{% url 'order-create' %}" class="btn btn-primary btn-sm ms-auto"><i class="bi bi-plus-lg me-1"></i>Yeni Sipariş</a>
-</div>
-
-<div class="data-card">
-  <table class="table table-borderless">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th data-i18n="customer">Müşteri</th>
-        <th data-i18n="status">Durum</th>
-        <th data-i18n="created-at">Oluşturulma</th>
-        <th data-i18n="fulfilled-at">Karşılanma</th>
-        <th class="text-end" data-i18n="total-amount">Toplam Tutar</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for row in orders %}
-      <tr>
-        <td class="text-muted" style="font-size:12.5px;">#{{ row.order.pk }}</td>
-        <td class="fw-medium">{{ row.order.customer.name }}</td>
-        <td>
-          <span class="badge {{ row.badge_cls }} fw-medium" style="font-size:11.5px; padding:4px 9px;">
-            {{ row.order.get_status_display }}
-          </span>
-        </td>
-        <td style="font-size:12.5px; color:var(--g-text-2);">{{ row.order.created_at|date:"d M Y" }}</td>
-        <td style="font-size:12.5px; color:var(--g-text-2);">{{ row.order.fulfilled_at|date:"d M Y"|default:"—" }}</td>
-        <td class="text-end fw-semibold">₺{{ row.total|floatformat:2 }}</td>
-      </tr>
-      {% empty %}
-      <tr>
-        <td colspan="6" class="empty-state">
-          <i class="bi bi-inbox"></i>
-          <span data-i18n="no-orders">Henüz hiç sipariş yok.</span>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
+  {% include view_template %}
 {% endblock %}
+
+{% block scripts %}<script src="{% static 'js/o-preview.js' %}?v={{ asset_version }}"></script>{% endblock %}

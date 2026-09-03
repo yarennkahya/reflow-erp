@@ -2,14 +2,24 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Count, Q
 from django.db.models.deletion import ProtectedError
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
 
 from sales.models import Customer
 
+from dashboard.grouping import group_by_choice
+from dashboard.views_helpers import is_ajax, paginate, pick_view
+
 from .forms import CustomerForm, OpportunityCreateForm, SaleForm
 from .models import Opportunity
-from .services import advance_stage, mark_as_lost, set_sale_activity
+from .services import (
+    advance_stage,
+    mark_as_lost,
+    set_opportunity_stage,
+    set_sale_activity,
+)
 
 @login_required
 def customer_list(request):
@@ -40,16 +50,21 @@ def customer_list(request):
         ),
     ).order_by('-is_active', 'name')
 
+    page_obj = paginate(request, customers)
+
     context = {
-        'customers': customers,
+        'page_obj': page_obj,
+        'customers': page_obj,
+        'status_options': (
+            ('active', _('Aktif müşteriler')),
+            ('inactive', _('Pasif müşteriler')),
+        ),
         'query': query,
         'selected_status': selected_status,
         'total_customers': Customer.objects.count(),
         'active_customers': Customer.objects.filter(is_active=True).count(),
         'active_sales': Opportunity.objects.filter(status=Opportunity.Status.ACTIVE).count(),
     }
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        return render(request, 'crm/partials/customer_list_region.html', context)
     return render(request, 'crm/list.html', context)
 
 
@@ -139,8 +154,40 @@ def sale_list(request):
     if query:
         sales = sales.filter(Q(title__icontains=query) | Q(customer__name__icontains=query))
 
+    # CRM pipeline'ında Odoo varsayılanı kanban.
+    view = pick_view(request, ('kanban', 'list', 'graph'), default='kanban')
+    rows = list(sales.order_by('-updated_at'))
+    page_obj = paginate(request, rows) if view == 'list' else None
+
+    columns = None
+    chart = None
+    if view == 'kanban':
+        columns = group_by_choice(
+            rows, 'stage', Opportunity.Stage.choices,
+            aggregate=lambda opp: float(opp.estimated_value or 0),
+        )
+    elif view == 'graph':
+        buckets = group_by_choice(
+            rows, 'stage', Opportunity.Stage.choices,
+            aggregate=lambda opp: float(opp.estimated_value or 0),
+        )
+        chart = {
+            'labels': [str(bucket['label']) for bucket in buckets],
+            'datasets': [
+                {'label': str(_('Fırsat sayısı')),
+                 'data': [bucket['count'] for bucket in buckets], 'axis': 'count'},
+                {'label': str(_('Tahmini tutar')),
+                 'data': [bucket['total'] for bucket in buckets], 'axis': 'value'},
+            ],
+        }
+
     context = {
-        'sales': sales.order_by('-updated_at'),
+        'view': view,
+        'view_template': f'crm/_sales_{view}.html',
+        'page_obj': page_obj,
+        'columns': columns,
+        'chart': chart,
+        'sales': list(page_obj) if page_obj is not None else rows,
         'query': query,
         'selected_status': selected_status,
         'selected_stage': selected_stage,
@@ -150,8 +197,7 @@ def sale_list(request):
         'passive_sales': Opportunity.objects.filter(status=Opportunity.Status.PASSIVE).count(),
         'won_sales': Opportunity.objects.filter(status=Opportunity.Status.WON).count(),
     }
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        return render(request, 'crm/partials/sale_list_region.html', context)
+    # AJAX bölgesi base.html'deki #o-view.
     return render(request, 'crm/sale_list.html', context)
 
 
@@ -241,3 +287,16 @@ def sale_activity(request, pk):
     except ValueError as error:
         messages.error(request, str(error))
     return redirect('crm-sale-list')
+
+
+@login_required
+@require_POST
+def opportunity_set_stage_view(request, pk):
+    """Kanban sürükle-bırak hedefi. JSON döner; JS kartı geri alabilsin diye
+    hata durumunda 400 + mesaj verir."""
+    obj = get_object_or_404(Opportunity, pk=pk)
+    try:
+        set_opportunity_stage(obj, request.POST.get('stage', ''))
+    except ValueError as error:
+        return JsonResponse({'ok': False, 'error': str(error)}, status=400)
+    return JsonResponse({'ok': True})

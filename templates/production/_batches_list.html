@@ -1,0 +1,34 @@
+<div class="o-list"><div class="o-list-scroll">
+  <table class="o-table">
+    <thead>
+      <tr>
+        <th>{% translate "Parti" %}</th>
+        <th>{% translate "Reçete" %}</th>
+        <th>{% translate "Çıktı lotu" %}</th>
+        <th class="o-num">{% translate "Miktar" %}</th>
+        <th>{% translate "Kalite" %}</th>
+        <th>{% translate "Kavurma" %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for batch in batches %}
+        <tr>
+          <td><a href="{% url 'production-batch-detail' batch.pk %}" class="o-table-link o-mono">RB #{{ batch.pk }}</a></td>
+          <td class="o-strong">{{ batch.recipe.name }}</td>
+          <td><a href="{% url 'lot-detail' batch.output_lot_id %}" class="o-mono o-table-link">{{ batch.output_lot.lot_code }}</a></td>
+          <td class="o-num">{{ batch.total_output_quantity|qty:batch.output_lot.product.get_unit_display }}</td>
+          <td>
+            {% if batch.quality_check %}{% ui_badge batch.quality_check "result" %}
+            {% else %}<span class="o-badge o-badge--muted">{% translate "Bekliyor" %}</span>{% endif %}
+          </td>
+          <td class="o-nowrap o-muted o-sm">{{ batch.roasted_at|date:"d M Y, H:i" }}</td>
+        </tr>
+      {% empty %}
+        {% translate "Üretim emri yok" as t %}
+        {% translate "İlk üretim emrini oluştur" as cta %}
+        {% url 'production-batch-create' as create_url %}
+        {% ui_empty icon="bi-thermometer-high" title=t action_url=create_url action_label=cta colspan=6 %}
+      {% endfor %}
+    </tbody>
+  </table>
+</div></div>

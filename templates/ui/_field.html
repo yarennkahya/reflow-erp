@@ -1,0 +1,17 @@
+{% if field %}
+<div class="o-field o-col-{{ cols }}{% if is_check %} o-field--check{% endif %}">
+  {% if is_check %}
+    <div class="o-check-row">
+      {{ control }}
+      <label class="o-label o-label--inline" for="{{ field.id_for_label }}">{{ label }}</label>
+    </div>
+  {% else %}
+    <label class="o-label" for="{{ field.id_for_label }}">
+      {{ label }}{% if required %}<span class="o-required" aria-hidden="true">*</span>{% endif %}
+    </label>
+    {{ control }}
+  {% endif %}
+  {% if help %}<p class="o-field-help">{{ help }}</p>{% endif %}
+  {% for error in field.errors %}<p class="o-field-error">{{ error }}</p>{% endfor %}
+</div>
+{% endif %}

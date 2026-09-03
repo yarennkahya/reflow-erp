@@ -1,7 +1,38 @@
 {% extends 'base.html' %}
-{% block title %}{% if product %}{{ product.name }} Düzenle{% else %}Tedarikçi Ürünü Ekle{% endif %} — Reflow Coffee ERP{% endblock %}
-{% block nav_purchasing %}active{% endblock %}
-{% block nav_purchasing_suppliers %}active{% endblock %}
-{% block page_title %}Satın Alma / Ürün Kataloğu{% endblock %}
-{% block extra_head %}<style>.form-card { max-width:720px; background: var(--g-surface); border:1px solid var(--g-border); border-radius:12px; overflow:hidden; }.form-card-head { padding:18px 22px; background:var(--g-n-50); border-bottom:1px solid var(--g-border); }.form-card-body { padding:22px; }.form-label { color:var(--g-text); font-size:13px; font-weight:600; }</style>{% endblock %}
-{% block content %}<div class="mb-3"><a href="{% url 'supplier-detail' supplier.pk %}" class="text-decoration-none" style="font-size:13px;"><i class="bi bi-arrow-left me-1"></i>{{ supplier.name }} kartına dön</a></div><div class="form-card"><div class="form-card-head"><h5 class="mb-1 fw-bold">{% if product %}Tedarikçi ürününü düzenle{% else %}Tedarikçi ürünü ekle{% endif %}</h5><p class="mb-0 text-muted" style="font-size:13px;">Bu ürün, {{ supplier.name }} için açılacak siparişlerde kullanılabilir.</p></div><form method="post" class="form-card-body">{% csrf_token %}{% if form.non_field_errors %}<div class="alert alert-danger py-2">{{ form.non_field_errors }}</div>{% endif %}<div class="row g-3"><div class="col-12"><label class="form-label" for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>{{ form.name }}{% for error in form.name.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div><div class="col-md-7"><label class="form-label" for="{{ form.category.id_for_label }}">{{ form.category.label }}</label>{{ form.category }}{% for error in form.category.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div><div class="col-md-5"><label class="form-label" for="{{ form.unit.id_for_label }}">{{ form.unit.label }}</label>{{ form.unit }}{% for error in form.unit.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div></div><div class="d-flex justify-content-end gap-2 border-top mt-4 pt-3"><a href="{% url 'supplier-detail' supplier.pk %}" class="btn btn-light">Vazgeç</a><button class="btn btn-primary" type="submit"><i class="bi bi-check-lg me-1"></i>{% if product %}Kaydet{% else %}Ürünü ekle{% endif %}</button></div></form></div>{% endblock %}
+{% block title %}{% if product %}{{ product.name }}{% else %}{% translate "Yeni Ürün" %}{% endif %}{% endblock %}
+
+{% block cp_breadcrumb %}
+  {% url 'supplier-detail' supplier.pk as back %}
+  {% if product %}{% translate "Ürünü düzenle" as rec %}{% else %}{% translate "Ürün ekle" as rec %}{% endif %}
+  {% ui_breadcrumb parent=supplier.name parent_url=back record=rec %}
+{% endblock %}
+
+{% block cp_buttons %}
+  <button type="submit" form="o-form" class="o-btn o-btn--primary">
+    <i class="bi bi-check-lg" aria-hidden="true"></i> {% translate "Kaydet" %}
+  </button>
+  <a class="o-btn" href="{% url 'supplier-detail' supplier.pk %}">{% translate "Vazgeç" %}</a>
+{% endblock %}
+
+{% block content_class %} o-content--sheet{% endblock %}
+
+{% block content %}
+{% ui_sheet %}
+  <form method="post" id="o-form">
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+
+    <h1 class="o-form-title">
+      {% if product %}{% translate "Katalog ürününü düzenle" %}{% else %}{% translate "Kataloğa ürün ekle" %}{% endif %}
+    </h1>
+    <p class="o-form-subtitle">{{ supplier.name }}</p>
+
+    {% translate "Ürün bilgileri" as g %}
+    {% ui_group g %}
+      {% ui_field form.name cols=12 %}
+      {% ui_field form.category cols=6 %}
+      {% ui_field form.unit cols=6 %}
+    {% endui_group %}
+  </form>
+{% endui_sheet %}
+{% endblock %}

@@ -1,12 +1,13 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from pgvector.django import VectorField
 from django.conf import settings
 
 class Document(models.Model):
     class Source(models.TextChoices):
-        PROCEDURE = 'procedure', 'Prosedür / talimat'
-        SUPPLIER_NOTE = 'supplier_note', 'Tedarikçi notu'
-        GENERAL = 'general', 'Genel bilgi'
+        PROCEDURE = 'procedure', _('Prosedür / talimat')
+        SUPPLIER_NOTE = 'supplier_note', _('Tedarikçi notu')
+        GENERAL = 'general', _('Genel bilgi')
 
     title = models.CharField(max_length=255)
     content = models.TextField()

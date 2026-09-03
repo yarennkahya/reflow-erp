@@ -1,67 +1,130 @@
 {% extends 'base.html' %}
-{% block title %}Sipariş #{{ order.pk }} - Reflow Coffee ERP{% endblock %}
-{% block content %}
-<div class="mb-4">
-  <div class="btn-group btn-group-sm" role="group">
-    <a href="/sales/" class="btn btn-primary">Siparişler</a>
-    <a href="/sales/customers/" class="btn btn-outline-primary">Müşteriler</a>
-    <a href="/sales/forecast/" class="btn btn-outline-primary">Talep Tahmini</a>
-    <a href="/sales/returns/" class="btn btn-outline-primary">İadeler</a>
-  </div>
-</div>
-<h1 class="mb-1">Sipariş #{{ order.pk }}</h1>
-<p class="text-muted mb-4">
-  <a href="{% url 'customer-detail' order.customer.pk %}">{{ order.customer.name }}</a>
-  · <span class="badge bg-secondary">{{ order.get_status_display }}</span>
-</p>
+{% block title %}SO #{{ order.pk }}{% endblock %}
 
-<table class="table bg-white">
-  <thead>
-    <tr>
-      <th>Ürün</th>
-      <th>Lot</th>
-      <th>Miktar</th>
-      <th>Birim Fiyat</th>
-      <th>Toplam</th>
-      <th>İade</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for item in order.items.all %}
-    <tr>
-      <td>{{ item.product.name }}</td>
-      <td>{{ item.lot.lot_code }}</td>
-      <td>{{ item.quantity }}</td>
-      <td>₺{{ item.unit_price }}</td>
-      <td>₺{{ item.line_total }}</td>
-      <td>
-        <form method="post" action="{% url 'return-request-create' item.pk %}" class="d-flex align-items-center gap-1">
-          {% csrf_token %}
-          <select name="reason" class="form-select form-select-sm" required aria-label="İade sebebi">
-            <option value="customer_changed_mind">Müşteri vazgeçti</option>
-            <option value="defective">Kusurlu ürün</option>
-          </select>
-          <input type="number" name="quantity" class="form-control form-control-sm" min="0.001" max="{{ item.quantity }}" step="0.001" placeholder="Miktar" required aria-label="İade miktarı">
-          <button type="submit" class="btn btn-sm btn-outline-danger text-nowrap">İade Talep Et</button>
-        </form>
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+{% block cp_breadcrumb %}
+  {% with pk=order.pk|stringformat:"s" %}{% ui_breadcrumb record="SO #"|add:pk %}{% endwith %}
+{% endblock %}
 
-{% if order.status == 'fulfilled' %}
-  {% if order.invoice %}
-    <a href="{% url 'invoice-detail' order.invoice.pk %}" class="btn btn-outline-primary btn-sm mt-3">
-      <i class="bi bi-receipt"></i> Faturayı Görüntüle
-    </a>
-  {% else %}
-    <form method="post" action="{% url 'invoice-create' order.pk %}" class="mt-3">
+{% block cp_buttons %}
+  {% comment %}
+    Durum geçişleri sales.services.set_order_status'tan geçer: KARŞILANDI
+    stok hareketi üretir, İPTAL yalnızca beklemedeki siparişlerde mümkündür.
+  {% endcomment %}
+  {% if order.status == 'pending' %}
+    <form method="post" action="{% url 'order-set-status' order.pk %}">
       {% csrf_token %}
-      <button type="submit" class="btn btn-primary btn-sm">
-        <i class="bi bi-receipt"></i> Fatura Oluştur
+      <input type="hidden" name="stage" value="fulfilled">
+      <button type="submit" class="o-btn o-btn--primary">
+        <i class="bi bi-check2-circle" aria-hidden="true"></i> {% translate "Siparişi Karşıla" %}
       </button>
     </form>
+    {% url 'order-set-status' order.pk as cancel_url %}
+    {% translate "İptal Et" as cancel_label %}
+    {% translate "Bu siparişi iptal etmek istediğinize emin misiniz?" as cancel_msg %}
+    {% ui_confirm url=cancel_url label=cancel_label message=cancel_msg icon="bi-x-lg" variant="danger" name="stage" value="cancelled" %}
   {% endif %}
-{% endif %}
+
+  {% if order.status == 'fulfilled' %}
+    {% if order.invoice %}
+      <a class="o-btn o-btn--primary" href="{% url 'invoice-detail' order.invoice.pk %}">
+        <i class="bi bi-receipt" aria-hidden="true"></i> {% translate "Faturayı Görüntüle" %}
+      </a>
+    {% else %}
+      <form method="post" action="{% url 'invoice-create' order.pk %}">
+        {% csrf_token %}
+        <button type="submit" class="o-btn o-btn--primary">
+          <i class="bi bi-receipt" aria-hidden="true"></i> {% translate "Fatura Oluştur" %}
+        </button>
+      </form>
+    {% endif %}
+  {% endif %}
+  <a class="o-btn" href="{% url 'customer-detail' order.customer_id %}">
+    <i class="bi bi-person" aria-hidden="true"></i> {{ order.customer.name }}
+  </a>
+{% endblock %}
+
+{% block content_class %} o-content--sheet{% endblock %}
+
+{% block content %}
+{% ui_sheet %}
+  {% ui_statusbar order "status" hide="cancelled" %}
+
+  <div class="o-form-head">
+    <div>
+      <h1 class="o-form-title o-mono">SO #{{ order.pk }}</h1>
+      <p class="o-form-subtitle">
+        <a href="{% url 'customer-detail' order.customer_id %}">{{ order.customer.name }}</a>
+        · {{ order.created_at|date:"d M Y, H:i" }}
+      </p>
+    </div>
+    {% ui_button_box %}
+      {% translate "Kalem" as l1 %}{% ui_stat value=order.items.count label=l1 icon="bi-list-ul" %}
+      {% if order.invoice %}
+        {% translate "Fatura" as l2 %}
+        {% url 'invoice-detail' order.invoice.pk as inv_url %}
+        {% ui_stat value=order.invoice.total_amount|money label=l2 icon="bi-receipt" url=inv_url %}
+      {% endif %}
+    {% endui_button_box %}
+  </div>
+
+  {% translate "Sipariş bilgileri" as g %}
+  {% ui_group g %}
+    {% translate "Müşteri" as f1 %}
+    {% url 'customer-detail' order.customer_id as cust_url %}
+    {% ui_field_value f1 order.customer.name url=cust_url icon="bi-person" cols=4 %}
+    {% translate "Oluşturulma" as f2 %}{% ui_field_value f2 order.created_at|date:"d M Y, H:i" icon="bi-clock" cols=4 %}
+    {% translate "Karşılanma" as f3 %}{% ui_field_value f3 order.fulfilled_at|date:"d M Y, H:i" icon="bi-check2-circle" cols=4 %}
+  {% endui_group %}
+
+  {% ui_notebook %}
+    {% translate "Kalemler" as t1 %}
+    {% ui_page t1 badge=order.items.count %}
+      <div class="o-list"><div class="o-list-scroll">
+        <table class="o-table">
+          <thead>
+            <tr>
+              <th>{% translate "Ürün" %}</th>
+              <th>{% translate "Lot" %}</th>
+              <th class="o-num">{% translate "Miktar" %}</th>
+              <th class="o-num">{% translate "Birim fiyat" %}</th>
+              <th class="o-num">{% translate "Tutar" %}</th>
+              <th>{% translate "İade" %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in order.items.all %}
+              <tr>
+                <td class="o-strong">{{ item.product.name }}</td>
+                <td><a href="{% url 'lot-detail' item.lot_id %}" class="o-mono o-table-link">{{ item.lot.lot_code }}</a></td>
+                <td class="o-num">{{ item.quantity|qty:item.product.get_unit_display }}</td>
+                <td class="o-num">{{ item.unit_price|money }}</td>
+                <td class="o-num o-strong">{{ item.line_total|money }}</td>
+                <td>
+                  <form method="post" action="{% url 'return-request-create' item.pk %}" class="o-return-form">
+                    {% csrf_token %}
+                    <select name="reason" class="o-select" required aria-label="{% translate 'İade sebebi' %}">
+                      <option value="customer_changed_mind">{% translate "Müşteri vazgeçti" %}</option>
+                      <option value="defective">{% translate "Kusurlu ürün" %}</option>
+                    </select>
+                    <input type="number" name="quantity" class="o-input" min="0.001"
+                           max="{{ item.quantity }}" step="0.001"
+                           placeholder="{% translate 'Miktar' %}" required
+                           aria-label="{% translate 'İade miktarı' %}">
+                    <button type="submit" class="o-btn o-btn--sm o-btn--danger">
+                      {% translate "İade" %}
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            {% empty %}
+              {% translate "Bu siparişte kalem yok" as e %}{% ui_empty icon="bi-list-ul" title=e colspan=6 %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div></div>
+    {% endui_page %}
+  {% endui_notebook %}
+{% endui_sheet %}
+
+{% ui_chatter order %}
 {% endblock %}

@@ -1,0 +1,43 @@
+<div class="o-list">
+  <div class="o-list-scroll">
+    <table class="o-table">
+      <thead>
+        <tr>
+          <th>{% translate "Ürün" %}</th>
+          <th>{% translate "Lot kodu" %}</th>
+          <th>{% translate "Depo" %}</th>
+          <th class="o-num">{% translate "Kalan" %}</th>
+          <th>{% translate "SKT" %}</th>
+          <th>{% translate "Tazelik" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in lots %}
+          <tr>
+            <td>
+              <a href="{% url 'lot-detail' row.lot.pk %}" class="o-table-link">{{ row.lot.product.name }}</a>
+              {% if row.lot.product.category %}<span class="o-table-sub">{{ row.lot.product.category }}</span>{% endif %}
+            </td>
+            <td><span class="o-mono">{{ row.lot.lot_code }}</span></td>
+            <td>
+              {% if row.lot.warehouse %}
+                <a href="{% url 'warehouse-detail' row.lot.warehouse_id %}" class="o-table-link">{{ row.lot.warehouse.name }}</a>
+              {% else %}<span class="o-faint">{% translate "Atanmamış" %}</span>{% endif %}
+            </td>
+            <td class="o-num {% if row.is_empty %}o-faint{% else %}o-strong{% endif %}">
+              {{ row.remaining|qty:row.lot.product.get_unit_display }}
+            </td>
+            <td class="o-nowrap">{{ row.lot.expiry_date|date:"d M Y" }}</td>
+            <td>{% ui_badge_raw "inventory.Lot.freshness" row.freshness %}</td>
+          </tr>
+        {% empty %}
+          {% translate "Gösterilecek lot yok" as t %}
+          {% translate "Stok, satın alma siparişinin teslim alma adımında oluşur." as d %}
+          {% translate "Satın alma siparişlerine git" as cta %}
+          {% url 'purchasing-list' as po_url %}
+          {% ui_empty icon="bi-box2" title=t text=d action_url=po_url action_label=cta colspan=6 %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,63 +1,53 @@
 {% extends 'base.html' %}
-{% block title %}Bildirimler — Reflow Coffee ERP{% endblock %}
-{% block page_title %}Sistem / Bildirimler{% endblock %}
-
-{% block extra_head %}
-<style>
-  .data-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:12px; overflow:hidden; }
-  .data-card .table { margin:0; font-size:13px; }
-  .data-card .table thead th { background:var(--g-n-50); border-bottom:1px solid var(--g-border); color:var(--g-text-2); font-size:11px; font-weight:700; letter-spacing:.65px; padding:11px 16px; text-transform:uppercase; white-space:nowrap; }
-  .data-card .table tbody td { border-color:var(--g-border-sub); color:var(--g-text); padding:13px 16px; vertical-align:middle; }
-  .data-card .table tbody tr:hover { background:var(--g-n-50); }
-  .notification-message { color:var(--g-text); font-weight:600; text-decoration:none; }
-  .notification-message:hover { color:#2563eb; }
-  .unread-row { background:#f8fbff; }
-  .unread-dot { background:#2563eb; border-radius:50%; display:inline-block; height:7px; margin-right:7px; width:7px; }
-  .empty-state { color:var(--g-text-3); padding:52px 24px; text-align:center; }
-  .empty-state i { display:block; font-size:34px; margin-bottom:8px; }
-</style>
-{% endblock %}
+{% block title %}{% translate "Bildirimler" %}{% endblock %}
+{% block cp_pager %}{% ui_pager page_obj %}{% endblock %}
 
 {% block content %}
-<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
-  <div>
-    <h4 class="fw-bold mb-1 text-dark"><i class="bi bi-bell me-2" style="color:#2563eb;"></i>Bildirimler</h4>
-    <p class="mb-0 text-muted" style="font-size:13px;">Operasyon ekiplerine ait güncel uyarıları ve işlem bildirimlerini takip edin.</p>
+  <div class="o-button-box o-po-kpis">
+    {% translate "Okunmamış" as l1 %}{% ui_stat value=unread_count label=l1 icon="bi-bell" variant="warning" %}
   </div>
-  <span class="badge bg-primary-subtle text-primary-emphasis fw-medium">{{ notifications|length }} kayıt</span>
-</div>
 
-<div class="data-card">
-  <div class="table-responsive">
-    <table class="table table-borderless align-middle">
+  <div class="o-list"><div class="o-list-scroll">
+    <table class="o-table">
       <thead>
-        <tr><th>Mesaj</th><th>Tarih</th><th>Durum</th></tr>
+        <tr>
+          <th>{% translate "Bildirim" %}</th>
+          <th>{% translate "Durum" %}</th>
+          <th>{% translate "Zaman" %}</th>
+          <th></th>
+        </tr>
       </thead>
       <tbody>
         {% for notification in notifications %}
-        <tr {% if not notification.is_read %}class="unread-row"{% endif %}>
-          <td>
-            <form method="post" action="{% url 'notification-read' notification.pk %}" data-notification-read data-notification-redirect="{{ notification.url }}">
-              {% csrf_token %}
-              <button type="submit" class="notification-message border-0 bg-transparent p-0 text-start">
-                {% if not notification.is_read %}<span class="unread-dot"></span>{% endif %}{{ notification.message }}
-              </button>
-            </form>
-          </td>
-          <td class="text-muted" style="font-size:12px;">{{ notification.created_at|date:"d M Y, H:i" }}</td>
-          <td>
-            {% if notification.is_read %}
-            <span class="badge bg-secondary-subtle text-secondary-emphasis fw-medium" data-notification-status>Okundu</span>
-            {% else %}
-            <span class="badge bg-primary-subtle text-primary-emphasis fw-medium" data-notification-status>Yeni</span>
-            {% endif %}
-          </td>
-        </tr>
+          <tr{% if not notification.is_read %} class="o-unread"{% endif %}>
+            <td>{{ notification.message }}</td>
+            <td>
+              <span class="o-badge o-badge--{% if notification.is_read %}muted{% else %}warning{% endif %}"
+                    data-notification-status>
+                {% if notification.is_read %}{% translate "Okundu" %}{% else %}{% translate "Okunmadı" %}{% endif %}
+              </span>
+            </td>
+            <td class="o-nowrap o-muted o-sm">{{ notification.created_at|date:"d M Y, H:i" }}</td>
+            <td class="o-actions">
+              {% if not notification.is_read %}
+                <form method="post" action="{% url 'notification-read' notification.pk %}"
+                      data-notification-read data-notification-redirect="{{ notification.url }}">
+                  {% csrf_token %}
+                  <button type="submit" class="o-btn o-btn--sm">
+                    <i class="bi bi-check-lg" aria-hidden="true"></i> {% translate "Okundu işaretle" %}
+                  </button>
+                </form>
+              {% elif notification.url %}
+                <a class="o-btn o-btn--sm o-btn--ghost" href="{{ notification.url }}">
+                  <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                </a>
+              {% endif %}
+            </td>
+          </tr>
         {% empty %}
-        <tr><td colspan="3" class="empty-state"><i class="bi bi-bell-slash"></i>Henüz bildirim yok.</td></tr>
+          {% translate "Bildirim yok" as t %}{% ui_empty icon="bi-bell-slash" title=t colspan=4 %}
         {% endfor %}
       </tbody>
     </table>
-  </div>
-</div>
+  </div></div>
 {% endblock %}

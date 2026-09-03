@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}{% if customer %}{{ customer.name }}{% else %}{% translate "Yeni Müşteri" %}{% endif %}{% endblock %}
+
+{% block cp_breadcrumb %}
+  {% if customer %}
+    {% url 'customer-detail' customer.pk as back %}
+    {% translate "Düzenle" as rec %}{% ui_breadcrumb parent=customer.name parent_url=back record=rec %}
+  {% else %}
+    {% translate "Yeni" as rec %}{% ui_breadcrumb record=rec %}
+  {% endif %}
+{% endblock %}
+
+{% block cp_buttons %}
+  <button type="submit" form="o-form" class="o-btn o-btn--primary">
+    <i class="bi bi-check-lg" aria-hidden="true"></i> {% translate "Kaydet" %}
+  </button>
+  <a class="o-btn" href="{% if customer %}{% url 'customer-detail' customer.pk %}{% else %}{% url 'customer-list' %}{% endif %}">
+    {% translate "Vazgeç" %}
+  </a>
+{% endblock %}
+
+{% block content_class %} o-content--sheet{% endblock %}
+
+{% block content %}
+{% ui_sheet %}
+  <form method="post" id="o-form">
+    {% csrf_token %}
+    {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+    {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+
+    <h1 class="o-form-title">
+      {% if customer %}{% translate "Müşteriyi düzenle" %}{% else %}{% translate "Yeni müşteri" %}{% endif %}
+    </h1>
+    <p class="o-form-subtitle">
+      {% translate "Toptan müşteriler kafeler, perakende müşteriler bireysel alıcılardır." %}
+    </p>
+
+    {% if next %}
+      <p class="o-note">
+        <i class="bi bi-info-circle" aria-hidden="true"></i>
+        {% translate "Kayıttan sonra sipariş formuna dönülecek ve bu müşteri seçili gelecek." %}
+      </p>
+    {% endif %}
+
+    {% translate "Müşteri bilgileri" as g %}
+    {% ui_group g %}
+      {% ui_field form.name cols=8 %}
+      {% ui_field form.customer_type cols=4 %}
+      {% ui_field form.contact_email cols=6 %}
+      {% ui_field form.contact_phone cols=6 %}
+    {% endui_group %}
+  </form>
+{% endui_sheet %}
+{% endblock %}

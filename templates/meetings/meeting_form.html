@@ -1,96 +1,107 @@
 {% extends 'base.html' %}
-{% block title %}{% if meeting %}Toplantıyı Düzenle{% else %}Yeni Toplantı{% endif %} — Reflow Coffee ERP{% endblock %}
-{% block nav_meetings %}active{% endblock %}
-{% block page_title %}Takvim / {% if meeting %}Toplantıyı Düzenle{% else %}Yeni Toplantı{% endif %}{% endblock %}
+{% block title %}{% if meeting %}{{ meeting.title }}{% else %}{% translate "Yeni Toplantı" %}{% endif %}{% endblock %}
 
-{% block extra_head %}
-<style>
-  .form-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:12px; max-width:900px; overflow:hidden; }
-  .form-card-head { background:var(--g-n-50); border-bottom:1px solid var(--g-border); padding:18px 22px; }
-  .form-card-body { padding:22px; }.form-label { color:var(--g-text); font-size:13px; font-weight:600; }
-  .form-help { color:var(--g-text-2); font-size:11.5px; }.form-note { background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; color:#1e40af; font-size:12.5px; padding:12px 13px; }
-</style>
+{% block cp_breadcrumb %}
+  {% if meeting %}
+    {% url 'meeting-detail' meeting.pk as back %}
+    {% translate "Düzenle" as rec %}{% ui_breadcrumb parent=meeting.title parent_url=back record=rec %}
+  {% else %}{% translate "Yeni toplantı" as rec %}{% ui_breadcrumb record=rec %}{% endif %}
 {% endblock %}
+
+{% block cp_buttons %}
+  <button type="submit" form="o-form" class="o-btn o-btn--primary">
+    <i class="bi bi-check-lg" aria-hidden="true"></i> {% translate "Kaydet" %}
+  </button>
+  <a class="o-btn" href="{% if meeting %}{% url 'meeting-detail' meeting.pk %}{% else %}{% url 'meeting-calendar' %}{% endif %}">
+    {% translate "Vazgeç" %}
+  </a>
+{% endblock %}
+
+{% block content_class %} o-content--sheet{% endblock %}
 
 {% block content %}
-<div class="mb-3"><a href="{% url 'meeting-calendar' %}" class="text-decoration-none" style="font-size:13px;"><i class="bi bi-arrow-left me-1"></i>Takvime dön</a></div>
-
-<div class="form-card">
-  <div class="form-card-head"><h5 class="mb-1 fw-bold">{% if meeting %}Toplantıyı Düzenle{% else %}Yeni Toplantı{% endif %}</h5><p class="mb-0 text-muted" style="font-size:13px;">Toplantının zamanını, sorumlusunu ve varsa müşteri/fırsat bağlantısını ekleyin.</p></div>
-  <form method="post" class="form-card-body" {% if meeting %}action="{% url 'meeting-edit' meeting.pk %}"{% else %}action="{% url 'meeting-create' %}"{% endif %}>
+{% ui_sheet %}
+  <form method="post" id="o-form" data-o-conflict-url="{% url 'meeting-check-conflicts' %}">
     {% csrf_token %}
-    <div class="row g-3">
-      <div class="col-12"><label for="title" class="form-label">Başlık</label><input id="title" name="title" type="text" class="form-control" maxlength="255" value="{{ meeting.title|default:'' }}" placeholder="Örn. Yeni hasat teklif görüşmesi" required></div>
-      <div class="col-md-4"><label for="meeting_date" class="form-label">Tarih</label><input id="meeting_date" name="meeting_date" type="date" class="form-control" value="{{ meeting.start_time|date:'Y-m-d'|default:'' }}" required></div>
-      <div class="col-md-4"><label for="start_time_only" class="form-label">Başlangıç Saati</label><input id="start_time_only" name="start_time_only" type="time" class="form-control" value="{{ meeting.start_time|time:'H:i'|default:'' }}" required></div>
-      <div class="col-md-4"><label for="end_time_only" class="form-label">Bitiş Saati</label><input id="end_time_only" name="end_time_only" type="time" class="form-control" value="{{ meeting.end_time|time:'H:i'|default:'' }}" required></div>
-      <div class="col-md-6"><label for="organizer" class="form-label">Organizatör</label><select id="organizer" name="organizer" class="form-select" required><option value="">Çalışan seçin</option>{% for employee in employees %}<option value="{{ employee.pk }}" {% if meeting and meeting.organizer_id == employee.pk %}selected{% endif %}>{{ employee.name }} · {{ employee.position }}</option>{% endfor %}</select><div class="mt-3"><label for="attendees" class="form-label">Katılımcılar <span class="text-muted fw-normal">(isteğe bağlı)</span></label><select id="attendees" name="attendees" multiple class="form-select">{% for employee in employees %}<option value="{{ employee.pk }}" {% if meeting and employee in meeting.attendees.all %}selected{% endif %}>{{ employee.name }} · {{ employee.position }}</option>{% endfor %}</select><div class="form-help mt-1">Birden fazla kişi seçmek için Ctrl veya Cmd tuşunu kullanın.</div></div></div>
-      <div class="col-md-6"><label for="location" class="form-label">Konum</label><input id="location" name="location" type="text" class="form-control" maxlength="255" value="{{ meeting.location|default:'' }}" placeholder="Örn. Merkez ofis / Google Meet"></div>
-      <div class="col-md-6"><label for="customer" class="form-label">Müşteri <span class="text-muted fw-normal">(isteğe bağlı)</span></label><select id="customer" name="customer" class="form-select"><option value="" {% if not meeting or not meeting.customer_id %}selected{% endif %}>Müşteri seçilmedi</option>{% for customer in customers %}<option value="{{ customer.pk }}" {% if meeting and meeting.customer_id == customer.pk %}selected{% endif %}>{{ customer.name }}</option>{% endfor %}</select></div>
-      <div class="col-md-6"><label for="opportunity" class="form-label">Fırsat <span class="text-muted fw-normal">(isteğe bağlı)</span></label><select id="opportunity" name="opportunity" class="form-select"><option value="" {% if not meeting or not meeting.opportunity_id %}selected{% endif %}>Fırsat seçilmedi</option>{% for opportunity in opportunities %}<option value="{{ opportunity.pk }}" {% if meeting and meeting.opportunity_id == opportunity.pk %}selected{% endif %}>{{ opportunity.title }} · {{ opportunity.customer.name }}</option>{% endfor %}</select><div class="form-help mt-1">Kazanılmış veya kaybedilmiş fırsatlar listelenmez.</div></div>
-      <div class="col-12"><label for="description" class="form-label">Açıklama <span class="text-muted fw-normal">(isteğe bağlı)</span></label><textarea id="description" name="description" class="form-control" rows="4" placeholder="Gündem, hazırlık notları veya görüşme hedefi...">{{ meeting.description|default:'' }}</textarea></div>
-    </div>
-    <div class="form-note mt-4"><i class="bi bi-info-circle-fill me-1"></i>Toplantı kaydedildiğinde organizatör, seçilen katılımcılar ve varsa müşteri için davet e-postası sıraya alınır.</div>
-    <div id="live-conflict-warning" class="alert alert-warning mt-4 mb-0" role="alert" style="display: none;"></div>
-    <div class="d-flex justify-content-end gap-2 border-top mt-4 pt-3"><a href="{% url 'meeting-calendar' %}" class="btn btn-light">Vazgeç</a><button class="btn btn-primary" type="submit"><i class="bi bi-calendar-check me-1"></i>{% if meeting %}Kaydet{% else %}Oluştur{% endif %}</button></div>
+    <h1 class="o-form-title">
+      {% if meeting %}{% translate "Toplantıyı düzenle" %}{% else %}{% translate "Yeni toplantı" %}{% endif %}
+    </h1>
+
+    <p class="o-note o-conflict" id="o-conflict-warning" hidden></p>
+
+    {% translate "Toplantı bilgileri" as g1 %}
+    {% ui_group g1 %}
+      <div class="o-field o-col-8">
+        <label class="o-label" for="title">{% translate "Başlık" %}<span class="o-required">*</span></label>
+        <input type="text" id="title" name="title" class="o-input" required value="{{ meeting.title|default:'' }}">
+      </div>
+      <div class="o-field o-col-4">
+        <label class="o-label" for="location">{% translate "Konum" %}</label>
+        <input type="text" id="location" name="location" class="o-input" value="{{ meeting.location|default:'' }}">
+      </div>
+
+      <div class="o-field o-col-4">
+        <label class="o-label" for="meeting_date">{% translate "Tarih" %}<span class="o-required">*</span></label>
+        <input type="date" id="meeting_date" name="meeting_date" class="o-input" required
+               value="{{ meeting.start_time|date:'Y-m-d'|default:'' }}">
+      </div>
+      <div class="o-field o-col-4">
+        <label class="o-label" for="start_time_only">{% translate "Başlangıç saati" %}<span class="o-required">*</span></label>
+        <input type="time" id="start_time_only" name="start_time_only" class="o-input" required
+               value="{{ meeting.start_time|time:'H:i'|default:'' }}">
+      </div>
+      <div class="o-field o-col-4">
+        <label class="o-label" for="end_time_only">{% translate "Bitiş saati" %}<span class="o-required">*</span></label>
+        <input type="time" id="end_time_only" name="end_time_only" class="o-input" required
+               value="{{ meeting.end_time|time:'H:i'|default:'' }}">
+      </div>
+
+      <div class="o-field o-col-12">
+        <label class="o-label" for="description">{% translate "Açıklama" %}</label>
+        <textarea id="description" name="description" class="o-textarea" rows="3">{{ meeting.description|default:'' }}</textarea>
+      </div>
+    {% endui_group %}
+
+    {% translate "Katılımcılar ve bağlantılar" as g2 %}
+    {% ui_group g2 %}
+      <div class="o-field o-col-6">
+        <label class="o-label" for="organizer">{% translate "Organizatör" %}<span class="o-required">*</span></label>
+        <select id="organizer" name="organizer" class="o-select" required>
+          <option value="">{% translate "Çalışan seçin" %}</option>
+          {% for emp in employees %}
+            <option value="{{ emp.pk }}" {% if meeting.organizer_id == emp.pk %}selected{% endif %}>{{ emp.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="o-field o-col-6">
+        <label class="o-label" for="attendees">{% translate "Katılımcılar" %}</label>
+        <select id="attendees" name="attendees" class="o-select o-select--multi" multiple>
+          {% for emp in employees %}
+            <option value="{{ emp.pk }}" {% if emp in meeting.attendees.all %}selected{% endif %}>{{ emp.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="o-field o-col-6">
+        <label class="o-label" for="customer">{% translate "Müşteri" %}</label>
+        <select id="customer" name="customer" class="o-select">
+          <option value="">—</option>
+          {% for c in customers %}
+            <option value="{{ c.pk }}" {% if meeting.customer_id == c.pk %}selected{% endif %}>{{ c.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="o-field o-col-6">
+        <label class="o-label" for="opportunity">{% translate "Fırsat" %}</label>
+        <select id="opportunity" name="opportunity" class="o-select">
+          <option value="">—</option>
+          {% for o in opportunities %}
+            <option value="{{ o.pk }}" {% if meeting.opportunity_id == o.pk %}selected{% endif %}>{{ o.title }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    {% endui_group %}
   </form>
-</div>
-
-<script>
-  const meetingDateInput = document.getElementById('meeting_date');
-  const startTimeInput = document.getElementById('start_time_only');
-  const endTimeInput = document.getElementById('end_time_only');
-  const organizerInput = document.getElementById('organizer');
-  const attendeesInput = document.getElementById('attendees');
-  const liveConflictWarning = document.getElementById('live-conflict-warning');
-
-  function hideLiveConflictWarning() {
-    liveConflictWarning.textContent = '';
-    liveConflictWarning.style.display = 'none';
-  }
-
-  async function checkLiveConflicts() {
-    const employeeIds = new Set();
-    if (organizerInput.value) {
-      employeeIds.add(organizerInput.value);
-    }
-    for (const option of attendeesInput.selectedOptions) {
-      employeeIds.add(option.value);
-    }
-
-    if (!meetingDateInput.value || !startTimeInput.value || !endTimeInput.value || !employeeIds.size) {
-      hideLiveConflictWarning();
-      return;
-    }
-
-    const params = new URLSearchParams({
-      date: meetingDateInput.value,
-      start_time: startTimeInput.value,
-      end_time: endTimeInput.value,
-    });
-    for (const employeeId of employeeIds) {
-      params.append('employee_ids', employeeId);
-    }
-
-    try {
-      const response = await fetch('{% url 'meeting-check-conflicts' %}?' + params.toString());
-      if (!response.ok) {
-        throw new Error('Çakışma kontrolü gerçekleştirilemedi.');
-      }
-      const data = await response.json();
-      if (data.conflicts.length) {
-        liveConflictWarning.textContent = 'Şu kişiler bu tarihte izinli görünüyor: ' + data.conflicts.join(', ');
-        liveConflictWarning.style.display = '';
-      } else {
-        hideLiveConflictWarning();
-      }
-    } catch (error) {
-      hideLiveConflictWarning();
-    }
-  }
-
-  [meetingDateInput, startTimeInput, endTimeInput, organizerInput, attendeesInput].forEach((input) => {
-    input.addEventListener('change', checkLiveConflicts);
-  });
-</script>
+{% endui_sheet %}
 {% endblock %}
+
+{% block scripts %}<script src="{% static 'js/o-meetings.js' %}?v={{ asset_version }}"></script>{% endblock %}

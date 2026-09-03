@@ -1,49 +1,78 @@
 {% extends 'base.html' %}
-{% block title %}Takvim — Reflow Coffee ERP{% endblock %}
-{% block nav_meetings %}active{% endblock %}
-{% block page_title %}Takvim{% endblock %}
+{% block title %}{% translate "Takvim" %}{% endblock %}
+{% block region_attr %} data-ajax-region{% endblock %}
 
-{% block extra_head %}
-<style>
-  .calendar-card, .upcoming-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:12px; overflow:hidden; }
-  .calendar-header { align-items:center; display:flex; gap:12px; justify-content:space-between; padding:16px 18px; }
-  .calendar-title { color:var(--g-text); font-size:18px; font-weight:700; margin:0; }
-  .calendar-nav { align-items:center; display:flex; gap:8px; }
-  .calendar-nav a { color:#2563eb; font-size:12.5px; font-weight:600; text-decoration:none; }
-  .calendar-nav a:hover { color:#1d4ed8; text-decoration:underline; }
-  .calendar-weekdays, .calendar-week { display:grid; grid-template-columns:repeat(7, minmax(110px, 1fr)); }
-  .calendar-weekdays { border-bottom:1px solid var(--g-border); border-top:1px solid var(--g-border); }
-  .calendar-weekday { background:var(--g-n-50); color:var(--g-text-2); font-size:10.5px; font-weight:700; letter-spacing:.6px; padding:10px 11px; text-align:right; text-transform:uppercase; }
-  .calendar-day, .calendar-blank { border-bottom:1px solid var(--g-border); border-right:1px solid var(--g-border); min-height:116px; padding:8px; }
-  .calendar-week > :nth-child(7n) { border-right:0; }
-  .calendar-week:last-child .calendar-day, .calendar-week:last-child .calendar-blank { border-bottom:0; }
-  .calendar-blank { background:#fbfdff; }
-  .calendar-day.is-today { background:#eff6ff; }
-  .calendar-day-number { color:var(--g-text-2); display:block; font-size:12px; font-weight:700; margin-bottom:6px; text-align:right; }
-  .is-today .calendar-day-number { color:#2563eb; }
-  .meeting-tag { background:#e0ecff; border-radius:5px; color:#1d4ed8; display:block; font-size:11px; line-height:1.3; margin-bottom:4px; overflow:hidden; padding:4px 5px; text-decoration:none; text-overflow:ellipsis; white-space:nowrap; }
-  .meeting-tag:hover { background:#bfdbfe; color:#1e40af; }
-  .meeting-time { font-weight:700; margin-right:3px; }
-  .upcoming-head { align-items:center; background:var(--g-n-50); border-bottom:1px solid var(--g-border); color:var(--g-text-2); display:flex; font-size:13px; font-weight:700; gap:7px; padding:13px 15px; }
-  .upcoming-item { border-bottom:1px solid var(--g-border-sub); color:var(--g-text); display:block; padding:13px 15px; text-decoration:none; }
-  .upcoming-item:last-child { border-bottom:0; }
-  .upcoming-item:hover { background:var(--g-n-50); color:#1d4ed8; }
-  .upcoming-title { color:var(--g-text); font-size:13px; font-weight:700; }
-  .upcoming-meta { color:var(--g-text-2); font-size:11.5px; margin-top:4px; }
-  .empty-upcoming { color:var(--g-text-3); font-size:12.5px; padding:28px 15px; text-align:center; }
-  @media (max-width: 991px) { .calendar-scroll { overflow-x:auto; } }
-  @media (max-width: 575px) { .calendar-header { align-items:flex-start; flex-direction:column; } .calendar-nav { width:100%; justify-content:space-between; } }
-</style>
+{% block cp_buttons %}
+  <a href="{% url 'meeting-create' %}" class="o-btn o-btn--primary">
+    <i class="bi bi-plus-lg" aria-hidden="true"></i> {% translate "Yeni Toplantı" %}
+  </a>
 {% endblock %}
 
 {% block content %}
-<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
-  <div>
-    <h4 class="fw-bold mb-1 text-dark"><i class="bi bi-calendar3 me-2" style="color:#2563eb;"></i>Toplantı Takvimi</h4>
-    <p class="mb-0 text-muted" style="font-size:13px;">Müşteri görüşmelerini ve ekip toplantılarını ay görünümünde takip edin.</p>
+  <div class="o-button-box o-po-kpis">
+    {% translate "Bu ay" as l1 %}{% ui_stat value=month_count label=l1 icon="bi-calendar3" %}
+    {% translate "Planlanan" as l2 %}{% ui_stat value=scheduled_count label=l2 icon="bi-clock" variant="success" %}
   </div>
-  <a href="{% url 'meeting-create' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Yeni Toplantı</a>
-</div>
 
-{% include 'meetings/_calendar_results.html' %}
+  <div class="o-cal-layout">
+    <div>
+      <div class="o-cal-toolbar">
+        <a class="o-btn o-btn--sm" data-ajax-link data-ajax-target="#o-view"
+           href="?year={{ prev_year }}&month={{ prev_month }}"
+           aria-label="{% translate 'Önceki ay' %}"><i class="bi bi-chevron-left" aria-hidden="true"></i></a>
+        <span class="o-cal-label">{{ month_label }}</span>
+        <a class="o-btn o-btn--sm" data-ajax-link data-ajax-target="#o-view"
+           href="?year={{ next_year }}&month={{ next_month }}"
+           aria-label="{% translate 'Sonraki ay' %}"><i class="bi bi-chevron-right" aria-hidden="true"></i></a>
+      </div>
+
+      <div class="o-cal">
+        <div class="o-cal-head">
+          {% for name in weekday_names %}<div class="o-cal-dow">{{ name }}</div>{% endfor %}
+        </div>
+        {% for week in weeks %}
+          <div class="o-cal-week">
+            {% for day in week %}
+              {% if day %}
+                <div class="o-cal-day{% if day.is_today %} o-cal-day--today{% endif %}">
+                  <span class="o-cal-num">{{ day.day }}</span>
+                  {% for meeting in day.events %}
+                    <a class="o-cal-event" href="{% url 'meeting-detail' meeting.pk %}"
+                       title="{{ meeting.title }} · {{ meeting.start_time|time:'H:i' }}">
+                      {{ meeting.start_time|time:"H:i" }} {{ meeting.title }}
+                    </a>
+                  {% endfor %}
+                </div>
+              {% else %}
+                <div class="o-cal-day o-cal-day--out"></div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <aside class="o-list o-cal-side">
+      <header class="o-list-head"><h2 class="o-list-title">{% translate "Yaklaşan Toplantılar" %}</h2></header>
+      <div class="o-upcoming">
+        {% for meeting in upcoming %}
+          <a class="o-upcoming-item" href="{% url 'meeting-detail' meeting.pk %}">
+            <span class="o-upcoming-date">
+              <strong>{{ meeting.start_time|date:"d" }}</strong>
+              <span>{{ meeting.start_time|date:"M" }}</span>
+            </span>
+            <span class="o-upcoming-body">
+              <span class="o-strong">{{ meeting.title }}</span>
+              <span class="o-muted o-xs">
+                {{ meeting.start_time|time:"H:i" }} – {{ meeting.end_time|time:"H:i" }}
+                {% if meeting.location %}· {{ meeting.location }}{% endif %}
+              </span>
+            </span>
+          </a>
+        {% empty %}
+          <p class="o-chatter-empty">{% translate "Yaklaşan toplantı yok." %}</p>
+        {% endfor %}
+      </div>
+    </aside>
+  </div>
 {% endblock %}

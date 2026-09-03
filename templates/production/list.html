@@ -1,74 +1,24 @@
 {% extends 'base.html' %}
-{% block title %}Üretim — Reflow Coffee ERP{% endblock %}
-{% block nav_production %}active{% endblock %}
-{% block nav_production_batches %}active{% endblock %}
-{% block page_title %}Üretim{% endblock %}
+{% block title %}{% translate "Üretim Emirleri" %}{% endblock %}
+{% block region_attr %} data-ajax-region{% endblock %}
 
-{% block extra_head %}
-<style>
-  .data-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:10px; overflow:hidden; }
-  .data-card .table { margin-bottom:0; font-size:13.5px; }
-  .data-card .table thead th { background:var(--g-n-50); color:var(--g-text-2); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.7px; border-bottom:1px solid var(--g-border); padding:10px 16px; white-space:nowrap; }
-  .data-card .table tbody td { padding:11px 16px; vertical-align:middle; color:var(--g-text); border-color:var(--g-border-sub); }
-  .data-card .table tbody tr:last-child td { border-bottom:none; }
-  .data-card .table tbody tr:hover { background:var(--g-n-50); }
-  .empty-state { padding:48px 24px; text-align:center; color:var(--g-text-3); }
-  .empty-state i { font-size:36px; display:block; margin-bottom:8px; }
-  .lot-code { font-family: monospace; font-size:12.5px; color:var(--g-text-2); }
-  .prod-subnav { display:flex; gap:4px; margin-bottom:20px; border-bottom:1px solid var(--g-border); padding-bottom:0; }
-  .prod-subnav a { padding:8px 14px; font-size:13px; font-weight:500; color:var(--g-text-2); text-decoration:none; border-bottom:2px solid transparent; margin-bottom:-1px; white-space:nowrap; }
-  .prod-subnav a:hover { color:var(--g-text); }
-  .prod-subnav a.active { color:#ca8a04; border-bottom-color:#ca8a04; font-weight:600; }
-</style>
+{% block cp_buttons %}
+  <a href="{% url 'production-batch-create' %}" class="o-btn o-btn--primary">
+    <i class="bi bi-plus-lg" aria-hidden="true"></i> {% translate "Yeni" %}
+  </a>
+  <a href="{% url 'production-recipes' %}" class="o-btn">
+    <i class="bi bi-journal-text" aria-hidden="true"></i> {% translate "Reçeteler" %}
+  </a>
 {% endblock %}
 
+{% block cp_pager %}{% ui_pager page_obj %}{% endblock %}
+{% block cp_views %}{% ui_view_switcher "list,kanban" current=view %}{% endblock %}
+
 {% block content %}
-<div class="prod-subnav">
-  <a href="{% url 'production-list' %}" class="active" data-i18n="production-orders">Üretim Emirleri</a>
-  <a href="{% url 'production-recipes' %}" data-i18n="recipes-bom">Reçeteler (BOM)</a>
-</div>
-
-<div class="d-flex align-items-center gap-3 mb-4">
-  <h4 class="fw-bold mb-0 text-dark"><i class="bi bi-fire me-2" style="color:#ca8a04;"></i><span data-i18n="production-orders">Üretim Emirleri</span></h4>
-  <span class="text-muted" style="font-size:13px;">{{ batches|length }} kayıt</span>
-  <a href="{% url 'production-batch-create' %}" class="btn btn-sm ms-auto" style="background:#ca8a04; color:#fff; font-size:13px;">
-    <i class="bi bi-plus-lg me-1"></i><span data-i18n="new-production-order">Yeni Üretim Emri</span>
-  </a>
-</div>
-
-<div class="data-card">
-  <table class="table table-borderless">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th data-i18n="recipe">Tarif (Reçete)</th>
-        <th data-i18n="output-product">Çıktı Ürünü</th>
-        <th data-i18n="output-lot-code">Çıktı Lot Kodu</th>
-        <th data-i18n="output-quantity">Çıktı Miktarı</th>
-        <th data-i18n="roast-date">Kavurma Tarihi</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for batch in batches %}
-      <tr>
-        <td class="text-muted" style="font-size:12.5px;">
-          <a href="{% url 'production-batch-detail' batch.pk %}" style="color:var(--g-text-2); text-decoration:none;">#{{ batch.pk }}</a>
-        </td>
-        <td class="fw-medium">{{ batch.recipe.name }}</td>
-        <td>{{ batch.output_lot.product.name }}</td>
-        <td><span class="lot-code">{{ batch.output_lot.lot_code }}</span></td>
-        <td>{{ batch.total_output_quantity|floatformat:3 }} {{ batch.output_lot.product.unit }}</td>
-        <td style="font-size:12.5px; color:var(--g-text-2);">{{ batch.roasted_at|date:"d M Y H:i" }}</td>
-      </tr>
-      {% empty %}
-      <tr>
-        <td colspan="6" class="empty-state">
-          <i class="bi bi-inbox"></i>
-          <span data-i18n="no-production-orders">Henüz hiç üretim emri yok.</span>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
+  <div class="o-button-box o-po-kpis">
+    {% translate "Üretim emri" as l1 %}{% ui_stat value=batch_count label=l1 icon="bi-thermometer-high" %}
+    {% translate "Kalite kontrolü bekleyen" as l2 %}{% ui_stat value=pending_qc label=l2 icon="bi-hourglass-split" variant="warning" %}
+    {% translate "Reçete" as l3 %}{% ui_stat value=recipe_count label=l3 icon="bi-journal-text" %}
+  </div>
+  {% include view_template %}
 {% endblock %}

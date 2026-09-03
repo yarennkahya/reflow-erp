@@ -1,113 +1,77 @@
 {% extends 'base.html' %}
-{% block title %}Finans — Reflow Coffee ERP{% endblock %}
-{% block nav_finance %}active{% endblock %}
-{% block nav_finance_overview %}active{% endblock %}
-{% block page_title %}Finans{% endblock %}
+{% block title %}{% translate "Kârlılık Raporu" %}{% endblock %}
+{% block cp_views %}{% ui_view_switcher "list,graph" current=view %}{% endblock %}
 
-{% block extra_head %}
-<style>
-  .summary-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:10px; padding:20px; }
-  .summary-card .label { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.7px; color:var(--g-text-2); margin-bottom:4px; }
-  .summary-card .value { font-size:26px; font-weight:700; color:var(--g-text); line-height:1; }
-  .summary-card .sub { font-size:12px; color:var(--g-text-3); margin-top:2px; }
-  .summary-card .icon-wrap { width:42px; height:42px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
-  .data-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:10px; overflow:hidden; }
-  .data-card .table { margin-bottom:0; font-size:13.5px; }
-  .data-card .table thead th { background:var(--g-n-50); color:var(--g-text-2); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.7px; border-bottom:1px solid var(--g-border); padding:10px 16px; white-space:nowrap; }
-  .data-card .table tbody td { padding:11px 16px; vertical-align:middle; color:var(--g-text); border-color:var(--g-border-sub); }
-  .data-card .table tbody tr:last-child td { border-bottom:none; }
-  .data-card .table tbody tr:hover { background:var(--g-n-50); }
-  .empty-state { padding:48px 24px; text-align:center; color:var(--g-text-3); }
-  .empty-state i { font-size:36px; display:block; margin-bottom:8px; }
-</style>
+{% block cp_buttons %}
+  <a href="{% url 'invoice-list' %}" class="o-btn">
+    <i class="bi bi-receipt" aria-hidden="true"></i> {% translate "Faturalar" %}
+  </a>
 {% endblock %}
 
 {% block content %}
-<div class="mb-3">
-  <div class="btn-group" role="group">
-    <a href="{% url 'finance-report' %}" class="btn btn-sm btn-primary">Kârlılık Raporu</a>
-    <a href="{% url 'invoice-list' %}" class="btn btn-sm btn-outline-primary">Faturalar</a>
+  <div class="o-button-box o-po-kpis">
+    {% translate "Toplam gelir" as l1 %}{% ui_stat value=report.total_revenue|money label=l1 icon="bi-arrow-up-right" variant="success" %}
+    {% translate "Toplam maliyet" as l2 %}{% ui_stat value=report.total_cost|money label=l2 icon="bi-arrow-down-right" %}
+    {% translate "Toplam kâr" as l3 %}{% ui_stat value=report.total_profit|money label=l3 icon="bi-cash-stack" variant="success" %}
+    {% translate "Kâr marjı" as l4 %}{% ui_stat value=report.margin_percent|stringformat:"s"|add:"%" label=l4 icon="bi-percent" %}
   </div>
-</div>
-<div class="d-flex align-items-baseline gap-3 mb-4">
-  <h4 class="fw-bold mb-0 text-dark"><i class="bi bi-graph-up-arrow me-2" style="color:#22c55e;"></i>Kârlılık Raporu</h4>
-  <span class="text-muted" style="font-size:13px;">Tamamlanan siparişler</span>
-</div>
 
-<!-- Özet kartlar -->
-<div class="row g-3 mb-4">
-  <div class="col-md-3">
-    <div class="summary-card d-flex align-items-start justify-content-between">
-      <div>
-        <div class="label">Toplam Gelir</div>
-        <div class="value">₺{{ report.total_revenue|floatformat:2 }}</div>
-      </div>
-      <div class="icon-wrap" style="background:#eff6ff; color:#3b82f6;"><i class="bi bi-arrow-up-right-circle"></i></div>
+  {% if view == 'graph' and charts %}
+    <div class="o-graph-grid">
+      {% translate "Sipariş bazında gelir ve maliyet" as gt1 %}
+      {% ui_graph "fin-orders" charts.profit type="bar" height=320 title=gt1 %}
+      {% translate "Ürün bazında kâr dağılımı" as gt2 %}
+      {% ui_graph "fin-products" charts.by_product type="doughnut" height=320 title=gt2 %}
     </div>
-  </div>
-  <div class="col-md-3">
-    <div class="summary-card d-flex align-items-start justify-content-between">
-      <div>
-        <div class="label">Toplam Maliyet</div>
-        <div class="value text-danger">₺{{ report.total_cost|floatformat:2 }}</div>
-      </div>
-      <div class="icon-wrap" style="background:#fef2f2; color:#ef4444;"><i class="bi bi-arrow-down-right-circle"></i></div>
-    </div>
-  </div>
-  <div class="col-md-3">
-    <div class="summary-card d-flex align-items-start justify-content-between" style="border-left:3px solid #22c55e;">
-      <div>
-        <div class="label">Net Kâr</div>
-        <div class="value text-success">₺{{ report.total_profit|floatformat:2 }}</div>
-      </div>
-      <div class="icon-wrap" style="background:#f0fdf4; color:#22c55e;"><i class="bi bi-graph-up-arrow"></i></div>
-    </div>
-  </div>
-  <div class="col-md-3">
-    <div class="summary-card d-flex align-items-start justify-content-between">
-      <div>
-        <div class="label">Kâr Marjı</div>
-        <div class="value">%{{ report.margin_percent|floatformat:2 }}</div>
-      </div>
-      <div class="icon-wrap" style="background:#f0fdf4; color:#16a34a;"><i class="bi bi-percent"></i></div>
-    </div>
-  </div>
-</div>
+  {% else %}
+    <div class="o-list"><div class="o-list-scroll">
+      <table class="o-table">
+        <thead>
+          <tr>
+            <th>{% translate "Sipariş" %}</th>
+            <th>{% translate "Ürün" %}</th>
+            <th class="o-num">{% translate "Miktar" %}</th>
+            <th class="o-num">{% translate "Gelir" %}</th>
+            <th class="o-num">{% translate "Maliyet" %}</th>
+            <th class="o-num">{% translate "Kâr" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for line in report.line_items %}
+            <tr>
+              <td><a href="{% url 'order-detail' line.order_id %}" class="o-table-link o-mono">SO #{{ line.order_id }}</a></td>
+              <td class="o-strong">{{ line.product }}</td>
+              <td class="o-num">{{ line.quantity|qty }}</td>
+              <td class="o-num">{{ line.revenue|money }}</td>
+              <td class="o-num o-muted">{{ line.cost|money }}</td>
+              <td class="o-num o-strong {% if line.profit >= 0 %}o-ok{% else %}o-bad{% endif %}">
+                {{ line.profit|money }}
+              </td>
+            </tr>
+          {% empty %}
+            {% translate "Karşılanmış sipariş yok" as t %}
+            {% translate "Kârlılık, karşılanan siparişlerden hesaplanır." as d %}
+            {% ui_empty icon="bi-graph-up" title=t text=d colspan=6 %}
+          {% endfor %}
+        </tbody>
+        {% if report.line_items %}
+          <tfoot>
+            <tr>
+              <td colspan="3" class="o-num">{% translate "Toplam" %}</td>
+              <td class="o-num">{{ report.total_revenue|money }}</td>
+              <td class="o-num">{{ report.total_cost|money }}</td>
+              <td class="o-num">{{ report.total_profit|money }}</td>
+            </tr>
+          </tfoot>
+        {% endif %}
+      </table>
+    </div></div>
+  {% endif %}
+{% endblock %}
 
-<!-- Kalem bazlı tablo -->
-<div class="data-card">
-  <table class="table table-borderless">
-    <thead>
-      <tr>
-        <th>Sipariş #</th>
-        <th>Ürün</th>
-        <th class="text-end">Miktar</th>
-        <th class="text-end">Gelir</th>
-        <th class="text-end">Maliyet</th>
-        <th class="text-end">Kâr</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for item in report.line_items %}
-      <tr>
-        <td class="text-muted" style="font-size:12.5px;">#{{ item.order_id }}</td>
-        <td class="fw-medium">{{ item.product }}</td>
-        <td class="text-end">{{ item.quantity|floatformat:3 }}</td>
-        <td class="text-end">₺{{ item.revenue|floatformat:2 }}</td>
-        <td class="text-end text-danger">₺{{ item.cost|floatformat:2 }}</td>
-        <td class="text-end fw-semibold {% if item.profit >= 0 %}text-success{% else %}text-danger{% endif %}">
-          ₺{{ item.profit|floatformat:2 }}
-        </td>
-      </tr>
-      {% empty %}
-      <tr>
-        <td colspan="6" class="empty-state">
-          <i class="bi bi-inbox"></i>
-          Henüz tamamlanmış sipariş yok.
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
+{% block scripts %}
+  {% if view == 'graph' %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="{% static 'js/o-charts.js' %}?v={{ asset_version }}"></script>
+  {% endif %}
 {% endblock %}

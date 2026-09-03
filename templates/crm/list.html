@@ -1,49 +1,72 @@
 {% extends 'base.html' %}
-{% block title %}Müşteriler — Reflow Coffee ERP{% endblock %}
-{% block nav_crm %}active{% endblock %}
-{% block nav_crm_customers %}active{% endblock %}
-{% block page_title %}CRM / Müşteriler{% endblock %}
+{% block title %}{% translate "Müşteriler" %}{% endblock %}
+{% block region_attr %} data-ajax-region{% endblock %}
 
-{% block extra_head %}
-<style>
-  .crm-stat, .data-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:12px; }
-  .crm-stat { padding:16px; display:flex; align-items:center; gap:12px; height:100%; }
-  .crm-stat-icon { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; }
-  .crm-stat-value { color:var(--g-text); font-size:22px; font-weight:700; line-height:1.1; }
-  .crm-stat-label { color:var(--g-text-2); font-size:11px; font-weight:600; letter-spacing:.6px; text-transform:uppercase; margin-top:3px; }
-  .data-card { overflow:hidden; }
-  .data-card .table { margin:0; font-size:13px; }
-  .data-card .table thead th { background:var(--g-n-50); border-bottom:1px solid var(--g-border); color:var(--g-text-2); font-size:11px; font-weight:700; letter-spacing:.65px; padding:11px 16px; text-transform:uppercase; white-space:nowrap; }
-  .data-card .table tbody td { border-color:var(--g-border-sub); color:var(--g-text); padding:13px 16px; vertical-align:middle; }
-  .data-card .table tbody tr:hover { background:var(--g-n-50); }
-  .customer-avatar { width:36px; height:36px; border-radius:50%; background:#ede9fe; color:#6d28d9; display:inline-flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; flex:0 0 auto; }
-  .customer-name { color:var(--g-text); font-weight:600; text-decoration:none; }
-  .customer-name:hover { color:#6d28d9; }
-  .customer-contact { color:var(--g-text-2); font-size:12px; margin-top:2px; }
-  .status-dot { width:7px; height:7px; display:inline-block; border-radius:50%; margin-right:5px; }
-  .empty-state { color:var(--g-text-3); padding:52px 24px; text-align:center; }
-  .empty-state i { display:block; font-size:34px; margin-bottom:8px; }
-  @media (max-width: 767.98px) { .customer-contact { display:none; } }
-</style>
+{% block cp_buttons %}
+  <a href="{% url 'crm-customer-create' %}" class="o-btn o-btn--primary">
+    <i class="bi bi-plus-lg" aria-hidden="true"></i> {% translate "Yeni" %}
+  </a>
+  <a href="{% url 'crm-sale-list' %}" class="o-btn">
+    <i class="bi bi-graph-up" aria-hidden="true"></i> {% translate "Satış Takibi" %}
+  </a>
+{% endblock %}
+
+{% block cp_pager %}{% ui_pager page_obj %}{% endblock %}
+
+{% block cp_search %}
+  <div class="o-cp-search-row">
+    {% translate "Müşteri, e-posta veya telefon ara" as ph %}
+    {% ui_search target="#o-view" placeholder=ph %}
+  </div>
+  {% ui_filter_chips choices=status_options param="status" selected=selected_status %}
 {% endblock %}
 
 {% block content %}
-<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
-  <div>
-    <h4 class="fw-bold mb-1 text-dark"><i class="bi bi-people-fill me-2" style="color:#7c3aed;"></i>Müşteri Yönetimi</h4>
-    <p class="mb-0 text-muted" style="font-size:13px;">Müşteri kartlarını, iletişim bilgilerini ve satış ilişkilerini yönetin.</p>
+  <div class="o-button-box o-po-kpis">
+    {% translate "Toplam müşteri" as l1 %}{% ui_stat value=total_customers label=l1 icon="bi-people" %}
+    {% translate "Aktif müşteri" as l2 %}{% ui_stat value=active_customers label=l2 icon="bi-person-check" variant="success" %}
+    {% translate "Aktif fırsat" as l3 %}{% ui_stat value=active_sales label=l3 icon="bi-lightning" %}
   </div>
-  <div class="d-flex gap-2">
-    <a href="{% url 'crm-sale-list' %}" class="btn btn-outline-primary"><i class="bi bi-bar-chart-steps me-1"></i>Satışları Görüntüle</a>
-    <a href="{% url 'crm-customer-create' %}" class="btn btn-primary"><i class="bi bi-person-plus me-1"></i>Yeni Müşteri</a>
+
+  <div class="o-list">
+    <div class="o-list-scroll">
+      <table class="o-table">
+        <thead>
+          <tr>
+            <th>{% translate "Müşteri" %}</th>
+            <th>{% translate "İletişim" %}</th>
+            <th>{% translate "Tür" %}</th>
+            <th class="o-num">{% translate "Fırsat" %}</th>
+            <th class="o-num">{% translate "Aktif" %}</th>
+            <th>{% translate "Durum" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for customer in customers %}
+            <tr>
+              <td>
+                <div class="o-row">
+                  {% ui_avatar customer.name size="sm" %}
+                  <a class="o-table-link" href="{% url 'crm-customer-detail' customer.pk %}">{{ customer.name }}</a>
+                </div>
+              </td>
+              <td class="o-sm o-muted">
+                {{ customer.contact_email|default:"—" }}
+                {% if customer.contact_phone %}<span class="o-table-sub">{{ customer.contact_phone }}</span>{% endif %}
+              </td>
+              <td>{% ui_badge customer "customer_type" %}</td>
+              <td class="o-num">{{ customer.sale_count }}</td>
+              <td class="o-num">{{ customer.active_sale_count }}</td>
+              <td>{% ui_badge customer "is_active" %}</td>
+            </tr>
+          {% empty %}
+            {% translate "Gösterilecek müşteri yok" as t %}
+            {% translate "İlk müşteriyi ekle" as cta %}
+            {% url 'crm-customer-create' as create_url %}
+            {% ui_empty icon="bi-people" title=t action_url=create_url action_label=cta colspan=6 %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
-</div>
-
-<div class="row g-3 mb-4">
-  <div class="col-md-4"><div class="crm-stat"><div class="crm-stat-icon" style="background:#f5f3ff;color:#7c3aed;"><i class="bi bi-people"></i></div><div><div class="crm-stat-value">{{ total_customers }}</div><div class="crm-stat-label">Toplam Müşteri</div></div></div></div>
-  <div class="col-md-4"><div class="crm-stat"><div class="crm-stat-icon" style="background:#f0fdf4;color:#16a34a;"><i class="bi bi-person-check"></i></div><div><div class="crm-stat-value">{{ active_customers }}</div><div class="crm-stat-label">Aktif Müşteri</div></div></div></div>
-  <div class="col-md-4"><div class="crm-stat"><div class="crm-stat-icon" style="background:#eff6ff;color:#2563eb;"><i class="bi bi-graph-up-arrow"></i></div><div><div class="crm-stat-value">{{ active_sales }}</div><div class="crm-stat-label">Aktif Satış</div></div></div></div>
-</div>
-
-{% include 'crm/partials/customer_list_region.html' %}
 {% endblock %}

@@ -9,6 +9,45 @@ from django.views.decorators.http import require_POST
 from .models import ChatMessage, Conversation
 from .services import ask_assistant
 
+_ALLOWED_EXTENSIONS = {'.pdf', '.txt', '.csv', '.md', '.xlsx', '.xls'}
+_MAX_CHARS = 20_000
+
+
+@csrf_exempt
+@require_POST
+@login_required
+def file_upload_view(request):
+    f = request.FILES.get('file')
+    if not f:
+        return JsonResponse({'error': 'Dosya bulunamadı.'}, status=400)
+
+    name = f.name.lower()
+    ext = next((e for e in _ALLOWED_EXTENSIONS if name.endswith(e)), None)
+    if ext is None:
+        return JsonResponse({'error': 'Desteklenmeyen dosya türü.'}, status=415)
+
+    try:
+        if ext == '.pdf':
+            import pypdf
+            reader = pypdf.PdfReader(f)
+            text = '\n'.join(page.extract_text() or '' for page in reader.pages)
+        elif ext in ('.xlsx', '.xls'):
+            import openpyxl
+            wb = openpyxl.load_workbook(f, read_only=True, data_only=True)
+            rows = []
+            for ws in wb.worksheets:
+                rows.append(f'=== {ws.title} ===')
+                for row in ws.iter_rows(values_only=True):
+                    rows.append('\t'.join('' if c is None else str(c) for c in row))
+            text = '\n'.join(rows)
+        else:
+            text = f.read().decode('utf-8', errors='replace')
+    except Exception as exc:
+        return JsonResponse({'error': f'Dosya okunamadı: {exc}'}, status=422)
+
+    text = text.strip()[:_MAX_CHARS]
+    return JsonResponse({'filename': f.name, 'chars': len(text), 'text': text})
+
 
 @csrf_exempt
 @require_POST

@@ -1,64 +1,100 @@
 {% extends 'base.html' %}
-{% block title %}{{ lot.product.name }} — Lot Detayı{% endblock %}
-{% block nav_inventory %}active{% endblock %}
-{% block nav_inventory_lots %}active{% endblock %}
-{% block page_title %}Stok / Lot Detayı{% endblock %}
+{% block title %}{{ lot.lot_code }}{% endblock %}
 
-{% block extra_head %}
-<style>
-  .lot-card, .data-card, .stat-card, .notice-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:12px; }
-  .lot-card { padding:20px; }
-  .lot-icon { width:52px; height:52px; border-radius:14px; background:#eff6ff; color:#2563eb; display:flex; align-items:center; justify-content:center; font-size:22px; }
-  .stat-card { height:100%; padding:15px; }.stat-label { color:var(--g-text-2); font-size:11px; font-weight:600; letter-spacing:.6px; text-transform:uppercase; }.stat-value { color:var(--g-text); font-size:20px; font-weight:700; margin-top:3px; }
-  .data-card { overflow:hidden; }.data-card .table { margin:0; font-size:13px; }.data-card .table thead th { background:var(--g-n-50); border-bottom:1px solid var(--g-border); color:var(--g-text-2); font-size:11px; font-weight:700; letter-spacing:.65px; padding:11px 16px; text-transform:uppercase; white-space:nowrap; }.data-card .table tbody td { border-color:var(--g-border-sub); color:var(--g-text); padding:13px 16px; vertical-align:middle; }.data-card .table tbody tr:hover { background:var(--g-n-50); }
-  .freshness-pill, .movement-pill { border-radius:20px; display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:600; padding:4px 8px; white-space:nowrap; }.freshness-normal { background:#f0fdf4; color:#15803d; }.freshness-priority_sale { background:#fff7ed; color:#c2410c; }.freshness-waste { background:#fef2f2; color:#b91c1c; }.stock-empty { background:var(--g-border-sub); color:var(--g-text-2); }
-  .movement-in { background:#f0fdf4; color:#15803d; }.movement-production { background:#fff7ed; color:#c2410c; }.movement-sale { background:#eff6ff; color:#1d4ed8; }.movement-waste { background:#fef2f2; color:#b91c1c; }
-  .info-row { display:flex; gap:10px; padding:11px 0; border-bottom:1px solid var(--g-border-sub); font-size:13px; }.info-row:last-child { border:0; padding-bottom:0; }.info-row i { color:#2563eb; width:16px; }.info-label { color:var(--g-text-2); min-width:104px; }.info-value { color:var(--g-text); font-weight:500; overflow-wrap:anywhere; }
-  .lot-code { background:var(--g-n-50); border-radius:5px; color:var(--g-text-2); font-family:monospace; font-size:12px; padding:3px 6px; }.qty-in { color:#15803d; font-weight:700; }.qty-out { color:#b91c1c; font-weight:700; }.notice-card { color:var(--g-text-2); font-size:12.5px; padding:13px 14px; }.empty { color:var(--g-text-3); padding:38px; text-align:center; }
-</style>
+{% block cp_breadcrumb %}{% ui_breadcrumb record=lot.lot_code %}{% endblock %}
+
+{% block cp_buttons %}
+  {% if stock_source.url %}
+    <a class="o-btn" href="{{ stock_source.url }}">
+      <i class="bi {{ stock_source.icon }}" aria-hidden="true"></i> {{ stock_source.label }}
+    </a>
+  {% endif %}
+  {% if lot.warehouse %}
+    <a class="o-btn" href="{% url 'warehouse-detail' lot.warehouse_id %}">
+      <i class="bi bi-buildings" aria-hidden="true"></i> {{ lot.warehouse.name }}
+    </a>
+  {% endif %}
 {% endblock %}
 
+{% block content_class %} o-content--sheet{% endblock %}
+
 {% block content %}
-<div class="mb-3"><a href="{% url 'inventory-list' %}" class="text-decoration-none" style="font-size:13px;"><i class="bi bi-arrow-left me-1"></i><span data-i18n="back-to-stocks">Stoklara dön</span></a></div>
+{% ui_sheet %}
+  <ol class="o-statusbar" aria-label="{% translate 'Tazelik' %}">
+    {% for key, label in freshness_steps %}
+      <li class="o-statusbar-step{% if key == freshness %} o-current{% endif %}">
+        <span class="o-statusbar-label">{{ label }}</span>
+      </li>
+    {% endfor %}
+  </ol>
 
-<div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mb-4">
-  <div class="d-flex align-items-center gap-3"><div class="lot-icon"><i class="bi bi-box-seam"></i></div><div><div class="d-flex flex-wrap align-items-center gap-2"><h4 class="fw-bold mb-0">{{ lot.product.name }}</h4><span class="freshness-pill {{ freshness_class }}">{{ freshness_label }}</span>{% if remaining <= 0 %}<span class="freshness-pill stock-empty" data-i18n="depleted">Tükendi</span>{% endif %}</div><div class="text-muted mt-1" style="font-size:13px;"><span class="lot-code">{{ lot.lot_code }}</span><span class="mx-1">·</span>{{ lot.product.category }}</div></div></div>
-  <div class="d-flex flex-wrap gap-2">{% if lot.warehouse %}<a class="btn btn-outline-primary" href="{% url 'warehouse-detail' lot.warehouse.pk %}"><i class="bi bi-building me-1"></i>{{ lot.warehouse.name }}</a>{% endif %}<a class="btn btn-primary" href="{% url 'purchasing-list' %}"><i class="bi bi-basket3 me-1"></i>Satın Alma</a></div>
-</div>
-
-<div class="row g-3 mb-4">
-  <div class="col-lg-3 col-sm-6"><div class="stat-card"><div class="stat-label" data-i18n="remaining-quantity">Kalan miktar</div><div class="stat-value {% if remaining <= 0 %}text-muted{% else %}text-success{% endif %}">{{ remaining|floatformat:3 }} {{ lot.product.get_unit_display }}</div></div></div>
-  <div class="col-lg-3 col-sm-6"><div class="stat-card"><div class="stat-label" data-i18n="initial-quantity">İlk giriş miktarı</div><div class="stat-value">{{ lot.quantity_received|floatformat:3 }} {{ lot.product.get_unit_display }}</div></div></div>
-  <div class="col-lg-3 col-sm-6"><div class="stat-card"><div class="stat-label" data-i18n="expiry-date">Son kullanma tarihi</div><div class="stat-value {% if freshness == 'WASTE' %}text-danger{% elif freshness == 'PRIORITY_SALE' %}text-warning-emphasis{% endif %}" style="font-size:16px;">{{ lot.expiry_date|date:"d M Y" }}</div></div></div>
-  <div class="col-lg-3 col-sm-6"><div class="stat-card"><div class="stat-label" data-i18n="unit-cost">Birim maliyet</div><div class="stat-value">{% if lot.unit_cost is not None %}₺{{ lot.unit_cost|floatformat:2 }}{% else %}—{% endif %}</div></div></div>
-</div>
-
-{% if remaining <= 0 %}
-<div class="notice-card mb-4" style="background:var(--g-n-50);"><i class="bi bi-info-circle-fill text-secondary me-1"></i>Bu lotun kullanılabilir stoğu kalmadı. Hareket geçmişi kayıt amacıyla korunur.</div>
-{% elif freshness == 'WASTE' %}
-<div class="notice-card mb-4" style="background:#fef2f2;color:#991b1b;border-color:#fecaca;"><i class="bi bi-exclamation-triangle-fill me-1"></i>Bu lotun son kullanma tarihi geçti. İmha veya kalite kontrol sürecini kayda alın.</div>
-{% elif freshness == 'PRIORITY_SALE' %}
-<div class="notice-card mb-4" style="background:#fff7ed;color:#9a3412;border-color:#fed7aa;"><i class="bi bi-clock-history me-1"></i>Bu lotun son kullanma tarihi yaklaşıyor; üretim veya satışta öncelikli kullanımı değerlendirin.</div>
-{% else %}
-<div class="notice-card mb-4"><i class="bi bi-shield-check text-success me-1"></i>Lot normal tazelik aralığında. Stok girişleri satın alma teslim alma kayıtlarından, çıkışlar ise üretim ve satış akışlarından gelir.</div>
-{% endif %}
-
-<div class="row g-4">
-  <div class="col-xl-8">
-    <div class="data-card">
-      <div class="p-3 border-bottom"><h6 class="mb-0 fw-bold" data-i18n="stock-movement-history">Stok hareket geçmişi</h6><small class="text-muted" data-i18n="stock-movement-history-desc">İlk teslim alma miktarı ve bu lotu etkileyen sonraki işlemler.</small></div>
-      <div class="table-responsive"><table class="table table-borderless"><thead><tr><th data-i18n="transaction">İşlem</th><th data-i18n="reference">Referans</th><th data-i18n="date">Tarih</th><th class="text-end" data-i18n="quantity">Miktar</th></tr></thead><tbody>
-        <tr><td><span class="movement-pill movement-in"><i class="bi bi-box-arrow-in-down"></i><span data-i18n="initial-receipt">İlk teslim alma</span></span></td><td><span class="lot-code">{{ lot.lot_code }}</span></td><td class="text-muted" style="font-size:12px;">{{ lot.received_at|date:"d M Y, H:i" }}</td><td class="text-end qty-in">+{{ lot.quantity_received|floatformat:3 }} {{ lot.product.get_unit_display }}</td></tr>
-        {% for item in movements %}
-        <tr><td><span class="movement-pill {{ item.css_class }}"><i class="bi {{ item.icon }}"></i>{{ item.label }}</span></td><td class="text-muted">{{ item.movement.get_movement_type_display }}</td><td class="text-muted" style="font-size:12px;">{{ item.movement.created_at|date:"d M Y, H:i" }}</td><td class="text-end {% if item.movement.quantity > 0 %}qty-in{% else %}qty-out{% endif %}">{% if item.movement.quantity > 0 %}+{% endif %}{{ item.movement.quantity|floatformat:3 }} {{ lot.product.get_unit_display }}</td></tr>
-        {% endfor %}
-      </tbody></table></div>
-      {% if not movements %}<div class="empty border-top"><i class="bi bi-clock-history d-block fs-3 mb-2"></i><span data-i18n="no-movements-yet">İlk teslim alma kaydından sonra henüz hareket oluşmadı.</span></div>{% endif %}
+  <div class="o-form-head">
+    <div>
+      <h1 class="o-form-title o-mono">{{ lot.lot_code }}</h1>
+      <p class="o-form-subtitle">{{ lot.product.name }}</p>
     </div>
+    {% ui_button_box %}
+      {% translate "Kalan" as l1 %}
+      {% ui_stat value=remaining|qty:lot.product.get_unit_display label=l1 icon="bi-box-seam" %}
+      {% translate "Giriş miktarı" as l2 %}
+      {% ui_stat value=lot.quantity_received|qty:lot.product.get_unit_display label=l2 icon="bi-box-arrow-in-down" %}
+      {% translate "Hareket" as l3 %}{% ui_stat value=movements|length label=l3 icon="bi-arrow-left-right" %}
+    {% endui_button_box %}
   </div>
-  <div class="col-xl-4">
-    <div class="lot-card mb-4"><h6 class="fw-bold mb-3" data-i18n="lot-information">Lot bilgileri</h6><div class="info-row"><i class="bi bi-tag"></i><span class="info-label" data-i18n="lot-code">Lot kodu</span><span class="info-value"><span class="lot-code">{{ lot.lot_code }}</span></span></div><div class="info-row"><i class="bi bi-box"></i><span class="info-label" data-i18n="product">Ürün</span><span class="info-value">{{ lot.product.name }}</span></div><div class="info-row"><i class="bi bi-grid"></i><span class="info-label" data-i18n="category">Kategori</span><span class="info-value">{{ lot.product.category }}</span></div><div class="info-row"><i class="bi bi-building"></i><span class="info-label" data-i18n="source-business">Kaynak işletme</span><span class="info-value">{{ lot.product.business.name }}</span></div><div class="info-row"><i class="bi bi-geo-alt"></i><span class="info-label" data-i18n="warehouse">Depo</span><span class="info-value">{% if lot.warehouse %}<a href="{% url 'warehouse-detail' lot.warehouse.pk %}" class="text-decoration-none">{{ lot.warehouse.name }}</a>{% else %}<span data-i18n="unassigned">Atanmamış</span>{% endif %}</span></div><div class="info-row"><i class="bi {{ stock_source.icon }}"></i><span class="info-label" data-i18n="stock-source">Giriş kaynağı</span><span class="info-value">{% if stock_source.url %}<a href="{{ stock_source.url }}" class="text-decoration-none">{{ stock_source.label }}</a>{% else %}{{ stock_source.label }}{% endif %}<small class="d-block text-muted fw-normal">{{ stock_source.description }}</small></span></div><div class="info-row"><i class="bi bi-calendar-plus"></i><span class="info-label" data-i18n="stock-entry">Stok girişi</span><span class="info-value">{{ lot.received_at|date:"d F Y, H:i" }}</span></div></div>
-    <div class="notice-card"><i class="bi bi-lock-fill text-primary me-1"></i>Miktarlar doğrudan düzenlenmez. Bu yaklaşım maliyet, lot ve işlem geçmişinin güvenilir kalmasını sağlar.</div>
-  </div>
-</div>
+
+  {% translate "Lot bilgileri" as g %}
+  {% ui_group g %}
+    {% translate "Ürün" as f1 %}{% ui_field_value f1 lot.product.name icon="bi-tag" cols=4 %}
+    {% translate "Kategori" as f2 %}{% ui_field_value f2 lot.product.category icon="bi-collection" cols=4 %}
+    {% translate "Depo" as f3 %}
+    {% if lot.warehouse %}{% url 'warehouse-detail' lot.warehouse_id as wh_url %}{% endif %}
+    {% ui_field_value f3 lot.warehouse.name url=wh_url icon="bi-buildings" cols=4 %}
+    {% translate "Son kullanma tarihi" as f4 %}{% ui_field_value f4 lot.expiry_date|date:"d M Y" icon="bi-calendar-x" cols=4 %}
+    {% translate "Birim maliyet" as f5 %}{% ui_field_value f5 lot.unit_cost|money icon="bi-cash" cols=4 %}
+    {% translate "Giriş zamanı" as f6 %}{% ui_field_value f6 lot.received_at|date:"d M Y, H:i" icon="bi-clock" cols=4 %}
+  {% endui_group %}
+
+  {% ui_notebook %}
+    {% translate "Stok Hareketleri" as t1 %}
+    {% ui_page t1 badge=movements|length %}
+      <div class="o-list"><div class="o-list-scroll">
+        <table class="o-table">
+          <thead>
+            <tr>
+              <th>{% translate "Hareket" %}</th>
+              <th class="o-num">{% translate "Miktar" %}</th>
+              <th>{% translate "Zaman" %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in movements %}
+              <tr>
+                <td>
+                  <span class="o-badge o-badge--{{ row.variant }}">
+                    <i class="bi {{ row.icon }}" aria-hidden="true"></i>&nbsp;{{ row.label }}
+                  </span>
+                </td>
+                <td class="o-num o-strong">{{ row.movement.quantity|qty:lot.product.get_unit_display }}</td>
+                <td class="o-nowrap o-muted o-sm">{{ row.movement.created_at|date:"d M Y, H:i" }}</td>
+              </tr>
+            {% empty %}
+              {% translate "Bu lot için hareket kaydı yok" as e %}
+              {% ui_empty icon="bi-arrow-left-right" title=e colspan=3 %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div></div>
+    {% endui_page %}
+
+    {% translate "Kaynak" as t2 %}
+    {% ui_page t2 %}
+      {% ui_group %}
+        {% translate "Kaynak belge" as s1 %}
+        {% ui_field_value s1 stock_source.label url=stock_source.url icon=stock_source.icon cols=6 %}
+        {% translate "Açıklama" as s2 %}
+        {% ui_field_value s2 stock_source.description cols=6 %}
+      {% endui_group %}
+    {% endui_page %}
+  {% endui_notebook %}
+{% endui_sheet %}
 {% endblock %}

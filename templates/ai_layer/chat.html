@@ -1,421 +1,109 @@
 {% extends 'base.html' %}
-{% block title %}AI Asistan — Reflow Coffee ERP{% endblock %}
-{% block nav_chat %}active{% endblock %}
-{% block page_title %}AI Asistan{% endblock %}
-{% block extra_head %}
-<script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
-
-<style>
-  #page-content { padding: 0 !important; }
-
-  #chat-shell {
-    display: flex;
-    flex-direction: column;
-    height: calc(100vh - 56px); /* full height minus topbar */
-    background: var(--g-surface);
-  }
-
-  /* Chat header */
-  #chat-head {
-    padding: 14px 20px;
-    border-bottom: 1px solid var(--g-border);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex-shrink: 0;
-    background: var(--g-surface);
-  }
-
-  .ai-avatar {
-    width: 38px; height: 38px;
-    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-    border-radius: 9px;
-    display: flex; align-items: center; justify-content: center;
-    color: #fff;
-    font-size: 17px;
-    flex-shrink: 0;
-  }
-
-  .ai-head-name {
-    font-weight: 600;
-    font-size: 14.5px;
-    color: var(--g-text);
-  }
-
-  .ai-head-status {
-    font-size: 12px;
-    color: #16a34a;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    margin-top: 1px;
-  }
-
-  .ai-head-status i { font-size: 7px; }
-
-  /* Messages area */
-  #messages {
-    flex: 1;
-    overflow-y: auto;
-    padding: 24px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-    background: var(--g-n-50);
-  }
-
-  /* Welcome state */
-  #welcome {
-    margin: auto;
-    text-align: center;
-    max-width: 380px;
-    color: var(--g-text-2);
-  }
-
-  #welcome .welcome-icon {
-    width: 64px; height: 64px;
-    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-    border-radius: 16px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 30px;
-    color: #fff;
-    margin: 0 auto 16px;
-  }
-
-  #welcome h5 {
-    font-weight: 700;
-    color: var(--g-text);
-    margin-bottom: 8px;
-  }
-
-  #welcome p {
-    font-size: 13.5px;
-    line-height: 1.6;
-    margin-bottom: 20px;
-  }
-
-  .suggestion-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    justify-content: center;
-  }
-
-  .chip {
-    background: var(--g-surface);
-    border: 1px solid var(--g-border);
-    border-radius: 20px;
-    padding: 6px 14px;
-    font-size: 12.5px;
-    color: var(--g-text);
-    cursor: pointer;
-    transition: border-color 0.14s, background 0.14s;
-  }
-
-  .chip:hover {
-    border-color: #3b82f6;
-    background: #eff6ff;
-    color: #1d4ed8;
-  }
-
-  /* Message rows */
-  .msg-row {
-    display: flex;
-    align-items: flex-end;
-    gap: 8px;
-    max-width: 72%;
-  }
-
-  .msg-row.user { align-self: flex-end; flex-direction: row-reverse; }
-  .msg-row.ai   { align-self: flex-start; }
-
-  .msg-avatar {
-    width: 28px; height: 28px;
-    border-radius: 7px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 13px;
-    flex-shrink: 0;
-  }
-
-  .msg-avatar.ai-av   { background: linear-gradient(135deg,#3b82f6,#1d4ed8); color:#fff; }
-  .msg-avatar.user-av { background: var(--g-border); color: var(--g-text-2); }
-
-  .bubble {
-    padding: 10px 14px;
-    border-radius: 12px;
-    font-size: 13.5px;
-    line-height: 1.6;
-    word-break: break-word;
-    max-width: 100%;
-  }
-
-  .bubble.user-b {
-    background: #3b82f6;
-    color: #fff;
-    border-bottom-right-radius: 3px;
-  }
-
-  .bubble.ai-b {
-    background: var(--g-surface);
-    color: var(--g-text);
-    border: 1px solid var(--g-border);
-    border-bottom-left-radius: 3px;
-  }
-
-  /* Typing indicator */
-  .typing-dots {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    padding: 12px 14px;
-  }
-
-  .dot {
-    width: 7px; height: 7px;
-    background: var(--g-text-3);
-    border-radius: 50%;
-    animation: bounce 1.2s infinite;
-  }
-
-  .dot:nth-child(2) { animation-delay: 0.2s; }
-  .dot:nth-child(3) { animation-delay: 0.4s; }
-
-  @keyframes bounce {
-    0%, 60%, 100% { transform: translateY(0); }
-    30%           { transform: translateY(-6px); }
-  }
-
-  /* Input bar */
-  #input-bar {
-    padding: 12px 16px;
-    border-top: 1px solid var(--g-border);
-    background: var(--g-surface);
-    display: flex;
-    align-items: flex-end;
-    gap: 10px;
-    flex-shrink: 0;
-  }
-
-  #user-input {
-    flex: 1;
-    border: 1px solid var(--g-border);
-    border-radius: 8px;
-    padding: 10px 14px;
-    font-size: 13.5px;
-    resize: none;
-    outline: none;
-    line-height: 1.5;
-    max-height: 120px;
-    font-family: inherit;
-    color: var(--g-text);
-    background: var(--g-n-50);
-    transition: border-color 0.15s, background 0.15s;
-  }
-
-  #user-input:focus {
-    border-color: #3b82f6;
-    background: var(--g-surface);
-  }
-
-  #send-btn {
-    width: 40px; height: 40px;
-    border-radius: 8px;
-    background: #3b82f6;
-    border: none;
-    color: #fff;
-    font-size: 16px;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    transition: background 0.14s;
-  }
-
-  #send-btn:hover    { background: #2563eb; }
-  #send-btn:disabled { background: var(--g-border); cursor: not-allowed; }
-</style>
-{% endblock %}
+{% block title %}{% translate "AI Asistan" %}{% endblock %}
+{% block cp %}{% endblock %}
+{% block content_class %} o-content--flush{% endblock %}
 
 {% block content %}
-<div style="display: flex; height: calc(100vh - 56px);">
-
-  <div id="chat-sidebar" style="width: 220px; border-right: 1px solid var(--g-border); overflow-y: auto; flex-shrink: 0; background: var(--g-surface);">
-    <div style="padding: 14px;">
-      <a href="/chat/" class="btn btn-primary btn-sm w-100 mb-3">+ Yeni Sohbet</a>
-      {% for conv in conversations %}
-      <a href="/chat/{{ conv.pk }}/" class="d-block text-truncate mb-2 p-2 rounded"
-         style="font-size: 12.5px; text-decoration: none; color: var(--g-text);
-         {% if active_conversation.pk == conv.pk %}background: #eff6ff; color: #1d4ed8;{% endif %}">
-        {{ conv.title|default:"Yeni sohbet" }}
+<div class="o-chat">
+  <aside class="o-chat-rail" aria-label="{% translate 'Sohbetler' %}">
+    <a href="{% url 'chat-page' %}" class="o-btn o-btn--primary o-btn--sm">
+      <i class="bi bi-plus-lg" aria-hidden="true"></i> {% translate "Yeni Sohbet" %}
+    </a>
+    {% for conv in conversations %}
+      <a href="{% url 'chat-page-conversation' conv.pk %}"
+         class="o-chat-conv{% if active_conversation.pk == conv.pk %} o-active{% endif %}">
+        {{ conv.title|default:_("Adsız sohbet") }}
       </a>
-      {% empty %}
-      <p class="text-muted" style="font-size: 12px;">Henüz sohbet yok.</p>
-      {% endfor %}
-    </div>
-  </div>
+    {% empty %}
+      <p class="o-faint o-sm">{% translate "Henüz sohbet yok." %}</p>
+    {% endfor %}
+  </aside>
 
-  <div id="chat-shell" style="flex: 1;">
+  <div class="o-chat-main">
+    <header class="o-chat-header">
+      <span class="o-chat-avatar o-chat-avatar--ai" aria-hidden="true">
+        <svg width="34" height="34" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="18" cy="18" r="18" fill="#3A2A20"/>
+          <line x1="18" y1="10" x2="11" y2="25" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
+          <line x1="18" y1="10" x2="25" y2="25" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
+          <line x1="11" y1="25" x2="25" y2="25" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
+          <circle cx="18" cy="10" r="2.8" fill="rgba(255,255,255,.85)"/>
+          <circle cx="11" cy="25" r="2.8" fill="rgba(255,255,255,.75)"/>
+          <circle cx="25" cy="25" r="3.2" fill="#C87941"/>
+          <circle cx="25" cy="25" r="5.5" stroke="#C87941" stroke-width="1" fill="none" opacity=".45"/>
+        </svg>
+      </span>
+      <div>
+        <p class="o-strong">{% translate "AI Asistan" %}</p>
+        <p class="o-xs o-muted">
+          <i class="bi bi-circle-fill o-chat-dot" aria-hidden="true"></i>
+          {% translate "Aktif — RAG + fonksiyon çağırma" %}
+        </p>
+      </div>
+    </header>
 
-
-  <!-- Header -->
-  <div id="chat-head">
-    <div class="ai-avatar"><i class="bi bi-robot"></i></div>
-    <div>
-      <div class="ai-head-name">Reflow AI Asistan</div>
-      <div class="ai-head-status">
-        <i class="bi bi-circle-fill"></i> Aktif — GPT + RAG + Function Calling
+    <div class="o-chat-feed" id="o-chat-feed" aria-live="polite">
+      <div class="o-chat-welcome" id="o-chat-welcome">
+        <span class="o-chat-welcome-icon" aria-hidden="true">
+          <svg width="52" height="52" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="18" cy="18" r="18" fill="#3A2A20"/>
+            <line x1="18" y1="10" x2="11" y2="25" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
+            <line x1="18" y1="10" x2="25" y2="25" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
+            <line x1="11" y1="25" x2="25" y2="25" stroke="rgba(255,255,255,.28)" stroke-width="1.5"/>
+            <circle cx="18" cy="10" r="2.8" fill="rgba(255,255,255,.85)"/>
+            <circle cx="11" cy="25" r="2.8" fill="rgba(255,255,255,.75)"/>
+            <circle cx="25" cy="25" r="3.2" fill="#C87941"/>
+            <circle cx="25" cy="25" r="5.5" stroke="#C87941" stroke-width="1" fill="none" opacity=".45"/>
+          </svg>
+        </span>
+        <h1 class="o-form-title">{% translate "Size nasıl yardımcı olabilirim?" %}</h1>
+        <p class="o-muted">{% translate "Stok, satış, üretim ve finans verilerinize doğal dille soru sorun." %}</p>
+        <div class="o-chat-chips">
+          <button type="button" class="o-chat-chip">{% translate "Kritik stok durumu nedir?" %}</button>
+          <button type="button" class="o-chat-chip">{% translate "En kârlı müşterilerim kimler?" %}</button>
+          <button type="button" class="o-chat-chip">{% translate "Bu hafta hangi lotlar iade edilmeli?" %}</button>
+          <button type="button" class="o-chat-chip">{% translate "Satış trendini özetle" %}</button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Messages -->
-  <div id="messages">
-    <div id="welcome">
-      <div class="welcome-icon"><i class="bi bi-chat-square-dots"></i></div>
-      <h5>Nasıl yardımcı olabilirim?</h5>
-      <p>Stok durumu, tazelik analizi, sipariş takibi veya operasyonel herhangi bir konuda soru sorabilirsiniz.</p>
-      <div class="suggestion-chips">
-        <div class="chip" onclick="fillInput(this)">Kritik stok durumu nedir?</div>
-        <div class="chip" onclick="fillInput(this)">En karlı müşterilerim kimler?</div>
-        <div class="chip" onclick="fillInput(this)">Bu hafta hangi lotlar iade edilmeli?</div>
-        <div class="chip" onclick="fillInput(this)">Satış trendini özetle</div>
+    <div class="o-chat-drop-overlay" id="o-chat-drop-overlay" aria-hidden="true">
+      <div class="o-chat-drop-target">
+        <i class="bi bi-cloud-upload" aria-hidden="true"></i>
+        <p>{% translate "Dosyayı buraya bırakın" %}</p>
+        <p class="o-xs o-muted">{% translate "PDF, TXT, CSV, XLSX" %}</p>
       </div>
     </div>
+
+    <form class="o-chat-bar" id="o-chat-form"
+          data-o-chat-url="{% url 'ai-chat' %}"
+          data-o-upload-url="{% url 'ai-upload' %}"
+          data-o-conversation-id="{{ active_conversation.pk|default:'' }}">
+      <div class="o-chat-file-pills" id="o-chat-file-pills"></div>
+      <div class="o-chat-bar-row">
+        <button type="button" class="o-chat-attach" id="o-chat-attach"
+                aria-label="{% translate 'Dosya ekle' %}" title="{% translate 'Dosya ekle' %}">
+          <i class="bi bi-paperclip" aria-hidden="true"></i>
+        </button>
+        <textarea class="o-chat-input" id="o-chat-input" rows="1"
+                  placeholder="{% translate 'Bir soru yazın veya dosya sürükleyin…' %}"
+                  aria-label="{% translate 'Mesajınız' %}"></textarea>
+        <button type="submit" class="o-btn o-btn--primary" aria-label="{% translate 'Gönder' %}">
+          <i class="bi bi-send-fill" aria-hidden="true"></i>
+        </button>
+      </div>
+      <input type="file" id="o-chat-file-input" accept=".pdf,.txt,.csv,.md,.xlsx,.xls"
+             multiple style="display:none" aria-hidden="true">
+    </form>
   </div>
-
-  <!-- Input -->
-  <div id="input-bar">
-    <textarea id="user-input" rows="1" placeholder="Mesajınızı yazın... (Enter ile gönderin, Shift+Enter yeni satır)"></textarea>
-    <button id="send-btn" title="Gönder">
-      <i class="bi bi-send-fill"></i>
-    </button>
-  </div>
-
-</div>
-
 </div>
 {% endblock %}
 
-{% block extra_scripts %}
-<script>
-  let currentConversationId = {{ active_conversation.pk|default:"null" }};
-  const initialMessages = JSON.parse('{{ initial_messages_json|escapejs }}');
-  const messagesEl  = document.getElementById('messages');
-  const welcomeEl   = document.getElementById('welcome');
-  const inputEl     = document.getElementById('user-input');
-  const sendBtnEl   = document.getElementById('send-btn');
+{% block inline_data %}
+<script type="application/json" id="o-chat-initial">{{ initial_messages_json|safe }}</script>
+{% endblock %}
 
-  let conversationHistory = [];
-
-  function hideWelcome() {
-    if (welcomeEl) { welcomeEl.style.display = 'none'; }
-  }
-
-  function appendMessage(role, text) {
-    hideWelcome();
-
-    const isUser = role === 'user';
-    const row = document.createElement('div');
-    row.className = 'msg-row ' + (isUser ? 'user' : 'ai');
-
-    const av = document.createElement('div');
-    av.className = 'msg-avatar ' + (isUser ? 'user-av' : 'ai-av');
-    av.innerHTML = isUser ? '<i class="bi bi-person-fill"></i>' : '<i class="bi bi-robot"></i>';
-
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble ' + (isUser ? 'user-b' : 'ai-b');
-      if (isUser) {
-      bubble.textContent = text;
-    } else {
-      bubble.innerHTML = marked.parse(text);
-    }
-    row.appendChild(av);
-    row.appendChild(bubble);
-    messagesEl.appendChild(row);
-    messagesEl.scrollTop = messagesEl.scrollHeight;
-  }
-
-  function showTyping() {
-    hideWelcome();
-    const row = document.createElement('div');
-    row.className = 'msg-row ai';
-    row.id = 'typing-row';
-
-    const av = document.createElement('div');
-    av.className = 'msg-avatar ai-av';
-    av.innerHTML = '<i class="bi bi-robot"></i>';
-
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble ai-b';
-    bubble.innerHTML = '<div class="typing-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>';
-
-    row.appendChild(av);
-    row.appendChild(bubble);
-    messagesEl.appendChild(row);
-    messagesEl.scrollTop = messagesEl.scrollHeight;
-  }
-
-  function removeTyping() {
-    const el = document.getElementById('typing-row');
-    if (el) el.remove();
-  }
-
-  async function sendMessage() {
-    const text = inputEl.value.trim();
-    if (!text) return;
-
-    appendMessage('user', text);
-    inputEl.value = '';
-    inputEl.style.height = 'auto';
-    sendBtnEl.disabled = true;
-    showTyping();
-
-    try {
-      const res = await fetch('/api/ai/chat/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-          message: text,
-          conversation_id: currentConversationId,
-        }),
-      });
-
-      removeTyping();
-
-      if (!res.ok) {
-        appendMessage('assistant', 'Bir hata oluştu (HTTP ' + res.status + '). Lütfen tekrar deneyin.');
-        return;
-      }
-
-      const data = await res.json();
-      const reply = data.answer || 'Cevap alınamadı.';
-      appendMessage('assistant', reply);
-      currentConversationId = data.conversation_id;
-    } catch (err) {
-      removeTyping();
-      appendMessage('assistant', 'Bağlantı hatası: ' + err.message);
-    } finally {
-      sendBtnEl.disabled = false;
-      inputEl.focus();
-    }
-  }
-
-  function fillInput(chipEl) {
-    inputEl.value = chipEl.textContent.trim();
-    inputEl.focus();
-  }
-  initialMessages.forEach(m => appendMessage(m.role, m.content));
-  sendBtnEl.addEventListener('click', sendMessage);
-
-  inputEl.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-  });
-
-  inputEl.addEventListener('input', () => {
-    inputEl.style.height = 'auto';
-    inputEl.style.height = Math.min(inputEl.scrollHeight, 120) + 'px';
-  });
-</script>
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
+<script src="{% static 'js/o-chat.js' %}?v={{ asset_version }}"></script>
 {% endblock %}

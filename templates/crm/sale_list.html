@@ -1,33 +1,39 @@
 {% extends 'base.html' %}
-{% block title %}Satış Takibi — Reflow Coffee ERP{% endblock %}
-{% block nav_crm %}active{% endblock %}
-{% block nav_crm_sales %}active{% endblock %}
-{% block page_title %}CRM / Satış Takibi{% endblock %}
+{% block title %}{% translate "Satış Takibi" %}{% endblock %}
+{% block region_attr %} data-ajax-region{% endblock %}
 
-{% block extra_head %}
-<style>
-  .crm-stat, .data-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:12px; }
-  .crm-stat { padding:16px; display:flex; align-items:center; gap:12px; height:100%; }
-  .crm-stat-icon { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; }
-  .crm-stat-value { color:var(--g-text); font-size:22px; font-weight:700; line-height:1.1; }
-  .crm-stat-label { color:var(--g-text-2); font-size:11px; font-weight:600; letter-spacing:.6px; text-transform:uppercase; margin-top:3px; }
-  .data-card { overflow:hidden; }.data-card .table { margin:0; font-size:13px; }.data-card .table thead th { background:var(--g-n-50); border-bottom:1px solid var(--g-border); color:var(--g-text-2); font-size:11px; font-weight:700; letter-spacing:.65px; padding:11px 16px; text-transform:uppercase; white-space:nowrap; }.data-card .table tbody td { border-color:var(--g-border-sub); color:var(--g-text); padding:12px 16px; vertical-align:middle; }.data-card .table tbody tr:hover { background:var(--g-n-50); }
-  .customer-link, .sale-link { color:var(--g-text); font-weight:600; text-decoration:none; }.customer-link:hover, .sale-link:hover { color:#2563eb; }
-  .sale-sub { color:var(--g-text-2); font-size:12px; margin-top:2px; }
-  .stage-pill, .sale-status-pill { border-radius:20px; display:inline-block; font-size:11.5px; font-weight:600; padding:4px 8px; white-space:nowrap; }
-  .stage-new { background:var(--g-border-sub); color:var(--g-text-2); } .stage-in_discussion { background:#e0f2fe; color:#0369a1; } .stage-proposal_sent { background:#eff6ff; color:#1d4ed8; } .stage-negotiation { background:#fdf4ff; color:#a21caf; } .stage-won { background:#f0fdf4; color:#15803d; } .stage-lost { background:#fef2f2; color:#b91c1c; }
-  .sale-status-active { background:#dcfce7; color:#166534; } .sale-status-passive { background:var(--g-border-sub); color:var(--g-text-2); } .sale-status-won { background:#d1fae5; color:#047857; } .sale-status-lost { background:#fee2e2; color:#b91c1c; }
-  .empty-state { color:var(--g-text-3); padding:52px 24px; text-align:center; }.empty-state i { display:block; font-size:34px; margin-bottom:8px; }
-</style>
+{% block cp_buttons %}
+  <a href="{% url 'opportunity-create' %}" class="o-btn o-btn--primary">
+    <i class="bi bi-plus-lg" aria-hidden="true"></i> {% translate "Yeni" %}
+  </a>
+  <a href="{% url 'crm-list' %}" class="o-btn">
+    <i class="bi bi-people" aria-hidden="true"></i> {% translate "Müşteriler" %}
+  </a>
+{% endblock %}
+
+{% block cp_pager %}{% ui_pager page_obj %}{% endblock %}
+{% block cp_views %}{% ui_view_switcher "kanban,list,graph" current=view %}{% endblock %}
+
+{% block cp_search %}
+  <div class="o-cp-search-row">
+    {% translate "Fırsat adı veya müşteri ara" as ph %}
+    {% ui_search target="#o-view" placeholder=ph filters=stage_choices filter_param="stage" selected=selected_stage groupby=status_choices groupby_param="status" groupby_selected=selected_status %}
+  </div>
 {% endblock %}
 
 {% block content %}
-<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
-  <div><h4 class="fw-bold mb-1 text-dark"><i class="bi bi-bar-chart-steps me-2" style="color:#2563eb;"></i>Satış Takibi</h4><p class="mb-0 text-muted" style="font-size:13px;">Her satışın durumunu, aşamasını ve tahmini değerini takip edin.</p></div>
-  <div class="d-flex gap-2"><a href="{% url 'crm-list' %}" class="btn btn-outline-primary"><i class="bi bi-people me-1"></i>Müşteriler</a><a href="{% url 'opportunity-create' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Yeni Fırsat</a></div>
-</div>
+  <div class="o-button-box o-po-kpis">
+    {% translate "Aktif fırsat" as l1 %}{% ui_stat value=active_sales label=l1 icon="bi-lightning" %}
+    {% translate "Kazanılan" as l2 %}{% ui_stat value=won_sales label=l2 icon="bi-trophy" variant="success" %}
+    {% translate "Pasif" as l3 %}{% ui_stat value=passive_sales label=l3 icon="bi-pause-circle" %}
+  </div>
 
-<div class="row g-3 mb-4"><div class="col-md-4"><div class="crm-stat"><div class="crm-stat-icon" style="background:#dcfce7;color:#16a34a;"><i class="bi bi-play-circle"></i></div><div><div class="crm-stat-value">{{ active_sales }}</div><div class="crm-stat-label">Aktif Satış</div></div></div></div><div class="col-md-4"><div class="crm-stat"><div class="crm-stat-icon" style="background:var(--g-border-sub);color:var(--g-text-2);"><i class="bi bi-pause-circle"></i></div><div><div class="crm-stat-value">{{ passive_sales }}</div><div class="crm-stat-label">Pasif Satış</div></div></div></div><div class="col-md-4"><div class="crm-stat"><div class="crm-stat-icon" style="background:#ecfdf5;color:#047857;"><i class="bi bi-trophy"></i></div><div><div class="crm-stat-value">{{ won_sales }}</div><div class="crm-stat-label">Kazanılan Satış</div></div></div></div></div>
+  {% include view_template %}
+{% endblock %}
 
-{% include 'crm/partials/sale_list_region.html' %}
+{% block scripts %}
+  {% if view == 'graph' %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="{% static 'js/o-charts.js' %}?v={{ asset_version }}"></script>
+  {% endif %}
 {% endblock %}

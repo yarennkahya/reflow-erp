@@ -1,157 +1,95 @@
 {% extends 'base.html' %}
-{% block title %}Yeni Reçete — Reflow Coffee ERP{% endblock %}
-{% block nav_production %}active{% endblock %}
-{% block nav_production_recipes %}active{% endblock %}
-{% block page_title %}Üretim{% endblock %}
+{% block title %}{% translate "Yeni Reçete" %}{% endblock %}
+{% block cp_breadcrumb %}{% translate "Yeni reçete" as rec %}{% ui_breadcrumb record=rec %}{% endblock %}
 
-{% block extra_head %}
-<style>
-  .prod-subnav { display:flex; gap:4px; margin-bottom:20px; border-bottom:1px solid var(--g-border); padding-bottom:0; }
-  .prod-subnav a { padding:8px 14px; font-size:13px; font-weight:500; color:var(--g-text-2); text-decoration:none; border-bottom:2px solid transparent; margin-bottom:-1px; white-space:nowrap; }
-  .prod-subnav a:hover { color:var(--g-text); }
-  .prod-subnav a.active { color:#ca8a04; border-bottom-color:#ca8a04; font-weight:600; }
-  .form-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:10px; padding:24px; margin-bottom:20px; }
-  .section-title { font-size:13px; font-weight:700; color:var(--g-text-2); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:14px; }
-  .comp-row td { vertical-align:middle; padding:6px 4px; }
-  .comp-row td:first-child { padding-left:0; }
-  .comp-row td:last-child { padding-right:0; }
-</style>
+{% block cp_buttons %}
+  <button type="submit" form="o-form" class="o-btn o-btn--primary">
+    <i class="bi bi-check-lg" aria-hidden="true"></i> {% translate "Oluştur" %}
+  </button>
+  <a class="o-btn" href="{% url 'production-recipes' %}">{% translate "Vazgeç" %}</a>
 {% endblock %}
+
+{% block content_class %} o-content--sheet{% endblock %}
 
 {% block content %}
-<div class="prod-subnav">
-  <a href="{% url 'production-list' %}" data-i18n="production-orders">Üretim Emirleri</a>
-  <a href="{% url 'production-recipes' %}" data-i18n="recipes-bom">Reçeteler (BOM)</a>
-</div>
+{% ui_sheet %}
+  <form method="post" id="o-form">
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
 
-<div class="d-flex align-items-center gap-3 mb-4">
-  <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-journal-plus me-2" style="color:#ca8a04;"></i><span data-i18n="new-recipe">Yeni Reçete</span></h5>
-  <a href="{% url 'production-recipes' %}" class="btn btn-sm btn-outline-secondary ms-auto" data-i18n="cancel">Vazgeç</a>
-</div>
+    <h1 class="o-form-title">{% translate "Yeni reçete" %}</h1>
+    <p class="o-form-subtitle">{% translate "Harmanın hangi yeşil kahve ürünlerinden hangi oranda oluştuğunu tanımlayın." %}</p>
 
-{% if messages %}
-{% for msg in messages %}
-<div class="alert alert-{{ msg.tags|default:'info' }} alert-dismissible" role="alert">
-  {{ msg }} <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-</div>
-{% endfor %}
-{% endif %}
+    {% translate "Reçete bilgileri" as g1 %}
+    {% ui_group g1 %}
+      {% ui_field form.name cols=6 %}
+      {% ui_field form.output_product cols=6 %}
+      {% ui_field form.description cols=12 %}
+    {% endui_group %}
 
-<form method="post">
-{% csrf_token %}
+    {% translate "Bileşenler" as g2 %}
+    {% ui_group g2 %}
+      <div class="o-col-12">
+        <p class="o-note">
+          <i class="bi bi-info-circle" aria-hidden="true"></i>
+          {% translate "Oranların toplamı tam olarak %100 olmalıdır." %}
+        </p>
 
-<div class="form-card">
-  <div class="section-title" data-i18n="recipe-information">Reçete Bilgileri</div>
-  <div class="row g-3">
-    <div class="col-md-5">
-      <label class="form-label fw-medium" style="font-size:13px;">{{ form.name.label }}</label>
-      {{ form.name }}
-      {% if form.name.errors %}<div class="text-danger" style="font-size:12px;">{{ form.name.errors.0 }}</div>{% endif %}
-    </div>
-    <div class="col-md-4">
-      <label class="form-label fw-medium" style="font-size:13px;">{{ form.output_product.label }}</label>
-      {{ form.output_product }}
-      {% if form.output_product.errors %}<div class="text-danger" style="font-size:12px;">{{ form.output_product.errors.0 }}</div>{% endif %}
-    </div>
-    <div class="col-12">
-      <label class="form-label fw-medium" style="font-size:13px;">{{ form.description.label }}</label>
-      {{ form.description }}
-    </div>
-  </div>
-</div>
+        {% ui_x2many min=1 %}
+          <template data-o-x2many-template>
+            <div class="o-x2many-row o-recipe-comp-row">
+              <div class="o-field">
+                <label class="o-label">{% translate "Ürün" %}</label>
+                <select name="component_product" class="o-select" required>
+                  <option value="">{% translate "Ürün seçin" %}</option>
+                  {% for p in products %}<option value="{{ p.pk }}">{{ p.name }}</option>{% endfor %}
+                </select>
+              </div>
+              <div class="o-field">
+                <label class="o-label">{% translate "Oran (%)" %}</label>
+                <input name="component_ratio" type="number" class="o-input" step="0.01" min="0.01" max="100" required>
+              </div>
+              <button type="button" class="o-x2many-del" data-o-x2many-del
+                      title="{% translate 'Bileşeni sil' %}" aria-label="{% translate 'Bileşeni sil' %}">
+                <i class="bi bi-trash" aria-hidden="true"></i>
+              </button>
+            </div>
+          </template>
 
-<div class="form-card">
-  <div class="d-flex align-items-center mb-3">
-    <div class="section-title mb-0" data-i18n="components">Bileşenler</div>
-    <button type="button" class="btn btn-sm btn-outline-secondary ms-auto" onclick="addComponent()" style="font-size:12px;">
-      <i class="bi bi-plus-lg me-1"></i><span data-i18n="add-component">Bileşen Ekle</span>
-    </button>
-  </div>
-  <p class="text-muted" style="font-size:12.5px; margin-bottom:12px;">Oranların toplamı tam olarak 100 olmalıdır.</p>
-  <table class="table table-borderless" style="font-size:13.5px;">
-    <thead>
-      <tr style="font-size:11px; color:var(--g-text-2); font-weight:600; text-transform:uppercase; letter-spacing:0.7px;">
-        <th style="width:55%;" data-i18n="input-product">Girdi Ürünü</th>
-        <th style="width:30%;" data-i18n="ratio-percent">Oran (%)</th>
-        <th style="width:15%;"></th>
-      </tr>
-    </thead>
-    <tbody id="components-tbody">
-      <tr class="comp-row" id="comp-row-0">
-        <td>
-          <select name="component_product" class="form-select form-select-sm">
-            <option value="">Ürün seçin</option>
-            {% for p in products %}<option value="{{ p.pk }}">{{ p.name }}</option>{% endfor %}
-          </select>
-        </td>
-        <td>
-          <input type="number" name="component_ratio" class="form-control form-control-sm" step="0.01" min="0.01" max="100" placeholder="ör. 60">
-        </td>
-        <td>
-          <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeRow(this)" style="font-size:12px;">
-            <i class="bi bi-trash3"></i>
-          </button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-  <div id="ratio-total" class="text-muted" style="font-size:12.5px; text-align:right;"></div>
-</div>
+          <div data-o-x2many-rows>
+            <div class="o-x2many-row o-recipe-comp-row">
+              <div class="o-field">
+                <label class="o-label">{% translate "Ürün" %}</label>
+                <select name="component_product" class="o-select" required>
+                  <option value="">{% translate "Ürün seçin" %}</option>
+                  {% for p in products %}<option value="{{ p.pk }}">{{ p.name }}</option>{% endfor %}
+                </select>
+              </div>
+              <div class="o-field">
+                <label class="o-label">{% translate "Oran (%)" %}</label>
+                <input name="component_ratio" type="number" class="o-input" step="0.01" min="0.01" max="100" required>
+              </div>
+              <button type="button" class="o-x2many-del" data-o-x2many-del
+                      title="{% translate 'Bileşeni sil' %}" aria-label="{% translate 'Bileşeni sil' %}">
+                <i class="bi bi-trash" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
 
-<div class="d-flex gap-2">
-  <button type="submit" class="btn" style="background:#ca8a04; color:#fff;" data-i18n="create-recipe">Reçete Oluştur</button>
-  <a href="{% url 'production-recipes' %}" class="btn btn-outline-secondary" data-i18n="cancel-alt">İptal</a>
-</div>
-</form>
-
-<script>
-const productOptions = `{% for p in products %}<option value="{{ p.pk }}">{{ p.name }}</option>{% endfor %}`;
-let rowIndex = 1;
-
-function addComponent() {
-  const tbody = document.getElementById('components-tbody');
-  const tr = document.createElement('tr');
-  tr.className = 'comp-row';
-  tr.id = 'comp-row-' + rowIndex++;
-  tr.innerHTML = `
-    <td>
-      <select name="component_product" class="form-select form-select-sm">
-        <option value="">Ürün seçin</option>
-        ${productOptions}
-      </select>
-    </td>
-    <td>
-      <input type="number" name="component_ratio" class="form-control form-control-sm" step="0.01" min="0.01" max="100" placeholder="ör. 40">
-    </td>
-    <td>
-      <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeRow(this)" style="font-size:12px;">
-        <i class="bi bi-trash3"></i>
-      </button>
-    </td>`;
-  tbody.appendChild(tr);
-  updateTotal();
-}
-
-function removeRow(btn) {
-  const rows = document.querySelectorAll('#components-tbody .comp-row');
-  if (rows.length <= 1) return;
-  btn.closest('tr').remove();
-  updateTotal();
-}
-
-function updateTotal() {
-  const inputs = document.querySelectorAll('[name="component_ratio"]');
-  let total = 0;
-  inputs.forEach(i => { const v = parseFloat(i.value); if (!isNaN(v)) total += v; });
-  const el = document.getElementById('ratio-total');
-  el.textContent = `Toplam: ${total.toFixed(2)}%`;
-  el.className = Math.abs(total - 100) < 0.01 ? 'text-success' : 'text-danger';
-  el.style.fontWeight = '600';
-  el.style.fontSize = '12.5px';
-  el.style.textAlign = 'right';
-}
-
-document.addEventListener('change', e => { if (e.target.name === 'component_ratio') updateTotal(); });
-document.addEventListener('input', e => { if (e.target.name === 'component_ratio') updateTotal(); });
-</script>
+          <div class="o-row">
+            <button type="button" class="o-btn o-btn--sm" data-o-x2many-add>
+              <i class="bi bi-plus-lg" aria-hidden="true"></i> {% translate "Bileşen ekle" %}
+            </button>
+            {% translate "Toplam" as sum_label %}
+            <span class="o-x2many-sum" data-o-x2many-sum
+                  data-o-sum-field="component_ratio" data-o-sum-target="100"
+                  data-o-sum-label="{{ sum_label }}" data-o-sum-suffix="%"></span>
+          </div>
+        {% endui_x2many %}
+      </div>
+    {% endui_group %}
+  </form>
+{% endui_sheet %}
 {% endblock %}
+
+{% block scripts %}<script src="{% static 'js/o-x2many.js' %}?v={{ asset_version }}"></script>{% endblock %}

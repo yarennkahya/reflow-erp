@@ -1,6 +1,42 @@
 from django import forms
 
-from .models import Application, Candidate, JobOpening, LeaveRequest
+from .models import Application, Candidate, CandidateDocument, Department, Employee, JobOpening, LeaveRequest, Position
+
+
+class EmployeeForm(forms.ModelForm):
+    class Meta:
+        model = Employee
+        fields = ('name', 'email', 'phone', 'department', 'position',
+                  'manager', 'hire_date', 'employment_status', 'salary')
+        labels = {
+            'name': 'Ad Soyad',
+            'email': 'E-posta',
+            'phone': 'Telefon',
+            'department': 'Departman',
+            'position': 'Pozisyon',
+            'manager': 'Yönetici',
+            'hire_date': 'İşe giriş tarihi',
+            'employment_status': 'Durum',
+            'salary': 'Maaş (TL)',
+        }
+        widgets = {
+            'hire_date': forms.DateInput(attrs={'type': 'date'}),
+            'salary': forms.NumberInput(attrs={'step': '0.01', 'min': '0'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['manager'].queryset = Employee.objects.order_by('name')
+        self.fields['manager'].required = False
+        self.fields['salary'].required = False
+
+    def clean(self):
+        cleaned_data = super().clean()
+        department = cleaned_data.get('department')
+        position = cleaned_data.get('position')
+        if department and position and position.department_id != department.pk:
+            self.add_error('position', 'Pozisyon seçili departmana ait olmalıdır.')
+        return cleaned_data
 
 
 class LeaveRequestForm(forms.ModelForm):
@@ -24,10 +60,6 @@ class LeaveRequestForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.widget.attrs.setdefault('class', 'form-control')
-        self.fields['employee'].widget.attrs['class'] = 'form-select'
-        self.fields['leave_type'].widget.attrs['class'] = 'form-select'
 
     def clean(self):
         cleaned_data = super().clean()
@@ -38,7 +70,25 @@ class LeaveRequestForm(forms.ModelForm):
         return cleaned_data
 
 
+_CV_ALLOWED = {'.pdf', '.doc', '.docx'}
+_CV_ACCEPT  = '.pdf,.doc,.docx'
+
+
+def _validate_cv(file):
+    ext = '.' + file.name.rsplit('.', 1)[-1].lower() if '.' in file.name else ''
+    if ext not in _CV_ALLOWED:
+        raise forms.ValidationError('Yalnızca PDF, DOC veya DOCX dosyaları kabul edilir.')
+
+
 class CandidateForm(forms.ModelForm):
+    cv_file = forms.FileField(
+        required=False,
+        label='CV Dosyası',
+        help_text='PDF, DOC veya DOCX yükleyin.',
+        validators=[_validate_cv],
+        widget=forms.ClearableFileInput(attrs={'accept': _CV_ACCEPT}),
+    )
+
     class Meta:
         model = Candidate
         fields = ('name', 'email', 'phone', 'resume_note')
@@ -46,18 +96,33 @@ class CandidateForm(forms.ModelForm):
             'name': 'Ad Soyad',
             'email': 'E-posta',
             'phone': 'Telefon',
-            'resume_note': 'Özgeçmiş Notu',
+            'resume_note': 'Notlar',
         }
         widgets = {
             'resume_note': forms.Textarea(
-                attrs={'rows': 4, 'placeholder': 'Aday hakkında kısa bir not ekleyin'}
+                attrs={'rows': 3, 'placeholder': 'Aday hakkında kısa bir not ekleyin'}
             ),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.widget.attrs.setdefault('class', 'form-control')
+
+
+class CandidateDocumentForm(forms.ModelForm):
+    class Meta:
+        model = CandidateDocument
+        fields = ('file', 'label')
+        labels = {'file': 'Dosya', 'label': 'Etiket (opsiyonel)'}
+        widgets = {
+            'label': forms.TextInput(attrs={'placeholder': 'Örn. CV 2026, Portfolyo…'}),
+            'file': forms.ClearableFileInput(attrs={'accept': _CV_ACCEPT}),
+        }
+
+    def clean_file(self):
+        file = self.cleaned_data.get('file')
+        if file:
+            _validate_cv(file)
+        return file
 
 
 class ApplicationForm(forms.ModelForm):
@@ -72,8 +137,6 @@ class ApplicationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['job_opening'].queryset = JobOpening.objects.filter(status='open')
-        for field in self.fields.values():
-            field.widget.attrs.setdefault('class', 'form-select')
 
 
 class JobOpeningForm(forms.ModelForm):
@@ -95,10 +158,6 @@ class JobOpeningForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.widget.attrs.setdefault('class', 'form-control')
-        self.fields['department'].widget.attrs['class'] = 'form-select'
-        self.fields['position'].widget.attrs['class'] = 'form-select'
 
     def clean(self):
         cleaned_data = super().clean()

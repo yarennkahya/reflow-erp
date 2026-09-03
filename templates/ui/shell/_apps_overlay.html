@@ -1,0 +1,30 @@
+<div class="o-apps" id="o-apps-overlay" hidden>
+  <div class="o-apps-search">
+    <i class="bi bi-search" aria-hidden="true"></i>
+    <input type="search" class="o-apps-input" data-o-apps-filter autocomplete="off"
+           placeholder="{% translate 'Uygulama ara…' %}" aria-label="{% translate 'Uygulama ara' %}">
+  </div>
+
+  <div class="o-apps-grid">
+    {% for app in nav_apps %}
+      {% if app.allowed %}
+        <a class="o-apps-tile{% if app.is_current %} o-current{% endif %}" href="{{ app.url }}"
+           data-o-app-name="{{ app.label|lower }}">
+          <span class="o-apps-icon" style="--o-tile: var({{ app.color }});">
+            <i class="bi {{ app.icon }}" aria-hidden="true"></i>
+          </span>
+          <span class="o-apps-label">{{ app.label }}</span>
+        </a>
+      {% else %}
+        <span class="o-apps-tile o-locked" data-o-app-name="{{ app.label|lower }}"
+              title="{% translate 'Bu modüle erişim izniniz yok' %}">
+          <span class="o-apps-icon" style="--o-tile: var(--o-n-400);">
+            <i class="bi {{ app.icon }}" aria-hidden="true"></i>
+          </span>
+          <span class="o-apps-label">{{ app.label }}</span>
+          <i class="bi bi-lock-fill o-apps-lock" aria-hidden="true"></i>
+        </span>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>

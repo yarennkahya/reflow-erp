@@ -1,0 +1,66 @@
+<div class="o-list">
+  <div class="o-list-scroll">
+    <table class="o-table">
+      <thead>
+        <tr>
+          <th>{% translate "Sipariş" %}</th>
+          <th>{% translate "Müşteri" %}</th>
+          <th>{% translate "Durum" %}</th>
+          <th class="o-num">{% translate "Kalem" %}</th>
+          <th class="o-num">{% translate "Toplam" %}</th>
+          <th>{% translate "Tarih" %}</th>
+          <th>{% translate "Fatura" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in orders %}
+          <tr>
+            <td><a href="{% url 'order-detail' row.order.pk %}" class="o-table-link o-mono">SO #{{ row.order.pk }}</a></td>
+            <td><a href="{% url 'customer-detail' row.order.customer_id %}" class="o-table-link">{{ row.order.customer.name }}</a></td>
+            <td>{% ui_badge row.order "status" %}</td>
+            <td class="o-num">{{ row.item_count }}</td>
+            <td class="o-num o-strong">{{ row.total|money }}</td>
+            <td class="o-nowrap o-muted o-sm">{{ row.order.created_at|date:"d M Y" }}</td>
+            <td class="o-actions" data-o-preview-actions>
+              {% if row.order.invoice %}
+                {% translate "Faturayı önizle" as prev_t %}
+                <button type="button" class="o-btn o-btn--sm o-btn--ghost"
+                        title="{{ prev_t }}" aria-label="{{ prev_t }}"
+                        data-o-preview-url="{% url 'invoice-preview' row.order.invoice.pk %}"
+                        data-o-preview-title="INV #{{ row.order.invoice.pk }} · {{ row.order.customer.name }}">
+                  <i class="bi bi-search" aria-hidden="true"></i>
+                </button>
+
+                {% translate "Faturayı gönder" as send_t %}
+                <form method="post" action="{% url 'invoice-send' row.order.invoice.pk %}"
+                      data-o-preview-action
+                      data-o-confirm="{% blocktranslate with name=row.order.customer.name %}Fatura {{ name }} adresine e-posta ile gönderilsin mi?{% endblocktranslate %}">
+                  {% csrf_token %}
+                  <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                  <button type="submit" class="o-btn o-btn--sm o-btn--ghost"
+                          title="{{ send_t }}" aria-label="{{ send_t }}">
+                    <i class="bi bi-envelope-arrow-up" aria-hidden="true"></i>
+                  </button>
+                </form>
+              {% elif row.order.status == 'fulfilled' %}
+                <form method="post" action="{% url 'invoice-create' row.order.pk %}">
+                  {% csrf_token %}
+                  <button type="submit" class="o-btn o-btn--sm" title="{% translate 'Fatura oluştur' %}">
+                    <i class="bi bi-receipt" aria-hidden="true"></i>
+                  </button>
+                </form>
+              {% else %}
+                <span class="o-faint">—</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          {% translate "Gösterilecek sipariş yok" as t %}
+          {% translate "İlk siparişi oluştur" as cta %}
+          {% url 'order-create' as create_url %}
+          {% ui_empty icon="bi-cart-x" title=t action_url=create_url action_label=cta colspan=7 %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>

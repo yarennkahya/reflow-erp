@@ -1,33 +1,14 @@
 from django import forms
 from django.db.models import Q
 
+from sales.forms import CustomerForm  # noqa: F401  (crm.views buradan import ediyor)
 from sales.models import Customer
 
 from .models import Opportunity
 
 
-class CustomerForm(forms.ModelForm):
-    class Meta:
-        model = Customer
-        fields = ('name', 'customer_type', 'contact_email', 'contact_phone')
-        labels = {
-            'name': 'Müşteri adı',
-            'customer_type': 'Müşteri türü',
-            'contact_email': 'E-posta adresi',
-            'contact_phone': 'Telefon numarası',
-        }
-        widgets = {
-            'name': forms.TextInput(attrs={'placeholder': 'Örn. Kahve Molası Cafe'}),
-            'contact_email': forms.EmailInput(attrs={'placeholder': 'ornek@firma.com'}),
-            'contact_phone': forms.TextInput(attrs={'placeholder': '+90 5XX XXX XX XX'}),
-        }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.widget.attrs.setdefault('class', 'form-control')
-        self.fields['customer_type'].widget.attrs['class'] = 'form-select'
-
+# CustomerForm sales/forms.py'de yaşıyor: Customer modeli sales'a ait.
+# Burada yeniden tanımlamak iki formun zamanla ayrışmasına yol açardı.
 
 class SaleForm(forms.ModelForm):
     class Meta:
@@ -55,12 +36,6 @@ class SaleForm(forms.ModelForm):
                 Q(is_active=True) | Q(pk=self.instance.customer_id)
             )
         self.fields['customer'].queryset = customer_queryset.order_by('name')
-
-        for field in self.fields.values():
-            field.widget.attrs.setdefault('class', 'form-control')
-        self.fields['customer'].widget.attrs['class'] = 'form-select'
-        self.fields['status'].widget.attrs['class'] = 'form-select'
-        self.fields['stage'].widget.attrs['class'] = 'form-select'
 
     def clean(self):
         cleaned_data = super().clean()
@@ -110,7 +85,3 @@ class OpportunityCreateForm(forms.ModelForm):
         self.fields['customer'].queryset = Customer.objects.filter(
             is_active=True
         ).order_by('name')
-
-        for field in self.fields.values():
-            field.widget.attrs.setdefault('class', 'form-control')
-        self.fields['customer'].widget.attrs['class'] = 'form-select'

@@ -1,0 +1,23 @@
+<nav class="o-sidebar" aria-label="{% translate 'Uygulama gezintisi' %}">
+  <div class="o-sidebar-nav">
+    {% for app in nav_apps %}
+      {% if app.allowed %}
+        <a class="o-sidebar-app{% if app.is_current %} is-current{% endif %}"
+           href="{{ app.url }}"
+           title="{{ app.label }}"
+           style="--o-tile: var({{ app.color }});">
+          <i class="bi {{ app.icon }} o-sidebar-icon" aria-hidden="true"></i>
+          <span class="o-sidebar-label">{{ app.label }}</span>
+        </a>
+      {% else %}
+        <span class="o-sidebar-app o-sidebar-app--locked"
+              title="{% translate 'Bu modüle erişim izniniz yok' %}"
+              style="--o-tile: var(--o-n-500);">
+          <i class="bi {{ app.icon }} o-sidebar-icon" aria-hidden="true"></i>
+          <span class="o-sidebar-label">{{ app.label }}</span>
+          <i class="bi bi-lock o-sidebar-lock" aria-hidden="true"></i>
+        </span>
+      {% endif %}
+    {% endfor %}
+  </div>
+</nav>

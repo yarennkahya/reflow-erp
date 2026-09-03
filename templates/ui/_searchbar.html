@@ -1,0 +1,68 @@
+<form class="o-search" method="get" role="search"
+      {% if target %}data-ajax-filter data-ajax-autosubmit data-ajax-target="{{ target }}"{% endif %}>
+  <div class="o-search-box">
+    <i class="bi bi-search o-search-icon" aria-hidden="true"></i>
+
+    <div class="o-search-facets">
+      {% for facet in facets %}
+        <span class="o-facet">
+          <span class="o-facet-label">{{ facet.label }}</span>
+          <span class="o-facet-value">{{ facet.value }}</span>
+          <button type="button" class="o-facet-x" data-o-facet-clear="{{ facet.param }}"
+                  aria-label="{% translate 'Filtreyi kaldır' %}">&times;</button>
+        </span>
+      {% endfor %}
+    </div>
+
+    <input type="search" name="{{ param }}" value="{{ query }}" class="o-search-input"
+           placeholder="{{ placeholder }}" autocomplete="off" aria-label="{{ placeholder }}">
+
+    {% if filters or groupby %}
+      <button type="button" class="o-search-caret" data-bs-toggle="dropdown"
+              data-bs-auto-close="outside" aria-expanded="false"
+              aria-label="{% translate 'Filtre ve gruplama' %}">
+        <i class="bi bi-chevron-down" aria-hidden="true"></i>
+      </button>
+      <div class="dropdown-menu dropdown-menu-end o-search-panel">
+        {% if filters %}
+          <div class="o-search-col">
+            <h6 class="o-search-col-title"><i class="bi bi-funnel" aria-hidden="true"></i> {% translate "Filtreler" %}</h6>
+            <label class="o-search-opt">
+              <input type="radio" name="{{ filter_param }}" value="all" {% if selected == 'all' %}checked{% endif %}>
+              <span>{% translate "Tümü" %}</span>
+            </label>
+            {% for value, label in filters %}
+              <label class="o-search-opt">
+                <input type="radio" name="{{ filter_param }}" value="{{ value }}" {% if selected == value %}checked{% endif %}>
+                <span>{{ label }}</span>
+              </label>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        {% if groupby %}
+          <div class="o-search-col">
+            <h6 class="o-search-col-title"><i class="bi bi-collection" aria-hidden="true"></i> {% translate "Grupla" %}</h6>
+            <label class="o-search-opt">
+              <input type="radio" name="{{ groupby_param }}" value="" {% if not groupby_selected %}checked{% endif %}>
+              <span>{% translate "Gruplama yok" %}</span>
+            </label>
+            {% for value, label in groupby %}
+              <label class="o-search-opt">
+                <input type="radio" name="{{ groupby_param }}" value="{{ value }}" {% if groupby_selected == value %}checked{% endif %}>
+                <span>{{ label }}</span>
+              </label>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <div class="o-search-col o-search-col--disabled" title="{% translate 'Yakında' %}">
+          <h6 class="o-search-col-title"><i class="bi bi-star" aria-hidden="true"></i> {% translate "Favoriler" %}</h6>
+          <p class="o-search-soon">{% translate "Kayıtlı arama yakında" %}</p>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  {% for item in hidden %}<input type="hidden" name="{{ item.name }}" value="{{ item.value }}">{% endfor %}
+</form>

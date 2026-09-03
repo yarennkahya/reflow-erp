@@ -1,16 +1,40 @@
 {% extends 'base.html' %}
-{% block title %}{% if warehouse %}{{ warehouse.name }} Düzenle{% else %}Yeni Depo{% endif %} — Reflow Coffee ERP{% endblock %}
-{% block nav_inventory %}active{% endblock %}
-{% block nav_inventory_warehouses %}active{% endblock %}
-{% block page_title %}Stok / Depolar{% endblock %}
+{% block title %}{% if warehouse %}{{ warehouse.name }}{% else %}{% translate "Yeni Depo" %}{% endif %}{% endblock %}
 
-{% block extra_head %}
-<style>
-  .form-card { max-width:720px; background: var(--g-surface); border:1px solid var(--g-border); border-radius:12px; overflow:hidden; }.form-card-head { padding:18px 22px; background:var(--g-n-50); border-bottom:1px solid var(--g-border); }.form-card-body { padding:22px; }.form-label { color:var(--g-text); font-size:13px; font-weight:600; }.form-help { color:var(--g-text-2); font-size:12px; }.form-note { background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; color:#1e40af; font-size:12.5px; padding:12px 13px; }
-</style>
+{% block cp_breadcrumb %}
+  {% if warehouse %}
+    {% url 'warehouse-detail' warehouse.pk as back %}
+    {% translate "Düzenle" as rec %}
+    {% ui_breadcrumb parent=warehouse.name parent_url=back record=rec %}
+  {% else %}
+    {% translate "Yeni" as rec %}{% ui_breadcrumb record=rec %}
+  {% endif %}
 {% endblock %}
 
+{% block cp_buttons %}
+  <button type="submit" form="o-form" class="o-btn o-btn--primary">
+    <i class="bi bi-check-lg" aria-hidden="true"></i> {% translate "Kaydet" %}
+  </button>
+  <a class="o-btn" href="{% if warehouse %}{% url 'warehouse-detail' warehouse.pk %}{% else %}{% url 'warehouse-list' %}{% endif %}">
+    {% translate "Vazgeç" %}
+  </a>
+{% endblock %}
+
+{% block content_class %} o-content--sheet{% endblock %}
+
 {% block content %}
-<div class="mb-3"><a href="{% if warehouse %}{% url 'warehouse-detail' warehouse.pk %}{% else %}{% url 'warehouse-list' %}{% endif %}" class="text-decoration-none" style="font-size:13px;"><i class="bi bi-arrow-left me-1"></i><span data-i18n="go-back">Geri dön</span></a></div>
-<div class="form-card"><div class="form-card-head"><h5 class="mb-1 fw-bold">{% if warehouse %}<span data-i18n="edit-warehouse-info">Depo bilgilerini düzenle</span>{% else %}<span data-i18n="add-new-warehouse">Yeni depo ekle</span>{% endif %}</h5><p class="mb-0 text-muted" style="font-size:13px;" data-i18n="warehouse-form-desc">Depolar, teslim alınan lotların nerede tutulduğunu izlemek için kullanılır.</p></div><form method="post" class="form-card-body">{% csrf_token %}{% if form.non_field_errors %}<div class="alert alert-danger py-2">{{ form.non_field_errors }}</div>{% endif %}<div class="row g-3"><div class="col-12"><label class="form-label" for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>{{ form.name }}{% for error in form.name.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div><div class="col-md-7"><label class="form-label" for="{{ form.city.id_for_label }}">{{ form.city.label }}</label>{{ form.city }}{% for error in form.city.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}<div class="form-help mt-1" data-i18n="city-form-help">Depo raporlarında ve filtrelerde bu şehir gösterilir.</div></div></div><div class="form-note mt-4"><i class="bi bi-info-circle-fill me-1"></i><span data-i18n="stock-source-note">Stok miktarı depodan değil, satın alma teslim alma, üretim ve satış işlemlerinden oluşur.</span></div><div class="d-flex justify-content-end gap-2 border-top mt-4 pt-3"><a href="{% if warehouse %}{% url 'warehouse-detail' warehouse.pk %}{% else %}{% url 'warehouse-list' %}{% endif %}" class="btn btn-light" data-i18n="cancel">Vazgeç</a><button class="btn btn-primary" type="submit"><i class="bi bi-check-lg me-1"></i>{% if warehouse %}<span data-i18n="save-changes">Değişiklikleri kaydet</span>{% else %}<span data-i18n="save-warehouse">Depoyu kaydet</span>{% endif %}</button></div></form></div>
+{% ui_sheet %}
+  <form method="post" id="o-form">
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+    <h1 class="o-form-title">
+      {% if warehouse %}{% translate "Depo bilgilerini düzenle" %}{% else %}{% translate "Yeni depo" %}{% endif %}
+    </h1>
+    {% translate "Depo bilgileri" as g %}
+    {% ui_group g %}
+      {% ui_field form.name cols=6 %}
+      {% ui_field form.city cols=6 %}
+    {% endui_group %}
+  </form>
+{% endui_sheet %}
 {% endblock %}

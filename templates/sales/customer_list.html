@@ -1,33 +1,66 @@
 {% extends 'base.html' %}
-{% block title %}Müşteriler - Reflow Coffee ERP{% endblock %}
-{% block content %}
-<div class="mb-4">
-  <div class="btn-group btn-group-sm" role="group">
-    <a href="/sales/" class="btn btn-outline-primary" data-i18n="orders">Siparişler</a>
-    <a href="/sales/customers/" class="btn btn-primary" data-i18n="customers">Müşteriler</a>
-    <a href="/sales/forecast/" class="btn btn-outline-primary" data-i18n="demand-forecast">Talep Tahmini</a>
-    <a href="/sales/returns/" class="btn btn-outline-primary" data-i18n="returns">İadeler</a>
+{% block title %}{% translate "Müşteriler" %}{% endblock %}
+{% block region_attr %} data-ajax-region{% endblock %}
+
+{% block cp_buttons %}
+  <a href="{% url 'customer-create' %}" class="o-btn o-btn--primary">
+    <i class="bi bi-plus-lg" aria-hidden="true"></i> {% translate "Yeni" %}
+  </a>
+  <a href="{% url 'sales-list' %}" class="o-btn">
+    <i class="bi bi-cart3" aria-hidden="true"></i> {% translate "Siparişler" %}
+  </a>
+{% endblock %}
+
+{% block cp_pager %}{% ui_pager page_obj %}{% endblock %}
+{% block cp_search %}
+  <div class="o-cp-search-row">
+    {% translate "Müşteri, e-posta veya telefon ara" as ph %}
+    {% ui_search target="#o-view" placeholder=ph %}
   </div>
-</div>
-<h1 class="mb-4">Müşteriler</h1>
-<table class="table bg-white">
-  <thead>
-    <tr>
-      <th>İsim</th>
-      <th>Tür</th>
-      <th>E-posta</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for customer in customers %}
-    <tr>
-      <td>{{ customer.name }}</td>
-      <td>{{ customer.get_customer_type_display }}</td>
-      <td>{{ customer.contact_email }}</td>
-      <td><a href="{% url 'customer-detail' customer.pk %}">Detay →</a></td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+  {% ui_filter_chips choices=type_choices param="customer_type" selected=selected_type %}
+{% endblock %}
+
+{% block content %}
+  <div class="o-button-box o-po-kpis">
+    {% translate "Toplam müşteri" as l1 %}{% ui_stat value=total_customers label=l1 icon="bi-people" %}
+    {% translate "Toptan müşteri" as l2 %}{% ui_stat value=wholesale_count label=l2 icon="bi-shop" %}
+  </div>
+
+  <div class="o-list">
+    <div class="o-list-scroll">
+      <table class="o-table">
+        <thead>
+          <tr>
+            <th>{% translate "Müşteri" %}</th>
+            <th>{% translate "İletişim" %}</th>
+            <th>{% translate "Tür" %}</th>
+            <th>{% translate "Durum" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for customer in customers %}
+            <tr>
+              <td>
+                <div class="o-row">
+                  {% ui_avatar customer.name size="sm" %}
+                  <a class="o-table-link" href="{% url 'customer-detail' customer.pk %}">{{ customer.name }}</a>
+                </div>
+              </td>
+              <td class="o-sm o-muted">
+                {{ customer.contact_email|default:"—" }}
+                {% if customer.contact_phone %}<span class="o-table-sub">{{ customer.contact_phone }}</span>{% endif %}
+              </td>
+              <td>{% ui_badge customer "customer_type" %}</td>
+              <td>{% ui_badge customer "is_active" %}</td>
+            </tr>
+          {% empty %}
+            {% translate "Gösterilecek müşteri yok" as t %}
+            {% translate "İlk müşteriyi ekle" as cta %}
+            {% url 'customer-create' as create_url %}
+            {% ui_empty icon="bi-people" title=t action_url=create_url action_label=cta colspan=4 %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 {% endblock %}

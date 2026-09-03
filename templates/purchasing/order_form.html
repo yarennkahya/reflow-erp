@@ -1,7 +1,50 @@
 {% extends 'base.html' %}
-{% block title %}{% if order %}PO #{{ order.pk }} Düzenle{% else %}Yeni Satın Alma Siparişi{% endif %} — Reflow Coffee ERP{% endblock %}
-{% block nav_purchasing %}active{% endblock %}
-{% block nav_purchasing_orders %}active{% endblock %}
-{% block page_title %}Satın Alma / Sipariş{% endblock %}
-{% block extra_head %}<style>.form-card { max-width:800px; background: var(--g-surface); border:1px solid var(--g-border); border-radius:12px; overflow:hidden; }.form-card-head { padding:18px 22px; background:var(--g-n-50); border-bottom:1px solid var(--g-border); }.form-card-body { padding:22px; }.form-label { color:var(--g-text); font-size:13px; font-weight:600; }.flow-tip { background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; color:#1e40af; font-size:12.5px; padding:10px 12px; }</style>{% endblock %}
-{% block content %}<div class="mb-3"><a href="{% if order %}{% url 'purchase-order-detail' order.pk %}{% else %}{% url 'purchasing-list' %}{% endif %}" class="text-decoration-none" style="font-size:13px;"><i class="bi bi-arrow-left me-1"></i>Geri dön</a></div><div class="form-card"><div class="form-card-head"><h5 class="mb-1 fw-bold">{% if order %}Taslak siparişi düzenle{% else %}Yeni satın alma siparişi{% endif %}</h5><p class="mb-0 text-muted" style="font-size:13px;">Önce tedarikçiyi ve teslimat bilgisini belirleyin; ardından sipariş kalemlerini ekleyin.</p></div><form method="post" class="form-card-body">{% csrf_token %}{% if form.non_field_errors %}<div class="alert alert-danger py-2">{{ form.non_field_errors }}</div>{% endif %}<div class="flow-tip mb-4"><i class="bi bi-info-circle me-1"></i>Sipariş taslak olarak oluşturulur. Kalemleri ekledikten sonra tedarikçiye gönderirsiniz.</div><div class="row g-3"><div class="col-md-7"><label class="form-label" for="{{ form.supplier.id_for_label }}">{{ form.supplier.label }}</label>{{ form.supplier }}{% for error in form.supplier.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}<div class="form-text">Listede yalnızca aktif dış tedarikçiler gösterilir. <a href="{% url 'supplier-create' %}">Yeni tedarikçi ekle</a></div></div><div class="col-md-5"><label class="form-label" for="{{ form.expected_delivery_date.id_for_label }}">{{ form.expected_delivery_date.label }}</label>{{ form.expected_delivery_date }}{% for error in form.expected_delivery_date.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div><div class="col-12"><label class="form-label" for="{{ form.notes.id_for_label }}">{{ form.notes.label }}</label>{{ form.notes }}{% for error in form.notes.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}</div></div><div class="d-flex justify-content-end gap-2 border-top mt-4 pt-3"><a href="{% if order %}{% url 'purchase-order-detail' order.pk %}{% else %}{% url 'purchasing-list' %}{% endif %}" class="btn btn-light">Vazgeç</a><button class="btn btn-primary" type="submit"><i class="bi bi-check-lg me-1"></i>{% if order %}Değişiklikleri kaydet{% else %}Taslak sipariş oluştur{% endif %}</button></div></form></div>{% endblock %}
+{% block title %}{% if order %}PO #{{ order.pk }}{% else %}{% translate "Yeni Sipariş" %}{% endif %}{% endblock %}
+
+{% block cp_breadcrumb %}
+  {% if order %}
+    {% with pk=order.pk|stringformat:"s" %}
+      {% url 'purchase-order-detail' order.pk as back %}
+      {% translate "Düzenle" as rec %}
+      {% ui_breadcrumb parent="PO #"|add:pk parent_url=back record=rec %}
+    {% endwith %}
+  {% else %}
+    {% translate "Yeni" as rec %}{% ui_breadcrumb record=rec %}
+  {% endif %}
+{% endblock %}
+
+{% block cp_buttons %}
+  <button type="submit" form="o-form" class="o-btn o-btn--primary">
+    <i class="bi bi-check-lg" aria-hidden="true"></i> {% translate "Kaydet" %}
+  </button>
+  <a class="o-btn" href="{% if order %}{% url 'purchase-order-detail' order.pk %}{% else %}{% url 'purchasing-list' %}{% endif %}">
+    {% translate "Vazgeç" %}
+  </a>
+{% endblock %}
+
+{% block content_class %} o-content--sheet{% endblock %}
+
+{% block content %}
+{% ui_sheet %}
+  <form method="post" id="o-form">
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+
+    <h1 class="o-form-title">
+      {% if order %}{% translate "Taslak siparişi düzenle" %}{% else %}{% translate "Yeni satın alma siparişi" %}{% endif %}
+    </h1>
+
+    <p class="o-note">
+      <i class="bi bi-info-circle" aria-hidden="true"></i>
+      {% translate "Sipariş taslak olarak oluşturulur. Kalemleri ekledikten sonra tedarikçiye gönderirsiniz." %}
+    </p>
+
+    {% translate "Sipariş bilgileri" as g %}
+    {% ui_group g %}
+      {% ui_field form.supplier cols=7 %}
+      {% ui_field form.expected_delivery_date cols=5 %}
+      {% ui_field form.notes cols=12 %}
+    {% endui_group %}
+  </form>
+{% endui_sheet %}
+{% endblock %}

@@ -2,6 +2,7 @@ from decimal import Decimal
 
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from hr.models import Employee
 from inventory.models import Lot, Product
@@ -59,8 +60,8 @@ class RoastBatch(models.Model):
 
 class QualityCheck(models.Model):
     class Result(models.TextChoices):
-        PASS = 'pass', 'Geçti'
-        FAIL = 'fail', 'Kaldı'
+        PASS = 'pass', _('Geçti')
+        FAIL = 'fail', _('Kaldı')
 
     batch = models.OneToOneField(
         RoastBatch, on_delete=models.PROTECT, related_name='quality_check'

@@ -3,18 +3,19 @@ from decimal import Decimal
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from inventory.models import Business, Lot, Product
 
 
 class PurchaseOrder(models.Model):
     class Status(models.TextChoices):
-        DRAFT = 'draft', 'Taslak'
-        SENT = 'sent', 'Tedarikçiye gönderildi'
-        CONFIRMED = 'confirmed', 'Tedarikçi teyit etti'
-        PARTIALLY_RECEIVED = 'partially_received', 'Kısmi teslim alındı'
-        RECEIVED = 'received', 'Tam teslim alındı'
-        CANCELLED = 'cancelled', 'İptal edildi'
+        DRAFT = 'draft', _('Taslak')
+        SENT = 'sent', _('Tedarikçiye gönderildi')
+        CONFIRMED = 'confirmed', _('Tedarikçi teyit etti')
+        PARTIALLY_RECEIVED = 'partially_received', _('Kısmi teslim alındı')
+        RECEIVED = 'received', _('Tam teslim alındı')
+        CANCELLED = 'cancelled', _('İptal edildi')
 
     supplier = models.ForeignKey(
         Business, on_delete=models.PROTECT, related_name='purchase_orders'

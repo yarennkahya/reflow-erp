@@ -1,48 +1,64 @@
 {% extends 'base.html' %}
-{% block title %}{{ customer.name }} - Reflow Coffee ERP{% endblock %}
+{% block title %}{{ customer.name }}{% endblock %}
+{% block cp_breadcrumb %}{% ui_breadcrumb record=customer.name %}{% endblock %}
+
+{% block cp_buttons %}
+  <a class="o-btn o-btn--primary" href="{% url 'order-create' %}?customer={{ customer.pk }}">
+    <i class="bi bi-plus-lg" aria-hidden="true"></i> {% translate "Yeni Sipariş" %}
+  </a>
+  <a class="o-btn" href="{% url 'customer-edit' customer.pk %}">
+    <i class="bi bi-pencil" aria-hidden="true"></i> {% translate "Düzenle" %}
+  </a>
+  <a class="o-btn" href="{% url 'crm-customer-detail' customer.pk %}">
+    <i class="bi bi-building" aria-hidden="true"></i> {% translate "CRM Kartı" %}
+  </a>
+{% endblock %}
+
+{% block content_class %} o-content--sheet{% endblock %}
 {% block content %}
-<div class="mb-4">
-  <div class="btn-group btn-group-sm" role="group">
-    <a href="/sales/" class="btn btn-outline-primary">Siparişler</a>
-    <a href="/sales/customers/" class="btn btn-primary">Müşteriler</a>
-    <a href="/sales/forecast/" class="btn btn-outline-primary">Talep Tahmini</a>
-    <a href="/sales/returns/" class="btn btn-outline-primary">İadeler</a>
-  </div>
-</div>
-<h1 class="mb-1">{{ customer.name }}</h1>
-<p class="text-muted mb-4">{{ customer.get_customer_type_display }} · {{ customer.contact_email }}</p>
-
-<div class="row g-4">
-  <div class="col-md-6">
-    <div class="card">
-      <div class="card-header">Sipariş Geçmişi (sales.Order)</div>
-      <div class="card-body">
-        {% for order in customer.orders.all %}
-          <div class="d-flex justify-content-between border-bottom py-2">
-            <a href="{% url 'order-detail' order.pk %}">Sipariş #{{ order.pk }}</a>
-            <span class="badge bg-secondary">{{ order.get_status_display }}</span>
-          </div>
-        {% empty %}
-          <p class="text-muted">Henüz sipariş yok.</p>
-        {% endfor %}
+{% ui_sheet %}
+  <div class="o-form-head">
+    <div class="o-row">
+      {% ui_avatar customer.name size="lg" %}
+      <div>
+        <h1 class="o-form-title">{{ customer.name }} {% ui_badge customer "is_active" %}</h1>
+        <p class="o-form-subtitle">{% ui_badge customer "customer_type" %}</p>
       </div>
     </div>
+    {% ui_button_box %}
+      {% translate "Sipariş" as l1 %}{% ui_stat value=customer.orders.count label=l1 icon="bi-cart3" %}
+    {% endui_button_box %}
   </div>
 
-  <div class="col-md-6">
-    <div class="card">
-      <div class="card-header d-flex align-items-center justify-content-between"><span>CRM Satış Kayıtları</span><a href="{% url 'crm-customer-detail' customer.pk %}" class="btn btn-sm btn-outline-primary">CRM kartını aç</a></div>
-      <div class="card-body">
-        {% for opp in customer.opportunities.all %}
-          <div class="d-flex justify-content-between border-bottom py-2">
-            <span>{{ opp.title }}</span>
-            <span class="badge {% if opp.status == 'active' %}bg-success{% elif opp.status == 'passive' %}bg-secondary{% elif opp.status == 'won' %}bg-success{% else %}bg-danger{% endif %}">{{ opp.get_status_display }} · {{ opp.get_stage_display }}</span>
-          </div>
-        {% empty %}
-          <p class="text-muted">Henüz fırsat yok.</p>
-        {% endfor %}
-      </div>
-    </div>
-  </div>
-</div>
+  {% translate "İletişim bilgileri" as g %}
+  {% ui_group g %}
+    {% translate "E-posta" as f1 %}{% ui_field_value f1 customer.contact_email icon="bi-envelope" cols=4 %}
+    {% translate "Telefon" as f2 %}{% ui_field_value f2 customer.contact_phone icon="bi-telephone" cols=4 %}
+    {% translate "Kayıt tarihi" as f3 %}{% ui_field_value f3 customer.created_at|date:"d M Y" icon="bi-calendar3" cols=4 %}
+  {% endui_group %}
+
+  {% ui_notebook %}
+    {% translate "Siparişler" as t1 %}
+    {% ui_page t1 badge=customer.orders.count %}
+      <div class="o-list"><div class="o-list-scroll">
+        <table class="o-table">
+          <thead><tr>
+            <th>{% translate "Sipariş" %}</th><th>{% translate "Durum" %}</th><th>{% translate "Tarih" %}</th>
+          </tr></thead>
+          <tbody>
+            {% for order in customer.orders.all %}
+              <tr>
+                <td><a href="{% url 'order-detail' order.pk %}" class="o-table-link o-mono">SO #{{ order.pk }}</a></td>
+                <td>{% ui_badge order "status" %}</td>
+                <td class="o-nowrap o-muted o-sm">{{ order.created_at|date:"d M Y" }}</td>
+              </tr>
+            {% empty %}
+              {% translate "Bu müşteriye ait sipariş yok" as e %}{% ui_empty icon="bi-cart-x" title=e colspan=3 %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div></div>
+    {% endui_page %}
+  {% endui_notebook %}
+{% endui_sheet %}
 {% endblock %}

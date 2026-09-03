@@ -1,84 +1,56 @@
 {% extends 'base.html' %}
-{% block title %}Reçeteler — Reflow Coffee ERP{% endblock %}
-{% block nav_production %}active{% endblock %}
-{% block nav_production_recipes %}active{% endblock %}
-{% block page_title %}Üretim{% endblock %}
+{% block title %}{% translate "Reçeteler" %}{% endblock %}
 
-{% block extra_head %}
-<style>
-  .prod-subnav { display:flex; gap:4px; margin-bottom:20px; border-bottom:1px solid var(--g-border); padding-bottom:0; }
-  .prod-subnav a { padding:8px 14px; font-size:13px; font-weight:500; color:var(--g-text-2); text-decoration:none; border-bottom:2px solid transparent; margin-bottom:-1px; white-space:nowrap; }
-  .prod-subnav a:hover { color:var(--g-text); }
-  .prod-subnav a.active { color:#ca8a04; border-bottom-color:#ca8a04; font-weight:600; }
-  .data-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:10px; overflow:hidden; margin-bottom:16px; }
-  .data-card .table { margin-bottom:0; font-size:13.5px; }
-  .data-card .table thead th { background:var(--g-n-50); color:var(--g-text-2); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.7px; border-bottom:1px solid var(--g-border); padding:10px 16px; white-space:nowrap; }
-  .data-card .table tbody td { padding:11px 16px; vertical-align:middle; color:var(--g-text); border-color:var(--g-border-sub); }
-  .data-card .table tbody tr:last-child td { border-bottom:none; }
-  .data-card .table tbody tr:hover { background:var(--g-n-50); }
-  .empty-state { padding:32px 24px; text-align:center; color:var(--g-text-3); }
-  .empty-state i { font-size:28px; display:block; margin-bottom:6px; }
-  .recipe-head { padding:14px 16px; background:#fefce8; border-bottom:1px solid #fef08a; display:flex; align-items:center; gap:10px; }
-  .recipe-title { font-size:14px; font-weight:700; color:#713f12; }
-  .recipe-output { font-size:12px; color:#92400e; }
-  .ratio-bar { display:inline-block; height:6px; border-radius:3px; background:#ca8a04; margin-right:6px; vertical-align:middle; }
-</style>
+{% block cp_buttons %}
+  <a href="{% url 'production-recipe-create' %}" class="o-btn o-btn--primary">
+    <i class="bi bi-plus-lg" aria-hidden="true"></i> {% translate "Yeni" %}
+  </a>
+  <a href="{% url 'production-list' %}" class="o-btn">
+    <i class="bi bi-thermometer-high" aria-hidden="true"></i> {% translate "Üretim Emirleri" %}
+  </a>
 {% endblock %}
+{% block cp_pager %}{% ui_pager page_obj %}{% endblock %}
 
 {% block content %}
-<div class="prod-subnav">
-  <a href="{% url 'production-list' %}" data-i18n="production-orders">Üretim Emirleri</a>
-  <a href="{% url 'production-recipes' %}" class="active" data-i18n="recipes-bom">Reçeteler (BOM)</a>
-</div>
-
-<div class="d-flex align-items-center gap-3 mb-3">
-  <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-journal-text me-2" style="color:#ca8a04;"></i><span data-i18n="recipes-bom">Reçeteler (BOM)</span></h5>
-  <span class="text-muted" style="font-size:13px;">{{ recipes|length }} reçete</span>
-  <a href="{% url 'production-recipe-create' %}" class="btn btn-sm ms-auto" style="background:#ca8a04; color:#fff; font-size:13px;">
-    <i class="bi bi-plus-lg me-1"></i><span data-i18n="new-recipe">Yeni Reçete</span>
-  </a>
-</div>
-
-{% for recipe in recipes %}
-<div class="data-card">
-  <div class="recipe-head">
-    <i class="bi bi-journal-bookmark" style="color:#ca8a04;"></i>
-    <div>
-      <div class="recipe-title">{{ recipe.name }}</div>
-      <div class="recipe-output">Çıktı: {{ recipe.output_product.name }}{% if recipe.description %} · {{ recipe.description }}{% endif %}</div>
-    </div>
-    <span class="text-muted ms-auto" style="font-size:12px;">{{ recipe.components.all|length }} bileşen</span>
+  <div class="o-button-box o-po-kpis">
+    {% translate "Reçete" as l1 %}{% ui_stat value=recipe_count label=l1 icon="bi-journal-text" %}
   </div>
-  {% with components=recipe.components.all %}
-  {% if components %}
-  <table class="table table-borderless">
-    <thead>
-      <tr><th data-i18n="input-product">Girdi Ürün</th><th data-i18n="ratio-percent">Oran (%)</th><th style="width:200px;" data-i18n="visual-ratio">Görsel Oran</th></tr>
-    </thead>
-    <tbody>
-      {% for comp in components %}
-      <tr>
-        <td class="fw-medium">{{ comp.input_product.name }}</td>
-        <td>%{{ comp.ratio_percent|floatformat:2 }}</td>
-        <td>
-          <span class="ratio-bar" style="width:{{ comp.ratio_percent }}px; max-width:180px;"></span>
-          <span style="font-size:12px; color:var(--g-text-2);">{{ comp.ratio_percent|floatformat:1 }}</span>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-  {% else %}
-  <div class="empty-state"><i class="bi bi-exclamation-circle"></i><span data-i18n="no-components">Bileşen tanımlanmamış.</span></div>
-  {% endif %}
-  {% endwith %}
-</div>
-{% empty %}
-<div class="data-card">
-  <div class="empty-state" style="padding:48px 24px;">
-    <i class="bi bi-inbox" style="font-size:36px; display:block; margin-bottom:8px;"></i>
-    <span data-i18n="no-recipes">Henüz hiç reçete yok.</span>
+
+  <div class="o-stack">
+    {% for recipe in recipes %}
+      <section class="o-list">
+        <header class="o-list-head">
+          <div>
+            <h2 class="o-list-title">{{ recipe.name }}</h2>
+            <p class="o-muted o-sm">
+              {% translate "Çıktı" %}: {{ recipe.output_product.name }}
+              {% if recipe.description %}· {{ recipe.description|truncatechars:70 }}{% endif %}
+            </p>
+          </div>
+          <a class="o-btn o-btn--sm" href="{% url 'production-batch-create' %}?recipe={{ recipe.pk }}">
+            <i class="bi bi-thermometer-high" aria-hidden="true"></i> {% translate "Üret" %}
+          </a>
+        </header>
+        <div class="o-recipe-bars">
+          {% for component in recipe.components.all %}
+            <div class="o-recipe-row">
+              <span class="o-recipe-name">{{ component.input_product.name }}</span>
+              <div class="progress o-recipe-bar">
+                <div class="progress-bar" style="width:{{ component.ratio_percent }}%"></div>
+              </div>
+              <span class="o-recipe-pct o-num">%{{ component.ratio_percent|floatformat:"-2" }}</span>
+            </div>
+          {% empty %}
+            <p class="o-muted o-sm">{% translate "Bu reçetede bileşen tanımlı değil." %}</p>
+          {% endfor %}
+        </div>
+      </section>
+    {% empty %}
+      {% translate "Reçete yok" as t %}
+      {% translate "Harmanın hangi yeşil kahve lotlarından hangi oranda oluştuğunu tanımlayın." as d %}
+      {% translate "İlk reçeteyi oluştur" as cta %}
+      {% url 'production-recipe-create' as create_url %}
+      {% ui_empty icon="bi-journal-text" title=t text=d action_url=create_url action_label=cta %}
+    {% endfor %}
   </div>
-</div>
-{% endfor %}
 {% endblock %}

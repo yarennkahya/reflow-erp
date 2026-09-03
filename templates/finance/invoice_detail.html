@@ -1,161 +1,135 @@
 {% extends 'base.html' %}
-{% block title %}Fatura #{{ invoice.pk }} — Reflow Coffee ERP{% endblock %}
-{% block nav_finance %}active{% endblock %}
-{% block nav_finance_invoices %}active{% endblock %}
-{% block page_title %}Finans{% endblock %}
+{% block title %}{{ invoice.invoice_number }}{% endblock %}
 
-{% block extra_head %}
-<style>
-  .data-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:10px; overflow:hidden; }
-  .data-card .table { margin-bottom:0; font-size:13.5px; }
-  .data-card .table thead th { background:var(--g-n-50); color:var(--g-text-2); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.7px; border-bottom:1px solid var(--g-border); padding:10px 16px; white-space:nowrap; }
-  .data-card .table tbody td { padding:11px 16px; vertical-align:middle; color:var(--g-text); border-color:var(--g-border-sub); }
-  .data-card .table tbody tr:last-child td { border-bottom:none; }
-  .summary-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:10px; padding:20px; }
-  .summary-card .label { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.7px; color:var(--g-text-2); margin-bottom:4px; }
-  .summary-card .value { font-size:24px; font-weight:700; color:var(--g-text); line-height:1; }
-  .payment-form-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:10px; padding:24px; }
-  .empty-state { padding:32px 24px; text-align:center; color:var(--g-text-3); }
-  .empty-state i { font-size:28px; display:block; margin-bottom:6px; }
-</style>
+{% block cp_breadcrumb %}
+  {% ui_breadcrumb record=invoice.invoice_number %}
 {% endblock %}
 
+{% block cp_buttons %}
+  <a class="o-btn o-btn--primary" href="{% url 'invoice-pdf' invoice.pk %}?preview=1" target="_blank">
+    <i class="bi bi-eye" aria-hidden="true"></i> {% translate "Önizle" %}
+  </a>
+  <a class="o-btn" href="{% url 'invoice-pdf' invoice.pk %}">
+    <i class="bi bi-file-earmark-pdf" aria-hidden="true"></i> {% translate "PDF İndir" %}
+  </a>
+  <form method="post" action="{% url 'invoice-send' invoice.pk %}" style="display:inline">
+    {% csrf_token %}<input type="hidden" name="next" value="{% url 'invoice-detail' invoice.pk %}">
+    <button type="submit" class="o-btn" {% if not invoice.order.customer.contact_email %}disabled title="E-posta tanımlı değil"{% endif %}>
+      <i class="bi bi-envelope" aria-hidden="true"></i> {% translate "E-posta Gönder" %}
+    </button>
+  </form>
+  <a class="o-btn" href="{% url 'order-detail' invoice.order_id %}">
+    <i class="bi bi-cart3" aria-hidden="true"></i> SO #{{ invoice.order_id }}
+  </a>
+{% endblock %}
+
+{% block content_class %} o-content--sheet{% endblock %}
+
 {% block content %}
-<div class="mb-3">
-  <div class="btn-group" role="group">
-    <a href="{% url 'finance-report' %}" class="btn btn-sm btn-outline-primary">Kârlılık Raporu</a>
-    <a href="{% url 'invoice-list' %}" class="btn btn-sm btn-outline-primary">Faturalar</a>
-  </div>
-</div>
+{% ui_sheet %}
+  {% ui_statusbar invoice "status" %}
 
-<div class="d-flex align-items-center gap-3 mb-4">
-  <h4 class="fw-bold mb-0 text-dark">
-    <i class="bi bi-receipt me-2" style="color:#6366f1;"></i>Fatura #{{ invoice.pk }}
-  </h4>
-  {% if invoice.status == 'paid' %}
-    <span class="badge" style="background:#dcfce7; color:#16a34a; font-size:12px;">Ödendi</span>
-  {% elif invoice.status == 'partially_paid' %}
-    <span class="badge" style="background:#fef9c3; color:#ca8a04; font-size:12px;">Kısmen Ödendi</span>
-  {% else %}
-    <span class="badge" style="background:#fee2e2; color:#dc2626; font-size:12px;">Ödenmedi</span>
-  {% endif %}
-  <span class="text-muted" style="font-size:13px;">{{ invoice.order.customer.name }} — Sipariş #{{ invoice.order.pk }}</span>
-</div>
-
-<!-- Özet kartlar -->
-<div class="row g-3 mb-4">
-  <div class="col-md-4">
-    <div class="summary-card">
-      <div class="label">Toplam Tutar</div>
-      <div class="value">₺{{ invoice.total_amount|floatformat:2 }}</div>
+  <div class="o-form-head">
+    <div>
+      <h1 class="o-form-title o-mono">{{ invoice.invoice_number }}</h1>
+      <p class="o-form-subtitle">
+        <a href="{% url 'customer-detail' invoice.order.customer_id %}">{{ invoice.order.customer.name }}</a>
+        · {{ invoice.issued_at|date:"d M Y" }}
+      </p>
     </div>
-  </div>
-  <div class="col-md-4">
-    <div class="summary-card">
-      <div class="label">Ödenen</div>
-      <div class="value text-success">₺{{ invoice.total_paid|floatformat:2 }}</div>
-    </div>
-  </div>
-  <div class="col-md-4">
-    <div class="summary-card" style="border-left:3px solid {% if invoice.balance_due == 0 %}#22c55e{% else %}#ef4444{% endif %};">
-      <div class="label">Kalan Bakiye</div>
-      <div class="value {% if invoice.balance_due == 0 %}text-success{% else %}text-danger{% endif %}">
-        ₺{{ invoice.balance_due|floatformat:2 }}
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="row g-4">
-  <!-- Sipariş kalemleri -->
-  <div class="col-lg-7">
-    <div class="fw-semibold text-dark mb-2" style="font-size:13px; text-transform:uppercase; letter-spacing:0.5px;">Sipariş Kalemleri</div>
-    <div class="data-card">
-      <table class="table table-borderless">
-        <thead>
-          <tr>
-            <th>Ürün</th>
-            <th class="text-end">Miktar</th>
-            <th class="text-end">Birim Fiyat</th>
-            <th class="text-end">Toplam</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for item in invoice.order.items.all %}
-          <tr>
-            <td>{{ item.product.name }}</td>
-            <td class="text-end">{{ item.quantity|floatformat:3 }}</td>
-            <td class="text-end">₺{{ item.unit_price|floatformat:2 }}</td>
-            <td class="text-end fw-semibold">₺{{ item.line_total|floatformat:2 }}</td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="4" class="empty-state"><i class="bi bi-inbox"></i>Kalem yok.</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Ödeme geçmişi -->
-    <div class="fw-semibold text-dark mb-2 mt-4" style="font-size:13px; text-transform:uppercase; letter-spacing:0.5px;">Ödeme Geçmişi</div>
-    <div class="data-card">
-      <table class="table table-borderless">
-        <thead>
-          <tr>
-            <th>Tarih</th>
-            <th>Yöntem</th>
-            <th class="text-end">Tutar</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for payment in invoice.payments.all %}
-          <tr>
-            <td class="text-muted" style="font-size:12.5px;">{{ payment.paid_at|date:"d.m.Y H:i" }}</td>
-            <td>{{ payment.get_method_display }}</td>
-            <td class="text-end fw-semibold text-success">₺{{ payment.amount|floatformat:2 }}</td>
-          </tr>
-          {% empty %}
-          <tr>
-            <td colspan="3" class="empty-state"><i class="bi bi-credit-card"></i>Henüz ödeme yok.</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+    {% ui_button_box %}
+      {% translate "Toplam" as l1 %}{% ui_stat value=invoice.total_amount|money label=l1 icon="bi-receipt" %}
+      {% translate "Ödenen" as l2 %}{% ui_stat value=invoice.total_paid|money label=l2 icon="bi-check2-circle" variant="success" %}
+      {% translate "Kalan" as l3 %}{% ui_stat value=invoice.balance_due|money label=l3 icon="bi-hourglass-split" variant="warning" %}
+    {% endui_button_box %}
   </div>
 
-  <!-- Ödeme formu -->
-  {% if invoice.status != 'paid' %}
-  <div class="col-lg-5">
-    <div class="fw-semibold text-dark mb-2" style="font-size:13px; text-transform:uppercase; letter-spacing:0.5px;">Ödeme Kaydet</div>
-    <div class="payment-form-card">
-      {% if error %}
-      <div class="alert alert-danger py-2 px-3" style="font-size:13px;">{{ error }}</div>
-      {% endif %}
-      <form method="post">
-        {% csrf_token %}
-        <div class="mb-3">
-          <label class="form-label fw-medium" style="font-size:13px;">Tutar (₺)</label>
-          <input type="number" name="amount" class="form-control" step="0.01" min="0.01"
-                 max="{{ invoice.balance_due }}" placeholder="0.00" required>
-          <div class="form-text">Kalan bakiye: ₺{{ invoice.balance_due|floatformat:2 }}</div>
-        </div>
-        <div class="mb-4">
-          <label class="form-label fw-medium" style="font-size:13px;">Ödeme Yöntemi</label>
-          <select name="method" class="form-select" required>
-            <option value="">Seçiniz…</option>
-            {% for value, label in payment_methods %}
-            <option value="{{ value }}">{{ label }}</option>
+  {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+  {% translate "Fatura bilgileri" as g %}
+  {% ui_group g %}
+    {% translate "Sipariş" as f1 %}
+    {% url 'order-detail' invoice.order_id as ord_url %}
+    {% with sonum=invoice.order_id|stringformat:"s" %}
+      {% ui_field_value f1 "SO #"|add:sonum url=ord_url icon="bi-cart3" mono=True cols=4 %}
+    {% endwith %}
+    {% translate "Düzenlenme" as f2 %}{% ui_field_value f2 invoice.issued_at|date:"d M Y, H:i" icon="bi-calendar3" cols=4 %}
+    {% translate "Vade" as f3 %}{% ui_field_value f3 invoice.due_date|date:"d M Y" icon="bi-calendar-x" cols=4 %}
+  {% endui_group %}
+
+  {% ui_notebook %}
+    {% translate "Sipariş Kalemleri" as t1 %}
+    {% ui_page t1 badge=invoice.order.items.count %}
+      <div class="o-list"><div class="o-list-scroll">
+        <table class="o-table">
+          <thead><tr>
+            <th>{% translate "Ürün" %}</th><th class="o-num">{% translate "Miktar" %}</th>
+            <th class="o-num">{% translate "Birim fiyat" %}</th><th class="o-num">{% translate "Tutar" %}</th>
+          </tr></thead>
+          <tbody>
+            {% for item in invoice.order.items.all %}
+              <tr>
+                <td class="o-strong">{{ item.product.name }}</td>
+                <td class="o-num">{{ item.quantity|qty:item.product.get_unit_display }}</td>
+                <td class="o-num">{{ item.unit_price|money }}</td>
+                <td class="o-num o-strong">{{ item.line_total|money }}</td>
+              </tr>
             {% endfor %}
-          </select>
-        </div>
-        <button type="submit" class="btn btn-primary w-100">
-          <i class="bi bi-check-circle me-1"></i>Ödemeyi Kaydet
-        </button>
-      </form>
-    </div>
-  </div>
-  {% endif %}
-</div>
+          </tbody>
+          <tfoot><tr>
+            <td colspan="3" class="o-num">{% translate "Toplam" %}</td>
+            <td class="o-num">{{ invoice.total_amount|money }}</td>
+          </tr></tfoot>
+        </table>
+      </div></div>
+    {% endui_page %}
+
+    {% translate "Ödemeler" as t2 %}
+    {% ui_page t2 badge=invoice.payments.count %}
+      {% if invoice.balance_due > 0 %}
+        <form method="post" class="o-pay-form">
+          {% csrf_token %}
+          <div class="o-field">
+            <label class="o-label" for="amount">{% translate "Tutar" %}</label>
+            <input type="number" id="amount" name="amount" class="o-input" step="0.01" min="0.01"
+                   max="{{ invoice.balance_due }}" value="{{ invoice.balance_due }}" required>
+          </div>
+          <div class="o-field">
+            <label class="o-label" for="method">{% translate "Ödeme yöntemi" %}</label>
+            <select id="method" name="method" class="o-select" required>
+              {% for value, label in payment_methods %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="o-field">
+            <span class="o-label">&nbsp;</span>
+            <button type="submit" class="o-btn o-btn--primary">
+              <i class="bi bi-cash-coin" aria-hidden="true"></i> {% translate "Ödeme Kaydet" %}
+            </button>
+          </div>
+        </form>
+      {% endif %}
+
+      <div class="o-list"><div class="o-list-scroll">
+        <table class="o-table">
+          <thead><tr>
+            <th>{% translate "Yöntem" %}</th><th class="o-num">{% translate "Tutar" %}</th><th>{% translate "Tarih" %}</th>
+          </tr></thead>
+          <tbody>
+            {% for payment in invoice.payments.all %}
+              <tr>
+                <td>{% ui_badge payment "method" %}</td>
+                <td class="o-num o-strong">{{ payment.amount|money }}</td>
+                <td class="o-nowrap o-muted o-sm">{{ payment.paid_at|date:"d M Y, H:i" }}</td>
+              </tr>
+            {% empty %}
+              {% translate "Henüz ödeme kaydı yok" as e %}{% ui_empty icon="bi-cash-coin" title=e colspan=3 %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div></div>
+    {% endui_page %}
+  {% endui_notebook %}
+{% endui_sheet %}
+
+{% ui_chatter invoice related=invoice.payments.all %}
 {% endblock %}

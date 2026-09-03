@@ -1,0 +1,25 @@
+<div class="o-kanban" data-o-kanban data-o-kanban-readonly="{% translate 'Fatura durumu kaydedilen ödemelerden doğar; kart sürüklenerek değiştirilemez.' %}">
+  {% for column in columns %}
+    <section class="o-kanban-col" aria-label="{{ column.label }}"
+             data-o-kanban-col data-o-kanban-value="{{ column.value }}">
+      <header class="o-kanban-head">
+        <span class="o-kanban-title">{{ column.label }}</span>
+        <span class="o-kanban-count">{{ column.count }}</span>
+        {% if column.total %}<span class="o-kanban-total">{{ column.total|money }}</span>{% endif %}
+      </header>
+      <div class="o-kanban-body" data-o-kanban-body>
+        {% for invoice in column.items %}
+          {% ui_kanban_card %}
+            <a class="o-kanban-card-link" href="{% url 'invoice-detail' invoice.pk %}" aria-label="INV #{{ invoice.pk }}"></a>
+            <p class="o-kanban-card-title o-mono">INV #{{ invoice.pk }}</p>
+            <p class="o-kanban-card-sub">{{ invoice.order.customer.name }}</p>
+            <div class="o-kanban-card-foot">
+              <span class="o-tag">{% translate "Kalan" %}: {{ invoice.balance_due|money }}</span>
+              <span class="o-strong">{{ invoice.total_amount|money }}</span>
+            </div>
+          {% endui_kanban_card %}
+        {% empty %}<p class="o-kanban-empty">—</p>{% endfor %}
+      </div>
+    </section>
+  {% endfor %}
+</div>

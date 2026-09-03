@@ -1,82 +1,25 @@
 {% extends 'base.html' %}
-{% block title %}Faturalar — Reflow Coffee ERP{% endblock %}
-{% block nav_finance %}active{% endblock %}
-{% block nav_finance_invoices %}active{% endblock %}
-{% block page_title %}Finans{% endblock %}
+{% block title %}{% translate "Faturalar" %}{% endblock %}
+{% block region_attr %} data-ajax-region{% endblock %}
 
-{% block extra_head %}
-<style>
-  .data-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:10px; overflow:hidden; }
-  .data-card .table { margin-bottom:0; font-size:13.5px; }
-  .data-card .table thead th { background:var(--g-n-50); color:var(--g-text-2); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.7px; border-bottom:1px solid var(--g-border); padding:10px 16px; white-space:nowrap; }
-  .data-card .table tbody td { padding:11px 16px; vertical-align:middle; color:var(--g-text); border-color:var(--g-border-sub); }
-  .data-card .table tbody tr:last-child td { border-bottom:none; }
-  .data-card .table tbody tr:hover { background:var(--g-n-50); }
-  .empty-state { padding:48px 24px; text-align:center; color:var(--g-text-3); }
-  .empty-state i { font-size:36px; display:block; margin-bottom:8px; }
-</style>
+{% block cp_buttons %}
+  <a href="{% url 'finance-report' %}" class="o-btn">
+    <i class="bi bi-graph-up-arrow" aria-hidden="true"></i> {% translate "Kârlılık" %}
+  </a>
+{% endblock %}
+{% block cp_pager %}{% ui_pager page_obj %}{% endblock %}
+{% block cp_views %}{% ui_view_switcher "list,kanban" current=view %}{% endblock %}
+{% block cp_search %}
+  <div class="o-cp-search-row">
+    {% translate "Fatura ara" as ph %}
+    {% ui_search target="#o-view" placeholder=ph filters=status_choices filter_param="status" selected=selected_status %}
+  </div>
 {% endblock %}
 
 {% block content %}
-<div class="mb-3">
-  <div class="btn-group" role="group">
-    <a href="{% url 'finance-report' %}" class="btn btn-sm btn-outline-primary">Kârlılık Raporu</a>
-    <a href="{% url 'invoice-list' %}" class="btn btn-sm btn-primary">Faturalar</a>
+  <div class="o-button-box o-po-kpis">
+    {% translate "Ödenmemiş" as l1 %}{% ui_stat value=unpaid_count label=l1 icon="bi-exclamation-circle" variant="danger" %}
+    {% translate "Ödenmiş" as l2 %}{% ui_stat value=paid_count label=l2 icon="bi-check2-circle" variant="success" %}
   </div>
-</div>
-
-<div class="d-flex align-items-baseline gap-3 mb-4">
-  <h4 class="fw-bold mb-0 text-dark"><i class="bi bi-receipt me-2" style="color:#6366f1;"></i>Faturalar</h4>
-  <span class="text-muted" style="font-size:13px;">Tüm faturalar</span>
-</div>
-
-<div class="data-card">
-  <table class="table table-borderless">
-    <thead>
-      <tr>
-        <th>Fatura #</th>
-        <th>Müşteri</th>
-        <th>Sipariş #</th>
-        <th class="text-end">Toplam</th>
-        <th class="text-end">Kalan</th>
-        <th>Durum</th>
-        <th>Vade Tarihi</th>
-        <th>Düzenleme</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for invoice in invoices %}
-      <tr>
-        <td class="fw-medium"><a href="{% url 'invoice-detail' invoice.pk %}" class="fw-semibold">#{{ invoice.pk }}</a></td>
-        <td>{{ invoice.order.customer.name }}</td>
-        <td class="text-muted">#{{ invoice.order.pk }}</td>
-        <td class="text-end">₺{{ invoice.total_amount|floatformat:2 }}</td>
-        <td class="text-end">₺{{ invoice.balance_due|floatformat:2 }}</td>
-        <td>
-          {% if invoice.status == 'paid' %}
-            <span class="badge" style="background:#dcfce7; color:#16a34a;">Ödendi</span>
-          {% elif invoice.status == 'partially_paid' %}
-            <span class="badge" style="background:#fef9c3; color:#ca8a04;">Kısmen Ödendi</span>
-          {% else %}
-            <span class="badge" style="background:#fee2e2; color:#dc2626;">Ödenmedi</span>
-          {% endif %}
-        </td>
-        <td class="text-muted" style="font-size:12.5px;">{{ invoice.due_date|default:"—" }}</td>
-        <td class="text-muted" style="font-size:12.5px;">{{ invoice.issued_at|date:"d.m.Y" }}</td>
-        <td>
-          <a href="{% url 'invoice-detail' invoice.pk %}" class="btn btn-sm btn-outline-secondary">Detay</a>
-        </td>
-      </tr>
-      {% empty %}
-      <tr>
-        <td colspan="9" class="empty-state">
-          <i class="bi bi-inbox"></i>
-          Henüz fatura oluşturulmamış.
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
+  {% include view_template %}
 {% endblock %}

@@ -1,0 +1,35 @@
+<div class="o-cal-toolbar">
+  <a class="o-btn o-btn--sm" data-ajax-link data-ajax-target="#o-view"
+     href="?view=calendar&year={{ prev_year }}&month={{ prev_month }}"
+     aria-label="{% translate 'Önceki ay' %}"><i class="bi bi-chevron-left" aria-hidden="true"></i></a>
+  <span class="o-cal-label">{{ month_label }}</span>
+  <a class="o-btn o-btn--sm" data-ajax-link data-ajax-target="#o-view"
+     href="?view=calendar&year={{ next_year }}&month={{ next_month }}"
+     aria-label="{% translate 'Sonraki ay' %}"><i class="bi bi-chevron-right" aria-hidden="true"></i></a>
+  <span class="o-muted o-sm">{% translate "Lotların son kullanma tarihleri" %}</span>
+</div>
+
+<div class="o-cal">
+  <div class="o-cal-head">
+    {% for name in weekday_names %}<div class="o-cal-dow">{{ name }}</div>{% endfor %}
+  </div>
+  {% for week in weeks %}
+    <div class="o-cal-week">
+      {% for day in week %}
+        {% if day %}
+          <div class="o-cal-day{% if day.is_today %} o-cal-day--today{% endif %}">
+            <span class="o-cal-num">{{ day.day }}</span>
+            {% for row in day.events %}
+              <a class="o-cal-event" href="{% url 'lot-detail' row.lot.pk %}"
+                 title="{{ row.lot.product.name }} · {{ row.lot.lot_code }}">
+                {{ row.lot.product.name }}
+              </a>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="o-cal-day o-cal-day--out"></div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% endfor %}
+</div>

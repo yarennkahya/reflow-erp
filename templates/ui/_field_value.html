@@ -1,0 +1,8 @@
+<div class="o-field o-field--readonly o-col-{{ cols }}">
+  <span class="o-label">{{ label }}</span>
+  <div class="o-field-value{% if mono %} o-mono{% endif %}">
+    {% if icon %}<i class="bi {{ icon }}" aria-hidden="true"></i>{% endif %}
+    {% if url %}<a href="{{ url }}">{{ value|default:"—" }}</a>
+    {% else %}{{ value|default:"—" }}{% endif %}
+  </div>
+</div>

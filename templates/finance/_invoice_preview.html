@@ -1,0 +1,62 @@
+{% comment %}
+  Fatura önizlemesi — satış listesindeki büyüteç butonu bunu bir <dialog>
+  içine yükler. Tam sayfa değil, yalnızca içerik.
+{% endcomment %}
+<div class="o-invoice">
+  <header class="o-invoice-head">
+    <div>
+      <p class="o-eyebrow">{% translate "Fatura" %}</p>
+      <h2 class="o-invoice-no o-mono">INV #{{ invoice.pk }}</h2>
+    </div>
+    {% ui_badge invoice "status" %}
+  </header>
+
+  <div class="o-invoice-meta">
+    <div>
+      <span class="o-label">{% translate "Müşteri" %}</span>
+      <span class="o-strong">{{ invoice.order.customer.name }}</span>
+      {% if invoice.order.customer.contact_email %}
+        <span class="o-muted o-sm">{{ invoice.order.customer.contact_email }}</span>
+      {% endif %}
+    </div>
+    <div>
+      <span class="o-label">{% translate "Sipariş" %}</span>
+      <span class="o-mono">SO #{{ invoice.order_id }}</span>
+    </div>
+    <div>
+      <span class="o-label">{% translate "Düzenlenme" %}</span>
+      <span>{{ invoice.issued_at|date:"d M Y" }}</span>
+    </div>
+    <div>
+      <span class="o-label">{% translate "Vade" %}</span>
+      <span>{{ invoice.due_date|date:"d M Y"|default:"—" }}</span>
+    </div>
+  </div>
+
+  <table class="o-table o-invoice-table">
+    <thead>
+      <tr>
+        <th>{% translate "Ürün" %}</th>
+        <th class="o-num">{% translate "Miktar" %}</th>
+        <th class="o-num">{% translate "Birim fiyat" %}</th>
+        <th class="o-num">{% translate "Tutar" %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in invoice.order.items.all %}
+        <tr>
+          <td class="o-strong">{{ item.product.name }}</td>
+          <td class="o-num">{{ item.quantity|qty:item.product.get_unit_display }}</td>
+          <td class="o-num">{{ item.unit_price|money }}</td>
+          <td class="o-num o-strong">{{ item.line_total|money }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <dl class="o-invoice-totals">
+    <div><dt>{% translate "Toplam" %}</dt><dd>{{ invoice.total_amount|money }}</dd></div>
+    <div><dt>{% translate "Ödenen" %}</dt><dd class="o-ok">{{ invoice.total_paid|money }}</dd></div>
+    <div class="o-invoice-due"><dt>{% translate "Kalan" %}</dt><dd>{{ invoice.balance_due|money }}</dd></div>
+  </dl>
+</div>

@@ -1,0 +1,3001 @@
+# Reflow Coffee ERP — İngilizce katalog.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Reflow Coffee ERP 0.2.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-01 10:26+0300\n"
+"PO-Revision-Date: 2026-09-01 09:23+0000\n"
+"Last-Translator: Reflow Coffee ERP\n"
+"Language-Team: English\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: ai_layer/models.py:8
+msgid "Prosedür / talimat"
+msgstr "Procedure / instruction"
+
+#: ai_layer/models.py:9
+msgid "Tedarikçi notu"
+msgstr "Supplier note"
+
+#: ai_layer/models.py:10
+msgid "Genel bilgi"
+msgstr "General information"
+
+#: crm/models.py:12
+msgid "İlk temas"
+msgstr "New"
+
+#: crm/models.py:13
+msgid "İhtiyaç analizi"
+msgstr "Qualification"
+
+#: crm/models.py:14
+msgid "Teklif sunuldu"
+msgstr "Proposition"
+
+#: crm/models.py:15
+msgid "Pazarlık"
+msgstr "Negotiation"
+
+#: crm/models.py:16 crm/models.py:22
+msgid "Kazanıldı"
+msgstr "Won"
+
+#: crm/models.py:17 crm/models.py:23
+msgid "Kaybedildi"
+msgstr "Lost"
+
+#: crm/models.py:20 dashboard/badges.py:131 hr/models.py:32
+#: templates/crm/list.html:39 templates/hr/list.html:13
+#: templates/inventory/warehouse_detail.html:82
+msgid "Aktif"
+msgstr "Active"
+
+#: crm/models.py:21 dashboard/badges.py:132 templates/crm/sale_list.html:28
+#: templates/inventory/warehouse_detail.html:82
+msgid "Pasif"
+msgstr "Inactive"
+
+#: crm/views.py:53
+msgid "Aktif müşteriler"
+msgstr "Active customers"
+
+#: crm/views.py:54
+msgid "Pasif müşteriler"
+msgstr "Archived customers"
+
+#: crm/views.py:171
+msgid "Fırsat sayısı"
+msgstr "Opportunity count"
+
+#: crm/views.py:173 templates/crm/_sales_list.html:10
+#: templates/crm/customer_detail.html:40
+msgid "Tahmini tutar"
+msgstr "Expected revenue"
+
+#: dashboard/badges.py:126
+msgid "Normal"
+msgstr "Normal"
+
+#: dashboard/badges.py:127
+msgid "Öncelikli kullanım"
+msgstr "Use first"
+
+#: dashboard/badges.py:128
+msgid "SKT geçti"
+msgstr "Expired"
+
+#: dashboard/calendars.py:16
+msgid "Ocak"
+msgstr "January"
+
+#: dashboard/calendars.py:16
+msgid "Şubat"
+msgstr "February"
+
+#: dashboard/calendars.py:16
+msgid "Mart"
+msgstr "March"
+
+#: dashboard/calendars.py:16
+msgid "Nisan"
+msgstr "April"
+
+#: dashboard/calendars.py:16
+msgid "Mayıs"
+msgstr "May"
+
+#: dashboard/calendars.py:16
+msgid "Haziran"
+msgstr "June"
+
+#: dashboard/calendars.py:17
+msgid "Temmuz"
+msgstr "July"
+
+#: dashboard/calendars.py:17
+msgid "Ağustos"
+msgstr "August"
+
+#: dashboard/calendars.py:17
+msgid "Eylül"
+msgstr "September"
+
+#: dashboard/calendars.py:17
+msgid "Ekim"
+msgstr "October"
+
+#: dashboard/calendars.py:17
+msgid "Kasım"
+msgstr "November"
+
+#: dashboard/calendars.py:17
+msgid "Aralık"
+msgstr "December"
+
+#: dashboard/calendars.py:21
+msgid "Pzt"
+msgstr "Mon"
+
+#: dashboard/calendars.py:21
+msgid "Sal"
+msgstr "Tue"
+
+#: dashboard/calendars.py:21
+msgid "Çar"
+msgstr "Wed"
+
+#: dashboard/calendars.py:21
+msgid "Per"
+msgstr "Thu"
+
+#: dashboard/calendars.py:21
+msgid "Cum"
+msgstr "Fri"
+
+#: dashboard/calendars.py:21
+msgid "Cmt"
+msgstr "Sat"
+
+#: dashboard/calendars.py:21
+msgid "Paz"
+msgstr "Sun"
+
+#: dashboard/navigation.py:43
+msgid "Kontrol Paneli"
+msgstr "Dashboard"
+
+#: dashboard/navigation.py:46 dashboard/navigation.py:136
+#: templates/dashboard/home.html:2 templates/hr/list.html:2
+msgid "Genel Bakış"
+msgstr "Overview"
+
+#: dashboard/navigation.py:48 templates/notifications/_dropdown_items.html:2
+#: templates/notifications/list.html:2 templates/ui/shell/_appbar.html:48
+#: templates/ui/shell/_appbar.html:68
+msgid "Bildirimler"
+msgstr "Notifications"
+
+#: dashboard/navigation.py:50 templates/dashboard/account_settings.html:2
+#: templates/ui/shell/_appbar.html:66
+msgid "Hesap Ayarları"
+msgstr "Account Settings"
+
+#: dashboard/navigation.py:55
+msgid "Stok"
+msgstr "Inventory"
+
+#: dashboard/navigation.py:58 templates/inventory/list.html:2
+#: templates/inventory/warehouse_list.html:10
+msgid "Stoklar"
+msgstr "Stock"
+
+#: dashboard/navigation.py:60 templates/inventory/list.html:7
+#: templates/inventory/warehouse_list.html:2
+msgid "Depolar"
+msgstr "Warehouses"
+
+#: dashboard/navigation.py:66 templates/public/landing.html:101
+msgid "Satın Alma"
+msgstr "Purchasing"
+
+#: dashboard/navigation.py:69 dashboard/navigation.py:97
+#: templates/crm/customer_detail.html:77 templates/purchasing/list.html:2
+#: templates/purchasing/supplier_detail.html:65
+#: templates/purchasing/supplier_list.html:10
+#: templates/sales/customer_detail.html:35 templates/sales/list.html:2
+#: templates/sales/return_list.html:7
+msgid "Siparişler"
+msgstr "Orders"
+
+#: dashboard/navigation.py:75 templates/purchasing/list.html:10
+#: templates/purchasing/supplier_list.html:2
+msgid "Tedarikçiler"
+msgstr "Suppliers"
+
+#: dashboard/navigation.py:83 templates/public/landing.html:106
+msgid "Üretim"
+msgstr "Manufacturing"
+
+#: dashboard/navigation.py:86 templates/production/list.html:2
+#: templates/production/recipe_list.html:9
+msgid "Üretim Emirleri"
+msgstr "Roast Batches"
+
+#: dashboard/navigation.py:89 templates/production/list.html:10
+#: templates/production/recipe_list.html:2
+msgid "Reçeteler"
+msgstr "Recipes"
+
+#: dashboard/navigation.py:94 templates/public/landing.html:111
+#: templates/public/landing.html:147
+msgid "Satış"
+msgstr "Sales"
+
+#: dashboard/navigation.py:99 dashboard/navigation.py:116
+#: templates/crm/list.html:2 templates/crm/sale_list.html:10
+#: templates/sales/customer_list.html:2
+msgid "Müşteriler"
+msgstr "Customers"
+
+#: dashboard/navigation.py:101 templates/sales/list.html:10
+#: templates/sales/return_list.html:2
+msgid "İadeler"
+msgstr "Returns"
+
+#: dashboard/navigation.py:104 templates/sales/forecast.html:2
+msgid "Talep Tahmini"
+msgstr "Demand Forecast"
+
+#: dashboard/navigation.py:105 dashboard/navigation.py:129
+msgid "Raporlama"
+msgstr "Reporting"
+
+#: dashboard/navigation.py:109
+msgid "CRM"
+msgstr "CRM"
+
+#: dashboard/navigation.py:112 templates/crm/list.html:10
+#: templates/crm/sale_list.html:2
+msgid "Satış Takibi"
+msgstr "Pipeline"
+
+#: dashboard/navigation.py:123 templates/public/landing.html:116
+#: templates/public/landing.html:151
+msgid "Finans"
+msgstr "Finance"
+
+#: dashboard/navigation.py:126 templates/finance/invoice_list.html:2
+#: templates/finance/list.html:7
+msgid "Faturalar"
+msgstr "Invoices"
+
+#: dashboard/navigation.py:128 templates/finance/list.html:2
+msgid "Kârlılık Raporu"
+msgstr "Profitability Report"
+
+#: dashboard/navigation.py:133
+msgid "İnsan Kaynakları"
+msgstr "Human Resources"
+
+#: dashboard/navigation.py:137 templates/hr/employee_list.html:2
+#: templates/hr/list.html:5 templates/hr/list.html:20
+msgid "Çalışanlar"
+msgstr "Employees"
+
+#: dashboard/navigation.py:139 templates/hr/employee_detail.html:9
+#: templates/hr/leave_list.html:2 templates/hr/list.html:6
+msgid "İzinler"
+msgstr "Time Off"
+
+#: dashboard/navigation.py:142 templates/hr/list.html:7
+#: templates/hr/recruitment.html:2
+msgid "İşe Alım"
+msgstr "Recruitment"
+
+#: dashboard/navigation.py:148 dashboard/navigation.py:151
+#: dashboard/templatetags/ui.py:242 templates/meetings/calendar.html:2
+msgid "Takvim"
+msgstr "Calendar"
+
+#: dashboard/navigation.py:157 templates/ai_layer/chat.html:2
+#: templates/ai_layer/chat.html:26
+msgid "AI Asistan"
+msgstr "AI Assistant"
+
+#: dashboard/navigation.py:160
+msgid "Sohbet"
+msgstr "Chat"
+
+#: dashboard/navigation.py:165 templates/audit/list.html:2
+msgid "Denetim Kaydı"
+msgstr "Audit Log"
+
+#: dashboard/navigation.py:168
+msgid "Kayıtlar"
+msgstr "Entries"
+
+#: dashboard/templatetags/ui.py:180
+msgid "Gösterilecek kayıt yok"
+msgstr "Nothing to show"
+
+#: dashboard/templatetags/ui.py:240
+msgid "Liste"
+msgstr "List"
+
+#: dashboard/templatetags/ui.py:241
+msgid "Kanban"
+msgstr "Kanban"
+
+#: dashboard/templatetags/ui.py:243
+msgid "Grafik"
+msgstr "Graph"
+
+#: dashboard/templatetags/ui.py:276
+msgid "Ara"
+msgstr "Search"
+
+#: dashboard/templatetags/ui.py:282
+msgid "Filtre"
+msgstr "Filter"
+
+#: dashboard/templatetags/ui.py:289 templates/ui/_searchbar.html:45
+msgid "Grupla"
+msgstr "Group By"
+
+#: dashboard/templatetags/ui.py:301
+msgid "Ara…"
+msgstr "Search…"
+
+#: finance/models.py:12
+msgid "Ödenmedi"
+msgstr "Unpaid"
+
+#: finance/models.py:13
+msgid "Kısmen Ödendi"
+msgstr "Partially Paid"
+
+#: finance/models.py:14
+msgid "Ödendi"
+msgstr "Paid"
+
+#: finance/models.py:39
+msgid "Nakit"
+msgstr "Cash"
+
+#: finance/models.py:40
+msgid "Havale/EFT"
+msgstr "Bank Transfer"
+
+#: finance/models.py:41
+msgid "Kredi Kartı"
+msgstr "Credit Card"
+
+#: finance/views.py:40 templates/finance/list.html:34
+msgid "Gelir"
+msgstr "Revenue"
+
+#: finance/views.py:41 templates/finance/list.html:35
+msgid "Maliyet"
+msgstr "Cost"
+
+#: finance/views.py:46 templates/finance/list.html:36
+msgid "Kâr"
+msgstr "Profit"
+
+#: hr/models.py:33
+msgid "İzinde"
+msgstr "On leave"
+
+#: hr/models.py:34
+msgid "Ayrıldı"
+msgstr "Left"
+
+#: hr/models.py:75 sales/models.py:29 templates/sales/list.html:26
+msgid "Beklemede"
+msgstr "Pending"
+
+#: hr/models.py:76
+msgid "Onaylandı"
+msgstr "Approved"
+
+#: hr/models.py:77 hr/models.py:157 sales/models.py:78
+msgid "Reddedildi"
+msgstr "Rejected"
+
+#: hr/models.py:107 templates/purchasing/supplier_list.html:38
+msgid "Açık"
+msgstr "Open"
+
+#: hr/models.py:108
+msgid "Kapatıldı"
+msgstr "Closed"
+
+#: hr/models.py:109
+msgid "Dolduruldu"
+msgstr "Filled"
+
+#: hr/models.py:152
+msgid "Başvurdu"
+msgstr "Applied"
+
+#: hr/models.py:153
+msgid "İnceleniyor"
+msgstr "Screening"
+
+#: hr/models.py:154
+msgid "Mülakat"
+msgstr "Interview"
+
+#: hr/models.py:155
+msgid "Teklif"
+msgstr "Offer"
+
+#: hr/models.py:156
+msgid "İşe Alındı"
+msgstr "Hired"
+
+#: inventory/models.py:20 templates/purchasing/_orders_list.html:7
+#: templates/purchasing/order_create_form.html:29
+#: templates/purchasing/order_detail.html:73
+#: templates/purchasing/order_item_form.html:29
+#: templates/purchasing/supplier_list.html:34
+msgid "Tedarikçi"
+msgstr "Supplier"
+
+#: inventory/models.py:21
+msgid "Toptan müşteri (kafe)"
+msgstr "Wholesale customer (café)"
+
+#: inventory/models.py:22
+msgid "İç işletme"
+msgstr "Internal"
+
+#: inventory/models.py:42
+msgid "Adet"
+msgstr "Piece"
+
+#: inventory/models.py:43
+msgid "Kg"
+msgstr "Kg"
+
+#: inventory/models.py:44
+msgid "Litre"
+msgstr "Litre"
+
+#: inventory/models.py:115 inventory/views.py:31
+msgid "Stok girişi"
+msgstr "Stock in"
+
+#: inventory/models.py:116 inventory/views.py:32
+msgid "Üretimde kullanıldı"
+msgstr "Used in production"
+
+#: inventory/models.py:117 inventory/views.py:33
+msgid "Satış sevkiyatı"
+msgstr "Sales delivery"
+
+#: inventory/models.py:118 inventory/views.py:34
+msgid "İmha / zayi"
+msgstr "Waste"
+
+#: meetings/models.py:11
+msgid "Planlandı"
+msgstr "Scheduled"
+
+#: meetings/models.py:12 sales/models.py:77
+msgid "Tamamlandı"
+msgstr "Completed"
+
+#: meetings/models.py:13
+msgid "İptal Edildi"
+msgstr "Cancelled"
+
+#: production/models.py:63
+msgid "Geçti"
+msgstr "Passed"
+
+#: production/models.py:64
+msgid "Kaldı"
+msgstr "Failed"
+
+#: production/views.py:31 templates/production/batch_detail.html:24
+msgid "Kalite kontrolü bekliyor"
+msgstr "Awaiting quality check"
+
+#: purchasing/models.py:13
+msgid "Taslak"
+msgstr "Draft"
+
+#: purchasing/models.py:14
+msgid "Tedarikçiye gönderildi"
+msgstr "Sent to supplier"
+
+#: purchasing/models.py:15
+msgid "Tedarikçi teyit etti"
+msgstr "Confirmed by supplier"
+
+#: purchasing/models.py:16
+msgid "Kısmi teslim alındı"
+msgstr "Partially received"
+
+#: purchasing/models.py:17
+msgid "Tam teslim alındı"
+msgstr "Fully received"
+
+#: purchasing/models.py:18 sales/models.py:31 templates/sales/list.html:28
+msgid "İptal edildi"
+msgstr "Cancelled"
+
+#: purchasing/views.py:429
+msgid "Aktif tedarikçiler"
+msgstr "Active suppliers"
+
+#: purchasing/views.py:430
+msgid "Pasif tedarikçiler"
+msgstr "Archived suppliers"
+
+#: sales/models.py:12
+msgid "Toptan (kafe)"
+msgstr "Wholesale (café)"
+
+#: sales/models.py:13
+msgid "Perakende (bireysel)"
+msgstr "Retail (individual)"
+
+#: sales/models.py:30 templates/sales/list.html:27
+msgid "Karşılandı"
+msgstr "Fulfilled"
+
+#: sales/models.py:72 templates/sales/order_detail.html:88
+msgid "Müşteri vazgeçti"
+msgstr "Customer changed mind"
+
+#: sales/models.py:73 templates/sales/order_detail.html:89
+msgid "Kusurlu ürün"
+msgstr "Defective product"
+
+#: sales/models.py:76
+msgid "Talep Edildi"
+msgstr "Requested"
+
+#: sales/views.py:125 templates/sales/forecast.html:22
+msgid "Tahmini talep"
+msgstr "Forecasted demand"
+
+#: sales/views.py:126 templates/sales/forecast.html:23
+msgid "Mevcut stok"
+msgstr "Current stock"
+
+#: templates/ai_layer/chat.html:8
+msgid "Sohbetler"
+msgstr "Conversations"
+
+#: templates/ai_layer/chat.html:10
+msgid "Yeni Sohbet"
+msgstr "New Chat"
+
+#: templates/ai_layer/chat.html:15
+msgid "Adsız sohbet"
+msgstr "Untitled chat"
+
+#: templates/ai_layer/chat.html:18
+msgid "Henüz sohbet yok."
+msgstr "No conversations yet."
+
+#: templates/ai_layer/chat.html:29
+msgid "Aktif — RAG + fonksiyon çağırma"
+msgstr "Online — RAG + function calling"
+
+#: templates/ai_layer/chat.html:37
+msgid "Size nasıl yardımcı olabilirim?"
+msgstr "How can I help you?"
+
+#: templates/ai_layer/chat.html:38
+msgid "Stok, satış, üretim ve finans verilerinize doğal dille soru sorun."
+msgstr ""
+"Ask about your stock, sales, production and finance data in plain language."
+
+#: templates/ai_layer/chat.html:40 templates/public/landing.html:170
+msgid "Kritik stok durumu nedir?"
+msgstr "What is the critical stock situation?"
+
+#: templates/ai_layer/chat.html:41 templates/public/landing.html:175
+msgid "En kârlı müşterilerim kimler?"
+msgstr "Who are my most profitable customers?"
+
+#: templates/ai_layer/chat.html:42
+msgid "Bu hafta hangi lotlar iade edilmeli?"
+msgstr "Which lots should be returned this week?"
+
+#: templates/ai_layer/chat.html:43 templates/public/landing.html:180
+msgid "Satış trendini özetle"
+msgstr "Summarise the sales trend"
+
+#: templates/ai_layer/chat.html:52
+msgid "Bir soru yazın…"
+msgstr "Ask a question…"
+
+#: templates/ai_layer/chat.html:53
+msgid "Mesajınız"
+msgstr "Your message"
+
+#: templates/ai_layer/chat.html:54
+msgid "Gönder"
+msgstr "Send"
+
+#: templates/audit/list.html:7
+msgid "Toplam kayıt"
+msgstr "Total entries"
+
+#: templates/audit/list.html:14
+msgid "Kullanıcı"
+msgstr "User"
+
+#: templates/audit/list.html:15
+msgid "İşlem"
+msgstr "Action"
+
+#: templates/audit/list.html:16
+msgid "Kayıt türü"
+msgstr "Record type"
+
+#: templates/audit/list.html:17
+msgid "Kayıt"
+msgstr "Record"
+
+#: templates/audit/list.html:18
+msgid "Detay"
+msgstr "Details"
+
+#: templates/audit/list.html:19 templates/inventory/lot_detail.html:66
+#: templates/notifications/list.html:16
+msgid "Zaman"
+msgstr "Time"
+
+#: templates/audit/list.html:38
+msgid "Denetim kaydı yok"
+msgstr "No audit entries"
+
+#: templates/audit/list.html:39
+msgid ""
+"Sipariş karşılama, teslim alma, ödeme ve kalite kontrolü işlemleri burada "
+"listelenir."
+msgstr ""
+"Order fulfilment, goods receipt, payment and quality check actions are "
+"listed here."
+
+#: templates/base.html:9
+msgid "Panel"
+msgstr "Dashboard"
+
+#: templates/base.html:33 templates/ui/shell/_messages.html:7
+msgid "Kapat"
+msgstr "Close"
+
+#: templates/base.html:34 templates/crm/customer_form.html:15
+#: templates/crm/opportunity_form.html:9 templates/crm/sale_form.html:27
+#: templates/hr/application_form.html:9 templates/hr/candidate_form.html:9
+#: templates/hr/job_opening_form.html:9 templates/hr/leave_request_form.html:9
+#: templates/inventory/warehouse_form.html:19
+#: templates/meetings/meeting_form.html:16
+#: templates/production/batch_create.html:11
+#: templates/production/recipe_create.html:9
+#: templates/purchasing/order_create_form.html:12
+#: templates/purchasing/order_form.html:21
+#: templates/purchasing/order_item_form.html:18
+#: templates/purchasing/supplier_form.html:19
+#: templates/purchasing/supplier_product_form.html:14
+#: templates/sales/order_form.html:9
+msgid "Vazgeç"
+msgstr "Discard"
+
+#: templates/base.html:35 templates/hr/_leaves_list.html:36
+#: templates/sales/return_list.html:52
+msgid "Onayla"
+msgstr "Confirm"
+
+#: templates/base.html:36
+msgid "Emin misiniz?"
+msgstr "Are you sure?"
+
+#: templates/base.html:37 templates/notifications/list.html:27
+msgid "Okundu"
+msgstr "Read"
+
+#: templates/base.html:38
+msgid "Liste güncellenemedi. Lütfen tekrar deneyin."
+msgstr "Could not refresh the list. Please try again."
+
+#: templates/base.html:39
+msgid "İçerik güncellenemedi. Lütfen tekrar deneyin."
+msgstr "Could not refresh the content. Please try again."
+
+#: templates/base.html:40
+msgid "Bildirim güncellenemedi. Lütfen tekrar deneyin."
+msgstr "Could not update the notification. Please try again."
+
+#: templates/base.html:41
+msgid "Şu kişiler bu tarihte izinli görünüyor:"
+msgstr "These people appear to be on leave that day:"
+
+#: templates/base.html:42 templates/finance/invoice_detail.html:32
+#: templates/finance/invoice_detail.html:71 templates/finance/list.html:60
+#: templates/production/recipe_create.html:83
+#: templates/purchasing/_orders_list.html:11
+#: templates/purchasing/order_detail.html:175
+#: templates/purchasing/supplier_detail.html:75
+#: templates/sales/_orders_list.html:10
+msgid "Toplam"
+msgstr "Total"
+
+#: templates/base.html:43
+msgid "Yanıt alınamadı. Lütfen tekrar deneyin."
+msgstr "No response received. Please try again."
+
+#: templates/base.html:45
+msgid "İçeriğe geç"
+msgstr "Skip to content"
+
+#: templates/crm/_sales_graph.html:2
+msgid "Aşamalara göre fırsat sayısı"
+msgstr "Opportunities by stage"
+
+#: templates/crm/_sales_kanban.html:28
+msgid "Sonraki aşamaya taşı"
+msgstr "Move to next stage"
+
+#: templates/crm/_sales_kanban.html:33
+msgid "Bu satışı kaybedildi olarak kapatmak istiyor musunuz?"
+msgstr "Do you want to close this opportunity as lost?"
+
+#: templates/crm/_sales_list.html:6 templates/crm/customer_detail.html:38
+#: templates/crm/customer_detail.html:58 templates/crm/list.html:38
+#: templates/meetings/meeting_detail.html:48
+#: templates/meetings/meeting_form.html:94
+msgid "Fırsat"
+msgstr "Opportunity"
+
+#: templates/crm/_sales_list.html:7 templates/crm/list.html:35
+#: templates/finance/_invoices_list.html:6
+#: templates/meetings/meeting_detail.html:43
+#: templates/meetings/meeting_form.html:85 templates/sales/_orders_list.html:7
+#: templates/sales/customer_list.html:24 templates/sales/order_detail.html:54
+#: templates/sales/order_form.html:25 templates/sales/return_list.html:29
+msgid "Müşteri"
+msgstr "Customer"
+
+#: templates/crm/_sales_list.html:8 templates/crm/customer_detail.html:58
+#: templates/hr/_recruitment_list.html:22
+msgid "Aşama"
+msgstr "Stage"
+
+#: templates/crm/_sales_list.html:9 templates/crm/customer_detail.html:59
+#: templates/crm/customer_detail.html:82 templates/crm/list.html:40
+#: templates/finance/_invoices_list.html:7 templates/hr/_employees_list.html:10
+#: templates/hr/_leaves_list.html:9 templates/hr/employee_detail.html:50
+#: templates/hr/employee_detail.html:73 templates/hr/list.html:24
+#: templates/hr/list.html:51 templates/inventory/warehouse_detail.html:81
+#: templates/inventory/warehouse_list.html:37
+#: templates/notifications/list.html:15
+#: templates/purchasing/_orders_list.html:8
+#: templates/purchasing/supplier_detail.html:72
+#: templates/purchasing/supplier_list.html:39
+#: templates/sales/_orders_list.html:8 templates/sales/customer_detail.html:40
+#: templates/sales/customer_list.html:27 templates/sales/forecast.html:24
+#: templates/sales/return_list.html:32
+msgid "Durum"
+msgstr "Status"
+
+#: templates/crm/_sales_list.html:11
+msgid "Güncelleme"
+msgstr "Updated"
+
+#: templates/crm/_sales_list.html:25
+msgid "Gösterilecek fırsat yok"
+msgstr "No opportunities to show"
+
+#: templates/crm/_sales_list.html:26
+msgid "İlk fırsatı oluştur"
+msgstr "Create the first opportunity"
+
+#: templates/crm/customer_detail.html:7 templates/crm/opportunity_form.html:2
+#: templates/crm/sale_form.html:2
+msgid "Yeni Fırsat"
+msgstr "New Opportunity"
+
+#: templates/crm/customer_detail.html:10 templates/crm/customer_form.html:7
+#: templates/crm/sale_form.html:5 templates/inventory/warehouse_detail.html:8
+#: templates/inventory/warehouse_form.html:7
+#: templates/meetings/meeting_detail.html:8
+#: templates/meetings/meeting_form.html:7
+#: templates/purchasing/order_detail.html:30
+#: templates/purchasing/order_detail.html:129
+#: templates/purchasing/order_form.html:8
+#: templates/purchasing/supplier_detail.html:13
+#: templates/purchasing/supplier_detail.html:116
+#: templates/purchasing/supplier_form.html:7
+msgid "Düzenle"
+msgstr "Edit"
+
+#: templates/crm/customer_detail.html:16
+#: templates/inventory/warehouse_detail.html:14
+#: templates/purchasing/supplier_detail.html:23
+msgid "Pasife al"
+msgstr "Archive"
+
+#: templates/crm/customer_detail.html:16
+#: templates/inventory/warehouse_detail.html:14
+#: templates/purchasing/supplier_detail.html:23
+msgid "Aktifleştir"
+msgstr "Unarchive"
+
+#: templates/crm/customer_detail.html:20 templates/crm/sale_form.html:23
+#: templates/inventory/warehouse_detail.html:18
+#: templates/purchasing/order_detail.html:43
+#: templates/purchasing/supplier_detail.html:28
+msgid "Sil"
+msgstr "Delete"
+
+#: templates/crm/customer_detail.html:21
+#, python-format
+msgid ""
+"%(name)s müşterisini ve bağlı CRM kayıtlarını silmek istediğinize emin "
+"misiniz?"
+msgstr "Are you sure you want to delete %(name)s and the related CRM records?"
+
+#: templates/crm/customer_detail.html:39 templates/crm/list.html:27
+#: templates/crm/sale_list.html:26
+msgid "Aktif fırsat"
+msgstr "Active opportunities"
+
+#: templates/crm/customer_detail.html:41 templates/crm/customer_detail.html:82
+#: templates/finance/invoice_detail.html:42 templates/finance/list.html:31
+#: templates/purchasing/_orders_list.html:6
+#: templates/purchasing/order_detail.html:98
+#: templates/purchasing/supplier_detail.html:71
+#: templates/purchasing/supplier_list.html:37
+#: templates/sales/_orders_list.html:6 templates/sales/customer_detail.html:23
+#: templates/sales/customer_detail.html:40 templates/sales/return_list.html:27
+msgid "Sipariş"
+msgstr "Order"
+
+#: templates/crm/customer_detail.html:45
+#: templates/purchasing/supplier_detail.html:56
+#: templates/purchasing/supplier_form.html:38
+#: templates/sales/customer_detail.html:27
+msgid "İletişim bilgileri"
+msgstr "Contact details"
+
+#: templates/crm/customer_detail.html:47
+#: templates/dashboard/account_settings.html:42
+#: templates/hr/employee_detail.html:7 templates/hr/employee_detail.html:38
+#: templates/purchasing/supplier_detail.html:58
+#: templates/sales/customer_detail.html:29
+msgid "E-posta"
+msgstr "Email"
+
+#: templates/crm/customer_detail.html:48 templates/hr/employee_detail.html:39
+#: templates/purchasing/supplier_detail.html:59
+#: templates/sales/customer_detail.html:30
+msgid "Telefon"
+msgstr "Phone"
+
+#: templates/crm/customer_detail.html:49
+#: templates/purchasing/supplier_list.html:36
+#: templates/sales/customer_detail.html:31
+msgid "Kayıt tarihi"
+msgstr "Registered on"
+
+#: templates/crm/customer_detail.html:53
+msgid "Fırsatlar"
+msgstr "Opportunities"
+
+#: templates/crm/customer_detail.html:59
+#: templates/finance/_invoices_list.html:8
+#: templates/finance/invoice_detail.html:58
+#: templates/finance/invoice_detail.html:84
+#: templates/finance/invoice_detail.html:106
+#: templates/purchasing/order_detail.html:102
+#: templates/sales/order_detail.html:72
+msgid "Tutar"
+msgstr "Amount"
+
+#: templates/crm/customer_detail.html:70
+msgid "Bu müşteriye ait fırsat yok"
+msgstr "No opportunities for this customer"
+
+#: templates/crm/customer_detail.html:82
+#: templates/finance/invoice_detail.html:106 templates/hr/list.html:51
+#: templates/meetings/meeting_form.html:44
+#: templates/production/batch_detail.html:82
+#: templates/sales/_orders_list.html:11 templates/sales/customer_detail.html:40
+msgid "Tarih"
+msgstr "Date"
+
+#: templates/crm/customer_detail.html:92
+#: templates/sales/customer_detail.html:50
+msgid "Bu müşteriye ait sipariş yok"
+msgstr "No orders for this customer"
+
+#: templates/crm/customer_form.html:2
+msgid "Yeni Müşteri"
+msgstr "New Customer"
+
+#: templates/crm/customer_form.html:8 templates/crm/list.html:7
+#: templates/crm/sale_form.html:6 templates/crm/sale_list.html:7
+#: templates/hr/leave_list.html:7 templates/inventory/warehouse_form.html:10
+#: templates/inventory/warehouse_list.html:7 templates/production/list.html:7
+#: templates/production/recipe_list.html:6 templates/purchasing/list.html:7
+#: templates/purchasing/order_form.html:12
+#: templates/purchasing/supplier_form.html:10
+#: templates/purchasing/supplier_list.html:7 templates/sales/list.html:7
+msgid "Yeni"
+msgstr "New"
+
+#: templates/crm/customer_form.html:13 templates/crm/sale_form.html:11
+#: templates/hr/application_form.html:7 templates/hr/candidate_form.html:7
+#: templates/hr/job_opening_form.html:7 templates/hr/leave_request_form.html:7
+#: templates/inventory/warehouse_form.html:16
+#: templates/meetings/meeting_form.html:13
+#: templates/production/batch_detail.html:102
+#: templates/purchasing/order_form.html:18
+#: templates/purchasing/order_item_form.html:15
+#: templates/purchasing/supplier_form.html:16
+#: templates/purchasing/supplier_product_form.html:12
+msgid "Kaydet"
+msgstr "Save"
+
+#: templates/crm/customer_form.html:24
+msgid "Müşteriyi düzenle"
+msgstr "Edit customer"
+
+#: templates/crm/customer_form.html:24
+msgid "Yeni müşteri"
+msgstr "New customer"
+
+#: templates/crm/customer_form.html:25
+msgid "Müşteri bilgileri"
+msgstr "Customer details"
+
+#: templates/crm/list.html:18 templates/sales/customer_list.html:8
+msgid "Müşteri, e-posta veya telefon ara"
+msgstr "Search customer, email or phone"
+
+#: templates/crm/list.html:25 templates/sales/customer_list.html:15
+msgid "Toplam müşteri"
+msgstr "Total customers"
+
+#: templates/crm/list.html:26
+msgid "Aktif müşteri"
+msgstr "Active customers"
+
+#: templates/crm/list.html:36 templates/purchasing/supplier_list.html:35
+#: templates/sales/customer_list.html:25
+msgid "İletişim"
+msgstr "Contact"
+
+#: templates/crm/list.html:37 templates/purchasing/supplier_detail.html:60
+#: templates/sales/customer_list.html:26
+msgid "Tür"
+msgstr "Type"
+
+#: templates/crm/list.html:62 templates/sales/customer_list.html:47
+msgid "Gösterilecek müşteri yok"
+msgstr "No customers to show"
+
+#: templates/crm/list.html:63
+msgid "İlk müşteriyi ekle"
+msgstr "Add the first customer"
+
+#: templates/crm/opportunity_form.html:3 templates/crm/opportunity_form.html:18
+#: templates/crm/sale_form.html:37
+msgid "Yeni fırsat"
+msgstr "New opportunity"
+
+#: templates/crm/opportunity_form.html:7
+#: templates/production/recipe_create.html:7
+#: templates/purchasing/order_create_form.html:10
+#: templates/sales/order_form.html:7
+msgid "Oluştur"
+msgstr "Create"
+
+#: templates/crm/opportunity_form.html:19
+msgid "Fırsat 'İlk temas' aşamasında ve aktif olarak oluşturulur."
+msgstr "The opportunity is created in the 'New' stage and set to active."
+
+#: templates/crm/opportunity_form.html:20 templates/crm/sale_form.html:38
+msgid "Fırsat bilgileri"
+msgstr "Opportunity details"
+
+#: templates/crm/sale_form.html:17
+msgid "Sonraki Aşama"
+msgstr "Next Stage"
+
+#: templates/crm/sale_form.html:24
+#, python-format
+msgid "%(name)s satış kaydını silmek istediğinize emin misiniz?"
+msgstr "Are you sure you want to delete the opportunity %(name)s?"
+
+#: templates/crm/sale_list.html:19
+msgid "Fırsat adı veya müşteri ara"
+msgstr "Search opportunity or customer"
+
+#: templates/crm/sale_list.html:27
+msgid "Kazanılan"
+msgstr "Won"
+
+#: templates/dashboard/account_settings.html:12
+msgid "E-posta tanımlı değil"
+msgstr "No email set"
+
+#: templates/dashboard/account_settings.html:17
+msgid "Roller"
+msgstr "Roles"
+
+#: templates/dashboard/account_settings.html:27
+msgid "Süper kullanıcı — tüm modüllere erişiminiz var."
+msgstr "Superuser — you have access to every module."
+
+#: templates/dashboard/account_settings.html:29
+msgid "Henüz bir role atanmadınız."
+msgstr "You have not been assigned a role yet."
+
+#: templates/dashboard/account_settings.html:39
+msgid "E-posta adresi"
+msgstr "Email address"
+
+#: templates/dashboard/account_settings.html:48
+msgid "Güncelle"
+msgstr "Update"
+
+#: templates/dashboard/account_settings.html:57
+msgid "Şifre değiştir"
+msgstr "Change password"
+
+#: templates/dashboard/account_settings.html:65
+msgid "Şifreyi Değiştir"
+msgstr "Change Password"
+
+#: templates/dashboard/home.html:7
+msgid "Aktif lot"
+msgstr "Active lots"
+
+#: templates/dashboard/home.html:10
+msgid "Açık satın alma"
+msgstr "Open purchases"
+
+#: templates/dashboard/home.html:13 templates/finance/list.html:13
+msgid "Toplam gelir"
+msgstr "Total revenue"
+
+#: templates/dashboard/home.html:16 templates/finance/list.html:16
+msgid "Kâr marjı"
+msgstr "Margin"
+
+#: templates/dashboard/home.html:21 templates/public/landing.html:11
+#: templates/public/landing.html:89
+msgid "Modüller"
+msgstr "Apps"
+
+#: templates/dashboard/home.html:34
+msgid "lot"
+msgstr "lots"
+
+#: templates/dashboard/home.html:34
+msgid "kritik"
+msgstr "critical"
+
+#: templates/dashboard/home.html:36
+msgid "açık"
+msgstr "open"
+
+#: templates/dashboard/home.html:38
+msgid "üretim emri"
+msgstr "roast batches"
+
+#: templates/dashboard/home.html:40
+msgid "karşılandı"
+msgstr "fulfilled"
+
+#: templates/dashboard/home.html:40
+msgid "müşteri"
+msgstr "customers"
+
+#: templates/dashboard/home.html:42
+msgid "aktif"
+msgstr "active"
+
+#: templates/dashboard/home.html:42
+msgid "kazanıldı"
+msgstr "won"
+
+#: templates/dashboard/home.html:44
+msgid "çalışan"
+msgstr "employees"
+
+#: templates/dashboard/home.html:44
+msgid "izin"
+msgstr "time off"
+
+#: templates/dashboard/home.html:51 templates/ui/shell/_apps_overlay.html:20
+msgid "Bu modüle erişim izniniz yok"
+msgstr "You do not have access to this module"
+
+#: templates/finance/_invoices_kanban.html:16
+#: templates/finance/_invoices_list.html:10
+#: templates/finance/invoice_detail.html:34
+#: templates/inventory/_lots_list.html:9 templates/inventory/lot_detail.html:37
+#: templates/inventory/warehouse_detail.html:51
+#: templates/production/batch_create.html:65
+#: templates/purchasing/order_detail.html:100
+msgid "Kalan"
+msgstr "Remaining"
+
+#: templates/finance/_invoices_list.html:5 templates/sales/order_detail.html:45
+msgid "Fatura"
+msgstr "Invoice"
+
+#: templates/finance/_invoices_list.html:9
+#: templates/finance/invoice_detail.html:33
+msgid "Ödenen"
+msgstr "Paid"
+
+#: templates/finance/_invoices_list.html:11
+#: templates/finance/invoice_detail.html:48
+msgid "Vade"
+msgstr "Due"
+
+#: templates/finance/_invoices_list.html:26
+msgid "Fatura yok"
+msgstr "No invoices"
+
+#: templates/finance/_invoices_list.html:27
+msgid "Fatura, karşılanmış bir siparişten oluşturulur."
+msgstr "An invoice is created from a fulfilled order."
+
+#: templates/finance/invoice_detail.html:40
+msgid "Fatura bilgileri"
+msgstr "Invoice details"
+
+#: templates/finance/invoice_detail.html:47
+msgid "Düzenlenme"
+msgstr "Issued"
+
+#: templates/finance/invoice_detail.html:52
+msgid "Sipariş Kalemleri"
+msgstr "Order Lines"
+
+#: templates/finance/invoice_detail.html:57 templates/finance/list.html:32
+#: templates/inventory/_lots_list.html:6 templates/inventory/lot_detail.html:47
+#: templates/inventory/warehouse_detail.html:49
+#: templates/production/batch_detail.html:61
+#: templates/production/recipe_create.html:42
+#: templates/production/recipe_create.html:62
+#: templates/purchasing/order_create_form.html:60
+#: templates/purchasing/order_create_form.html:88
+#: templates/purchasing/order_detail.html:97
+#: templates/purchasing/order_detail.html:193
+#: templates/purchasing/supplier_detail.html:102
+#: templates/sales/forecast.html:19 templates/sales/order_detail.html:68
+#: templates/sales/order_form.html:50 templates/sales/order_form.html:84
+#: templates/sales/return_list.html:28
+msgid "Ürün"
+msgstr "Product"
+
+#: templates/finance/invoice_detail.html:57 templates/finance/list.html:33
+#: templates/inventory/lot_detail.html:65
+#: templates/production/_batches_list.html:8
+#: templates/purchasing/order_create_form.html:70
+#: templates/purchasing/order_create_form.html:98
+#: templates/purchasing/order_detail.html:196
+#: templates/sales/order_detail.html:70 templates/sales/order_detail.html:93
+#: templates/sales/order_form.html:67 templates/sales/order_form.html:101
+#: templates/sales/return_list.html:30
+msgid "Miktar"
+msgstr "Quantity"
+
+#: templates/finance/invoice_detail.html:58
+#: templates/purchasing/order_create_form.html:74
+#: templates/purchasing/order_create_form.html:102
+#: templates/purchasing/order_detail.html:101
+#: templates/sales/order_detail.html:71 templates/sales/order_form.html:71
+#: templates/sales/order_form.html:105
+msgid "Birim fiyat"
+msgstr "Unit price"
+
+#: templates/finance/invoice_detail.html:78
+msgid "Ödemeler"
+msgstr "Payments"
+
+#: templates/finance/invoice_detail.html:89
+msgid "Ödeme yöntemi"
+msgstr "Payment method"
+
+#: templates/finance/invoice_detail.html:97
+msgid "Ödeme Kaydet"
+msgstr "Register Payment"
+
+#: templates/finance/invoice_detail.html:106
+msgid "Yöntem"
+msgstr "Method"
+
+#: templates/finance/invoice_detail.html:116
+msgid "Henüz ödeme kaydı yok"
+msgstr "No payments recorded yet"
+
+#: templates/finance/invoice_list.html:7
+msgid "Kârlılık"
+msgstr "Profitability"
+
+#: templates/finance/invoice_list.html:14
+msgid "Fatura ara"
+msgstr "Search invoices"
+
+#: templates/finance/invoice_list.html:21
+msgid "Ödenmemiş"
+msgstr "Unpaid"
+
+#: templates/finance/invoice_list.html:22
+msgid "Ödenmiş"
+msgstr "Paid"
+
+#: templates/finance/list.html:14
+msgid "Toplam maliyet"
+msgstr "Total cost"
+
+#: templates/finance/list.html:15
+msgid "Toplam kâr"
+msgstr "Total profit"
+
+#: templates/finance/list.html:21
+msgid "Sipariş bazında gelir ve maliyet"
+msgstr "Revenue and cost per order"
+
+#: templates/finance/list.html:23
+msgid "Ürün bazında kâr dağılımı"
+msgstr "Profit distribution by product"
+
+#: templates/finance/list.html:52
+msgid "Karşılanmış sipariş yok"
+msgstr "No fulfilled orders"
+
+#: templates/finance/list.html:53
+msgid "Kârlılık, karşılanan siparişlerden hesaplanır."
+msgstr "Profitability is computed from fulfilled orders."
+
+#: templates/hr/_employees_list.html:5 templates/hr/_leaves_list.html:5
+#: templates/hr/employee_detail.html:73 templates/hr/employee_list.html:33
+#: templates/hr/list.html:12 templates/hr/list.html:24
+#: templates/hr/list.html:51
+msgid "Çalışan"
+msgstr "Employee"
+
+#: templates/hr/_employees_list.html:6 templates/hr/employee_detail.html:34
+#: templates/hr/employee_detail.html:73 templates/hr/recruitment.html:6
+msgid "Pozisyon"
+msgstr "Position"
+
+#: templates/hr/_employees_list.html:7 templates/hr/employee_detail.html:33
+#: templates/hr/list.html:24
+msgid "Departman"
+msgstr "Department"
+
+#: templates/hr/_employees_list.html:8 templates/hr/employee_detail.html:35
+#: templates/registration/login.html:107
+msgid "Yönetici"
+msgstr "Manager"
+
+#: templates/hr/_employees_list.html:9 templates/hr/employee_detail.html:40
+msgid "İşe giriş"
+msgstr "Hired on"
+
+#: templates/hr/_employees_list.html:32
+msgid "Gösterilecek çalışan yok"
+msgstr "No employees to show"
+
+#: templates/hr/_leaves_calendar.html:4
+#: templates/inventory/_lots_calendar.html:4
+#: templates/meetings/calendar.html:22
+msgid "Önceki ay"
+msgstr "Previous month"
+
+#: templates/hr/_leaves_calendar.html:8
+#: templates/inventory/_lots_calendar.html:8
+#: templates/meetings/calendar.html:26
+msgid "Sonraki ay"
+msgstr "Next month"
+
+#: templates/hr/_leaves_calendar.html:9
+msgid "İzin aralıkları"
+msgstr "Time off ranges"
+
+#: templates/hr/_leaves_list.html:6 templates/hr/employee_detail.html:49
+msgid "İzin türü"
+msgstr "Time off type"
+
+#: templates/hr/_leaves_list.html:7 templates/hr/employee_detail.html:49
+msgid "Başlangıç"
+msgstr "Start"
+
+#: templates/hr/_leaves_list.html:8 templates/hr/employee_detail.html:50
+msgid "Bitiş"
+msgstr "End"
+
+#: templates/hr/_leaves_list.html:10 templates/hr/_leaves_list.html:32
+msgid "Onaylayan"
+msgstr "Approver"
+
+#: templates/hr/_leaves_list.html:33
+msgid "Onaylayan seçin"
+msgstr "Select an approver"
+
+#: templates/hr/_leaves_list.html:41
+msgid "Bu izin talebini reddetmek istiyor musunuz?"
+msgstr "Do you want to reject this time off request?"
+
+#: templates/hr/_leaves_list.html:47
+msgid "İzin talebi yok"
+msgstr "No time off requests"
+
+#: templates/hr/_leaves_list.html:48
+msgid "İlk izin talebini oluştur"
+msgstr "Create the first request"
+
+#: templates/hr/_recruitment_list.html:9
+msgid "Son başvuru"
+msgstr "Closing date"
+
+#: templates/hr/_recruitment_list.html:14
+msgid "doluluk"
+msgstr "filled"
+
+#: templates/hr/_recruitment_list.html:22 templates/hr/recruitment.html:9
+#: templates/hr/recruitment.html:21
+msgid "Aday"
+msgstr "Candidate"
+
+#: templates/hr/_recruitment_list.html:22 templates/hr/recruitment.html:12
+msgid "Başvuru"
+msgstr "Application"
+
+#: templates/hr/_recruitment_list.html:37
+msgid "Bu pozisyona başvuru yok"
+msgstr "No applications for this opening"
+
+#: templates/hr/_recruitment_list.html:44
+msgid "Açık pozisyon yok"
+msgstr "No open positions"
+
+#: templates/hr/_recruitment_list.html:45
+msgid "İlk pozisyonu aç"
+msgstr "Open the first position"
+
+#: templates/hr/application_form.html:2
+msgid "Yeni Başvuru"
+msgstr "New Application"
+
+#: templates/hr/application_form.html:3 templates/hr/application_form.html:19
+msgid "Yeni başvuru"
+msgstr "New application"
+
+#: templates/hr/application_form.html:20
+msgid "Başvuru bilgileri"
+msgstr "Application details"
+
+#: templates/hr/candidate_form.html:2
+msgid "Yeni Aday"
+msgstr "New Candidate"
+
+#: templates/hr/candidate_form.html:3 templates/hr/candidate_form.html:19
+msgid "Yeni aday"
+msgstr "New candidate"
+
+#: templates/hr/candidate_form.html:20
+msgid "Aday bilgileri"
+msgstr "Candidate details"
+
+#: templates/hr/employee_detail.html:26
+msgid "İzin talebi"
+msgstr "Time off request"
+
+#: templates/hr/employee_detail.html:27 templates/hr/employee_detail.html:68
+msgid "Ekip"
+msgstr "Team"
+
+#: templates/hr/employee_detail.html:31
+msgid "Çalışan bilgileri"
+msgstr "Employee details"
+
+#: templates/hr/employee_detail.html:44
+msgid "İzin Geçmişi"
+msgstr "Time Off History"
+
+#: templates/hr/employee_detail.html:61
+msgid "İzin kaydı yok"
+msgstr "No time off records"
+
+#: templates/hr/employee_detail.html:88
+msgid "Bu çalışana bağlı ekip yok"
+msgstr "This employee has no direct reports"
+
+#: templates/hr/employee_list.html:14
+msgid "Tüm departmanlar"
+msgstr "All departments"
+
+#: templates/hr/employee_list.html:20
+msgid "Tüm yöneticiler"
+msgstr "All managers"
+
+#: templates/hr/job_opening_form.html:2
+msgid "Yeni Pozisyon"
+msgstr "New Position"
+
+#: templates/hr/job_opening_form.html:3 templates/hr/job_opening_form.html:19
+msgid "Yeni pozisyon"
+msgstr "New position"
+
+#: templates/hr/job_opening_form.html:20
+msgid "Pozisyon bilgileri"
+msgstr "Position details"
+
+#: templates/hr/leave_list.html:16
+msgid "İzin ara"
+msgstr "Search time off"
+
+#: templates/hr/leave_list.html:23 templates/hr/list.html:14
+msgid "Bekleyen izin"
+msgstr "Pending requests"
+
+#: templates/hr/leave_request_form.html:2
+msgid "Yeni İzin Talebi"
+msgstr "New Time Off Request"
+
+#: templates/hr/leave_request_form.html:3
+#: templates/hr/leave_request_form.html:19
+msgid "Yeni i̇zin talebi"
+msgstr "New time off request"
+
+#: templates/hr/leave_request_form.html:20
+msgid "İzin talebi bilgileri"
+msgstr "Time off details"
+
+#: templates/hr/list.html:15 templates/hr/recruitment.html:20
+msgid "Açık pozisyon"
+msgstr "Open positions"
+
+#: templates/hr/list.html:39
+msgid "Çalışan kaydı yok"
+msgstr "No employee records"
+
+#: templates/hr/list.html:47
+msgid "Bekleyen İzinler"
+msgstr "Pending Time Off"
+
+#: templates/hr/list.html:61
+msgid "Bekleyen izin talebi yok"
+msgstr "No pending requests"
+
+#: templates/hr/recruitment.html:22
+msgid "Aktif başvuru"
+msgstr "Active applications"
+
+#: templates/inventory/_lots_calendar.html:9
+msgid "Lotların son kullanma tarihleri"
+msgstr "Lot expiry dates"
+
+#: templates/inventory/_lots_list.html:7
+#: templates/inventory/warehouse_detail.html:50
+#: templates/purchasing/order_detail.html:194
+msgid "Lot kodu"
+msgstr "Lot code"
+
+#: templates/inventory/_lots_list.html:8 templates/inventory/lot_detail.html:49
+#: templates/inventory/warehouse_list.html:34
+#: templates/production/batch_detail.html:51
+#: templates/purchasing/order_detail.html:195
+msgid "Depo"
+msgstr "Warehouse"
+
+#: templates/inventory/_lots_list.html:10
+#: templates/inventory/warehouse_detail.html:52
+#: templates/production/batch_create.html:65
+#: templates/production/batch_detail.html:52
+#: templates/purchasing/order_detail.html:197
+msgid "SKT"
+msgstr "Expiry"
+
+#: templates/inventory/_lots_list.html:11
+#: templates/inventory/lot_detail.html:23
+#: templates/inventory/warehouse_detail.html:53
+msgid "Tazelik"
+msgstr "Freshness"
+
+#: templates/inventory/_lots_list.html:25
+msgid "Atanmamış"
+msgstr "Unassigned"
+
+#: templates/inventory/_lots_list.html:34
+msgid "Gösterilecek lot yok"
+msgstr "No lots to show"
+
+#: templates/inventory/_lots_list.html:35
+msgid "Stok, satın alma siparişinin teslim alma adımında oluşur."
+msgstr "Stock is created at the receipt step of a purchase order."
+
+#: templates/inventory/_lots_list.html:36
+msgid "Satın alma siparişlerine git"
+msgstr "Go to purchase orders"
+
+#: templates/inventory/list.html:16
+msgid "Ürün, kategori veya lot kodu ara"
+msgstr "Search product, category or lot code"
+
+#: templates/inventory/list.html:23
+msgid "Gösterilen lot"
+msgstr "Lots shown"
+
+#: templates/inventory/list.html:24
+#: templates/inventory/warehouse_detail.html:37
+msgid "Stokta olan"
+msgstr "In stock"
+
+#: templates/inventory/list.html:25
+msgid "Deposu atanmamış"
+msgstr "No warehouse"
+
+#: templates/inventory/list.html:26
+#: templates/inventory/warehouse_detail.html:38
+msgid "Dikkat gerektiren"
+msgstr "Needs attention"
+
+#: templates/inventory/list.html:31
+msgid ""
+"Stok girişi, satın alma siparişinin teslim alma adımında otomatik oluşur; "
+"böylece maliyet ve lot geçmişi korunur."
+msgstr ""
+"Stock entries are created automatically at the receipt step of a purchase "
+"order, preserving cost and lot history."
+
+#: templates/inventory/lot_detail.html:39
+msgid "Giriş miktarı"
+msgstr "Received quantity"
+
+#: templates/inventory/lot_detail.html:41
+#: templates/inventory/lot_detail.html:64
+msgid "Hareket"
+msgstr "Movement"
+
+#: templates/inventory/lot_detail.html:45
+msgid "Lot bilgileri"
+msgstr "Lot details"
+
+#: templates/inventory/lot_detail.html:48
+#: templates/purchasing/supplier_detail.html:103
+msgid "Kategori"
+msgstr "Category"
+
+#: templates/inventory/lot_detail.html:52
+#: templates/production/batch_create.html:98
+msgid "Son kullanma tarihi"
+msgstr "Expiry date"
+
+#: templates/inventory/lot_detail.html:53
+msgid "Birim maliyet"
+msgstr "Unit cost"
+
+#: templates/inventory/lot_detail.html:54
+msgid "Giriş zamanı"
+msgstr "Received at"
+
+#: templates/inventory/lot_detail.html:58
+msgid "Stok Hareketleri"
+msgstr "Stock Movements"
+
+#: templates/inventory/lot_detail.html:81
+msgid "Bu lot için hareket kaydı yok"
+msgstr "No movements recorded for this lot"
+
+#: templates/inventory/lot_detail.html:89
+msgid "Kaynak"
+msgstr "Source"
+
+#: templates/inventory/lot_detail.html:92
+msgid "Kaynak belge"
+msgstr "Source document"
+
+#: templates/inventory/lot_detail.html:94
+#: templates/meetings/meeting_detail.html:55
+#: templates/meetings/meeting_form.html:60
+msgid "Açıklama"
+msgstr "Description"
+
+#: templates/inventory/warehouse_detail.html:19
+#, python-format
+msgid "%(name)s deposunu silmek istediğinize emin misiniz?"
+msgstr "Are you sure you want to delete the warehouse %(name)s?"
+
+#: templates/inventory/warehouse_detail.html:36
+#: templates/inventory/warehouse_list.html:36
+#: templates/sales/order_detail.html:69 templates/sales/order_form.html:57
+#: templates/sales/order_form.html:91
+msgid "Lot"
+msgstr "Lot"
+
+#: templates/inventory/warehouse_detail.html:43
+msgid "Lotlar"
+msgstr "Lots"
+
+#: templates/inventory/warehouse_detail.html:68
+msgid "Bu depoda lot yok"
+msgstr "No lots in this warehouse"
+
+#: templates/inventory/warehouse_detail.html:76
+msgid "Bilgiler"
+msgstr "Details"
+
+#: templates/inventory/warehouse_detail.html:79
+msgid "Depo adı"
+msgstr "Warehouse name"
+
+#: templates/inventory/warehouse_detail.html:80
+#: templates/inventory/warehouse_list.html:35
+msgid "Şehir"
+msgstr "City"
+
+#: templates/inventory/warehouse_form.html:2
+msgid "Yeni Depo"
+msgstr "New Warehouse"
+
+#: templates/inventory/warehouse_form.html:31
+msgid "Depo bilgilerini düzenle"
+msgstr "Edit warehouse details"
+
+#: templates/inventory/warehouse_form.html:31
+msgid "Yeni depo"
+msgstr "New warehouse"
+
+#: templates/inventory/warehouse_form.html:33
+msgid "Depo bilgileri"
+msgstr "Warehouse details"
+
+#: templates/inventory/warehouse_list.html:18
+msgid "Depo adı veya şehir ara"
+msgstr "Search warehouse or city"
+
+#: templates/inventory/warehouse_list.html:25
+msgid "Toplam depo"
+msgstr "Total warehouses"
+
+#: templates/inventory/warehouse_list.html:26
+msgid "Aktif depo"
+msgstr "Active warehouses"
+
+#: templates/inventory/warehouse_list.html:54
+msgid "Gösterilecek depo yok"
+msgstr "No warehouses to show"
+
+#: templates/inventory/warehouse_list.html:55
+msgid "İlk depoyu ekle"
+msgstr "Add the first warehouse"
+
+#: templates/meetings/calendar.html:7 templates/meetings/meeting_form.html:2
+msgid "Yeni Toplantı"
+msgstr "New Meeting"
+
+#: templates/meetings/calendar.html:13
+msgid "Bu ay"
+msgstr "This month"
+
+#: templates/meetings/calendar.html:14
+msgid "Planlanan"
+msgstr "Scheduled"
+
+#: templates/meetings/calendar.html:56
+msgid "Yaklaşan Toplantılar"
+msgstr "Upcoming Meetings"
+
+#: templates/meetings/calendar.html:73
+msgid "Yaklaşan toplantı yok."
+msgstr "No upcoming meetings."
+
+#: templates/meetings/meeting_detail.html:11
+#: templates/purchasing/order_detail.html:36
+msgid "İptal Et"
+msgstr "Cancel"
+
+#: templates/meetings/meeting_detail.html:12
+msgid "Bu toplantıyı iptal etmek istediğinize emin misiniz?"
+msgstr "Are you sure you want to cancel this meeting?"
+
+#: templates/meetings/meeting_detail.html:31
+msgid "Katılımcı"
+msgstr "Attendees"
+
+#: templates/meetings/meeting_detail.html:35
+#: templates/meetings/meeting_form.html:32
+msgid "Toplantı bilgileri"
+msgstr "Meeting details"
+
+#: templates/meetings/meeting_detail.html:37
+#: templates/meetings/meeting_form.html:68
+msgid "Organizatör"
+msgstr "Organiser"
+
+#: templates/meetings/meeting_detail.html:40
+#: templates/meetings/meeting_form.html:39 templates/ui/_breadcrumb.html:1
+msgid "Konum"
+msgstr "Location"
+
+#: templates/meetings/meeting_detail.html:41
+#: templates/purchasing/_orders_list.html:12
+#: templates/purchasing/order_detail.html:80
+#: templates/sales/order_detail.html:57
+msgid "Oluşturulma"
+msgstr "Created"
+
+#: templates/meetings/meeting_detail.html:60
+msgid "Bu toplantı için açıklama eklenmemiş."
+msgstr "No description has been added for this meeting."
+
+#: templates/meetings/meeting_detail.html:65
+#: templates/meetings/meeting_form.html:77
+msgid "Katılımcılar"
+msgstr "Attendees"
+
+#: templates/meetings/meeting_detail.html:74
+msgid "Katılımcı eklenmemiş"
+msgstr "No attendees added"
+
+#: templates/meetings/meeting_form.html:8
+#: templates/meetings/meeting_form.html:27
+msgid "Yeni toplantı"
+msgstr "New meeting"
+
+#: templates/meetings/meeting_form.html:27
+msgid "Toplantıyı düzenle"
+msgstr "Edit the meeting"
+
+#: templates/meetings/meeting_form.html:35
+msgid "Başlık"
+msgstr "Title"
+
+#: templates/meetings/meeting_form.html:49
+msgid "Başlangıç saati"
+msgstr "Start time"
+
+#: templates/meetings/meeting_form.html:54
+msgid "Bitiş saati"
+msgstr "End time"
+
+#: templates/meetings/meeting_form.html:65
+msgid "Katılımcılar ve bağlantılar"
+msgstr "Attendees and links"
+
+#: templates/meetings/meeting_form.html:70
+msgid "Çalışan seçin"
+msgstr "Select an employee"
+
+#: templates/notifications/_dropdown_items.html:17
+msgid "Yeni bildirim yok"
+msgstr "No new notifications"
+
+#: templates/notifications/_dropdown_items.html:20
+msgid "Tümünü Gör"
+msgstr "See all"
+
+#: templates/notifications/list.html:7
+msgid "Okunmamış"
+msgstr "Unread"
+
+#: templates/notifications/list.html:14
+msgid "Bildirim"
+msgstr "Notification"
+
+#: templates/notifications/list.html:27
+msgid "Okunmadı"
+msgstr "Unread"
+
+#: templates/notifications/list.html:37
+msgid "Okundu işaretle"
+msgstr "Mark as read"
+
+#: templates/notifications/list.html:48
+msgid "Bildirim yok"
+msgstr "No notifications"
+
+#: templates/production/_batches_list.html:5
+msgid "Parti"
+msgstr "Batch"
+
+#: templates/production/_batches_list.html:6
+#: templates/production/batch_create.html:28
+#: templates/production/batch_detail.html:46 templates/production/list.html:21
+#: templates/production/recipe_list.html:16
+msgid "Reçete"
+msgstr "Recipe"
+
+#: templates/production/_batches_list.html:7
+#: templates/production/batch_detail.html:48
+msgid "Çıktı lotu"
+msgstr "Output lot"
+
+#: templates/production/_batches_list.html:9 templates/public/landing.html:143
+msgid "Kalite"
+msgstr "Quality"
+
+#: templates/production/_batches_list.html:10 templates/public/landing.html:139
+msgid "Kavurma"
+msgstr "Roasted"
+
+#: templates/production/_batches_list.html:22
+msgid "Bekliyor"
+msgstr "Pending"
+
+#: templates/production/_batches_list.html:27
+msgid "Üretim emri yok"
+msgstr "No roast batches"
+
+#: templates/production/_batches_list.html:28
+msgid "İlk üretim emrini oluştur"
+msgstr "Create the first roast batch"
+
+#: templates/production/batch_create.html:2
+msgid "Yeni Üretim Emri"
+msgstr "New Roast Batch"
+
+#: templates/production/batch_create.html:3
+#: templates/production/batch_create.html:18
+msgid "Yeni üretim emri"
+msgstr "New roast batch"
+
+#: templates/production/batch_create.html:8
+msgid "Üretimi Başlat"
+msgstr "Start Production"
+
+#: templates/production/batch_create.html:20
+msgid ""
+"Reçeteyi seçin, tüketilecek yeşil kahve lotlarını belirleyin ve çıktı lotunu "
+"tanımlayın."
+msgstr ""
+"Pick the recipe, choose the green coffee lots to consume and define the "
+"output lot."
+
+#: templates/production/batch_create.html:23
+msgid "1. Reçete seçimi"
+msgstr "1. Recipe selection"
+
+#: templates/production/batch_create.html:30
+msgid "Reçete seçin…"
+msgstr "Select a recipe…"
+
+#: templates/production/batch_create.html:40
+msgid "Reçeteyi Yükle"
+msgstr "Load Recipe"
+
+#: templates/production/batch_create.html:51
+#, python-format
+msgid "2. Girdi lotları — %(name)s"
+msgstr "2. Input lots — %(name)s"
+
+#: templates/production/batch_create.html:62
+msgid "Lot seçin…"
+msgstr "Select a lot…"
+
+#: templates/production/batch_create.html:72
+#, python-format
+msgid "%(name)s için stokta lot yok."
+msgstr "No lot in stock for %(name)s."
+
+#: templates/production/batch_create.html:79
+msgid "3. Çıktı bilgileri"
+msgstr "3. Output details"
+
+#: templates/production/batch_create.html:83
+#: templates/production/batch_detail.html:35
+msgid "Çıktı miktarı"
+msgstr "Output quantity"
+
+#: templates/production/batch_create.html:91
+msgid "Çıktı lot kodu"
+msgstr "Output lot code"
+
+#: templates/production/batch_detail.html:10
+msgid "Çıktı Lotu"
+msgstr "Output Lot"
+
+#: templates/production/batch_detail.html:18
+msgid "Kalite kontrolü"
+msgstr "Quality check"
+
+#: templates/production/batch_detail.html:20
+msgid "Kavuruldu"
+msgstr "Roasted"
+
+#: templates/production/batch_detail.html:37
+msgid "Bileşen"
+msgstr "Components"
+
+#: templates/production/batch_detail.html:39
+#: templates/production/batch_detail.html:80
+msgid "Kupa puanı"
+msgstr "Cupping score"
+
+#: templates/production/batch_detail.html:44
+msgid "Üretim bilgileri"
+msgstr "Production details"
+
+#: templates/production/batch_detail.html:47
+msgid "Çıktı ürünü"
+msgstr "Output product"
+
+#: templates/production/batch_detail.html:53
+msgid "Kavurma zamanı"
+msgstr "Roasted at"
+
+#: templates/production/batch_detail.html:57
+msgid "Reçete Bileşenleri"
+msgstr "Recipe Components"
+
+#: templates/production/batch_detail.html:61
+msgid "Oran"
+msgstr "Ratio"
+
+#: templates/production/batch_detail.html:74
+msgid "Kalite Kontrolü"
+msgstr "Quality Check"
+
+#: templates/production/batch_detail.html:78
+msgid "Sonuç"
+msgstr "Result"
+
+#: templates/production/batch_detail.html:81
+msgid "Kontrol eden"
+msgstr "Inspector"
+
+#: templates/production/batch_detail.html:84
+#: templates/purchasing/supplier_detail.html:61
+msgid "Notlar"
+msgstr "Notes"
+
+#: templates/production/batch_detail.html:93
+msgid "Kalite kontrolü kaydet"
+msgstr "Record a quality check"
+
+#: templates/production/list.html:19
+msgid "Üretim emri"
+msgstr "Roast batches"
+
+#: templates/production/list.html:20
+msgid "Kalite kontrolü bekleyen"
+msgstr "Awaiting quality check"
+
+#: templates/production/recipe_create.html:2
+msgid "Yeni Reçete"
+msgstr "New Recipe"
+
+#: templates/production/recipe_create.html:3
+#: templates/production/recipe_create.html:20
+msgid "Yeni reçete"
+msgstr "New recipe"
+
+#: templates/production/recipe_create.html:21
+msgid ""
+"Harmanın hangi yeşil kahve ürünlerinden hangi oranda oluştuğunu tanımlayın."
+msgstr ""
+"Define which green coffee products make up the blend and in what ratio."
+
+#: templates/production/recipe_create.html:23
+msgid "Reçete bilgileri"
+msgstr "Recipe details"
+
+#: templates/production/recipe_create.html:30
+msgid "Bileşenler"
+msgstr "Components"
+
+#: templates/production/recipe_create.html:35
+#, python-format
+msgid "Oranların toplamı tam olarak %%100 olmalıdır."
+msgstr "The ratios must add up to exactly %%100."
+
+#: templates/production/recipe_create.html:44
+#: templates/production/recipe_create.html:64
+#: templates/sales/order_form.html:52 templates/sales/order_form.html:86
+msgid "Ürün seçin"
+msgstr "Select a product"
+
+#: templates/production/recipe_create.html:49
+#: templates/production/recipe_create.html:69
+#, python-format
+msgid "Oran (%%)"
+msgstr "Ratio (%%)"
+
+#: templates/production/recipe_create.html:53
+#: templates/production/recipe_create.html:73
+msgid "Bileşeni sil"
+msgstr "Remove component"
+
+#: templates/production/recipe_create.html:81
+msgid "Bileşen ekle"
+msgstr "Add a component"
+
+#: templates/production/recipe_list.html:26
+msgid "Çıktı"
+msgstr "Output"
+
+#: templates/production/recipe_list.html:31
+msgid "Üret"
+msgstr "Produce"
+
+#: templates/production/recipe_list.html:44
+msgid "Bu reçetede bileşen tanımlı değil."
+msgstr "No components defined for this recipe."
+
+#: templates/production/recipe_list.html:49
+msgid "Reçete yok"
+msgstr "No recipes"
+
+#: templates/production/recipe_list.html:50
+msgid ""
+"Harmanın hangi yeşil kahve lotlarından hangi oranda oluştuğunu tanımlayın."
+msgstr "Define which green coffee lots make up the blend and in what ratio."
+
+#: templates/production/recipe_list.html:51
+msgid "İlk reçeteyi oluştur"
+msgstr "Create the first recipe"
+
+#: templates/public/base_public.html:7
+msgid ""
+"Kahve kavurma ve dağıtım için uçtan uca ERP: tedarik, üretim, satış, finans "
+"ve AI karar desteği."
+msgstr ""
+"End-to-end ERP for coffee roasting and distribution: sourcing, production, "
+"sales, finance and AI decision support."
+
+#: templates/public/landing.html:2
+msgid "Kahve kavurma ve dağıtım ERP'si"
+msgstr "Coffee roasting & distribution ERP"
+
+#: templates/public/landing.html:10
+msgid "Bölümler"
+msgstr "Sections"
+
+#: templates/public/landing.html:12 templates/public/landing.html:130
+msgid "Nasıl çalışır"
+msgstr "How it works"
+
+#: templates/public/landing.html:13 templates/public/landing.html:160
+msgid "AI katmanı"
+msgstr "AI layer"
+
+#: templates/public/landing.html:14 templates/public/landing.html:194
+msgid "SSS"
+msgstr "FAQ"
+
+#: templates/public/landing.html:23 templates/registration/login.html:59
+#: templates/ui/shell/_appbar.html:41
+msgid "Tema değiştir"
+msgstr "Toggle theme"
+
+#: templates/public/landing.html:26 templates/public/landing.html:229
+#: templates/registration/login.html:101
+msgid "Giriş Yap"
+msgstr "Log in"
+
+#: templates/public/landing.html:33
+msgid "Kahve kavurma & dağıtım"
+msgstr "Coffee roasting & distribution"
+
+#: templates/public/landing.html:34 templates/registration/login.html:12
+msgid "Yeşil kahveden fincana, tek sistemde."
+msgstr "From green bean to cup, in one system."
+
+#: templates/public/landing.html:36
+msgid ""
+"Tedarikçi alımından harman reçetesine, kavurma partisinden toptan siparişe "
+"kadar\n"
+"        tüm operasyonu tek kayıt defterinde toplayın. Stok asla doğrudan "
+"değişmez — her hareket izlenebilir."
+msgstr ""
+"From supplier purchase to blend recipe, from roast batch to wholesale order "
+"—\n"
+"        run the whole operation on one ledger. Stock never changes directly; "
+"every movement is traceable."
+
+#: templates/public/landing.html:41
+msgid "Demoyu dene"
+msgstr "Try the demo"
+
+#: templates/public/landing.html:43
+msgid "Modülleri gör"
+msgstr "See the modules"
+
+#: templates/public/landing.html:47
+msgid "Demo hesabı: root / root — rol bazlı hesaplar giriş sayfasında listeli."
+msgstr ""
+"Demo account: root / root — role-based accounts are listed on the sign-in "
+"page."
+
+#: templates/public/landing.html:54
+msgid "Satın Alma / Siparişler"
+msgstr "Purchasing / Orders"
+
+#: templates/public/landing.html:58 templates/purchasing/list.html:26
+#: templates/purchasing/supplier_detail.html:50
+msgid "Açık sipariş"
+msgstr "Open orders"
+
+#: templates/public/landing.html:59 templates/purchasing/list.html:27
+msgid "Teslimat bekleyen"
+msgstr "Awaiting delivery"
+
+#: templates/public/landing.html:60
+msgid "Geciken"
+msgstr "Overdue"
+
+#: templates/public/landing.html:64
+msgid "Kısmi"
+msgstr "Partial"
+
+#: templates/public/landing.html:69
+msgid "Teyit"
+msgstr "Confirmed"
+
+#: templates/public/landing.html:74
+msgid "Gönderildi"
+msgstr "Sent"
+
+#: templates/public/landing.html:79
+msgid "Teslim"
+msgstr "Received"
+
+#: templates/public/landing.html:90
+msgid "Operasyonun tamamı, tek platformda"
+msgstr "The whole operation, one platform"
+
+#: templates/public/landing.html:91
+msgid ""
+"Her modül aynı veritabanını paylaşır; bir yerde oluşan hareket diğer her "
+"yerde görünür."
+msgstr ""
+"Every module shares one database, so a movement created in one place shows "
+"up everywhere."
+
+#: templates/public/landing.html:96
+msgid "Stok & Lot"
+msgstr "Stock & Lots"
+
+#: templates/public/landing.html:97
+msgid ""
+"Lot bazlı tazelik takibi, depo yerleşimi ve hareket defteri. Stok hiçbir "
+"zaman doğrudan güncellenmez."
+msgstr ""
+"Lot-level freshness tracking, warehouse placement and a movement ledger. "
+"Stock is never updated directly."
+
+#: templates/public/landing.html:102
+msgid ""
+"Taslaktan teslim almaya sipariş akışı; teslim alma adımı lot ve maliyeti "
+"otomatik oluşturur."
+msgstr ""
+"Draft-to-receipt order flow; the receipt step creates the lot and its cost "
+"automatically."
+
+#: templates/public/landing.html:107
+msgid ""
+"Reçete tabanlı harman: yeşil kahve lotları düşer, kavrulmuş çıktı lotu "
+"oluşur."
+msgstr ""
+"Recipe-driven blending: green coffee lots are consumed and a roasted output "
+"lot is created."
+
+#: templates/public/landing.html:112
+msgid "Toptan ve perakende siparişler, iade akışı ve talep tahmini."
+msgstr "Wholesale and retail orders, the returns flow and demand forecasting."
+
+#: templates/public/landing.html:117
+msgid ""
+"Lot maliyetinden sipariş kârına gerçek kârlılık; fatura ve ödeme takibi."
+msgstr ""
+"Real profitability from lot cost to order margin, plus invoice and payment "
+"tracking."
+
+#: templates/public/landing.html:121
+msgid "CRM & İK"
+msgstr "CRM & HR"
+
+#: templates/public/landing.html:122
+msgid ""
+"Fırsat pipeline'ı, müşteri kartları, çalışan ve izin yönetimi, işe alım "
+"panosu."
+msgstr ""
+"Opportunity pipeline, customer cards, employee and time off management, "
+"recruitment board."
+
+#: templates/public/landing.html:131
+msgid "Çekirdekten fincana izlenebilir zincir"
+msgstr "A traceable chain from bean to cup"
+
+#: templates/public/landing.html:135
+msgid "Tedarik"
+msgstr "Sourcing"
+
+#: templates/public/landing.html:136
+msgid ""
+"Tedarikçiye sipariş açılır, teslim alındığında lot ve birim maliyet "
+"kaydedilir."
+msgstr ""
+"An order is raised with the supplier; on receipt the lot and unit cost are "
+"recorded."
+
+#: templates/public/landing.html:140
+msgid "Reçete oranlarına göre yeşil lotlar tüketilir, çıktı lotu üretilir."
+msgstr ""
+"Green lots are consumed per the recipe ratios and an output lot is produced."
+
+#: templates/public/landing.html:144
+msgid "Kupa puanı ve sonuç kaydedilir; parti geçmişi kalıcı olur."
+msgstr ""
+"The cupping score and result are recorded; the batch history is permanent."
+
+#: templates/public/landing.html:148
+msgid "Tazelik penceresine göre eski lotlar öncelikli sevk edilir."
+msgstr "Older lots ship first, based on the freshness window."
+
+#: templates/public/landing.html:152
+msgid "Fatura ve ödeme kaydedilir, kârlılık lot maliyetinden hesaplanır."
+msgstr ""
+"Invoices and payments are recorded and profitability is computed from lot "
+"cost."
+
+#: templates/public/landing.html:161
+msgid "Verinize doğal dille soru sorun"
+msgstr "Ask your data in plain language"
+
+#: templates/public/landing.html:163
+msgid ""
+"RAG ve fonksiyon çağırma ile çalışan asistan veritabanına asla doğrudan "
+"yazmaz;\n"
+"      yalnızca tanımlı ve yetkilendirilmiş fonksiyonları çağırır."
+msgstr ""
+"The assistant runs on RAG and function calling. It never writes to the "
+"database directly —\n"
+"      it can only call defined, authorised functions."
+
+#: templates/public/landing.html:171
+msgid "Tazelik penceresi daralan lotları önceliklendirir."
+msgstr "Prioritises lots whose freshness window is closing."
+
+#: templates/public/landing.html:176
+msgid "Sipariş kalemlerinden gerçek kâr hesabıyla yanıtlar."
+msgstr "Answers with real margin computed from order lines."
+
+#: templates/public/landing.html:181
+msgid "Talep tahminini geçmiş satışlarla birlikte yorumlar."
+msgstr "Reads the demand forecast alongside past sales."
+
+#: templates/public/landing.html:195
+msgid "Sık sorulanlar"
+msgstr "Frequently asked questions"
+
+#: templates/public/landing.html:199
+msgid "Stok neden doğrudan güncellenmiyor?"
+msgstr "Why is stock never updated directly?"
+
+#: templates/public/landing.html:200
+msgid ""
+"Her değişiklik bir stok hareketi olarak eklenir. Böylece bakiye her zaman\n"
+"        hareketlerin toplamıdır ve geçmiş geriye dönük bozulmaz."
+msgstr ""
+"Every change is appended as a stock movement, so the balance is always the "
+"sum of\n"
+"        movements and history is never rewritten."
+
+#: templates/public/landing.html:204
+msgid "Tazelik nasıl hesaplanıyor?"
+msgstr "How is freshness computed?"
+
+#: templates/public/landing.html:205
+msgid ""
+"Lotun son kullanma tarihine kalan gün sayısına göre üç durum üretilir:\n"
+"        normal, öncelikli kullanım ve SKT geçti. Hiçbir alan veritabanında "
+"tutulmaz, anlık hesaplanır."
+msgstr ""
+"Three states are derived from the days left until the lot expires:\n"
+"        normal, use first and expired. Nothing is stored — it is computed on "
+"the fly."
+
+#: templates/public/landing.html:209
+msgid "Rol bazlı erişim var mı?"
+msgstr "Is there role-based access?"
+
+#: templates/public/landing.html:210
+msgid ""
+"Evet. Her modül Django grup izinlerine bağlıdır; yetkisi olmayan kullanıcı\n"
+"        modülü kilitli görür ve doğrudan URL ile de erişemez."
+msgstr ""
+"Yes. Every module is gated by Django group permissions; an unauthorised user "
+"sees it\n"
+"        locked and cannot reach it by URL either."
+
+#: templates/public/landing.html:214
+msgid "AI katmanı veritabanına yazabilir mi?"
+msgstr "Can the AI layer write to the database?"
+
+#: templates/public/landing.html:215
+msgid ""
+"Hayır. Model yalnızca tanımlı fonksiyonları çağırabilir; yazma işlemleri\n"
+"        her zaman uygulamanın kendi servis katmanından geçer."
+msgstr ""
+"No. The model can only call defined functions; every write goes through the\n"
+"        application service layer."
+
+#: templates/public/landing.html:224
+msgid "Demoyu şimdi deneyin"
+msgstr "Try the demo now"
+
+#: templates/public/landing.html:226
+msgid ""
+"Örnek veriyle dolu bir ortam sizi bekliyor — rol bazlı hesaplarla farklı "
+"görünümleri karşılaştırın."
+msgstr ""
+"An environment full of sample data is waiting — compare the views across "
+"role-based accounts."
+
+#: templates/public/landing.html:241
+#, python-format
+msgid "Sürüm %(version)s · Kahve kavurma & dağıtım ERP + AI karar desteği"
+msgstr ""
+"Version %(version)s · Coffee roasting & distribution ERP + AI decision "
+"support"
+
+#: templates/purchasing/_orders_kanban.html:23
+#: templates/sales/_orders_kanban.html:17
+msgid "kalem"
+msgstr "lines"
+
+#: templates/purchasing/_orders_list.html:9
+#: templates/purchasing/order_detail.html:77
+#: templates/purchasing/supplier_detail.html:73
+msgid "Beklenen teslimat"
+msgstr "Expected delivery"
+
+#: templates/purchasing/_orders_list.html:10
+#: templates/purchasing/order_detail.html:65
+#: templates/purchasing/supplier_detail.html:74
+#: templates/sales/_orders_list.html:9 templates/sales/order_detail.html:43
+msgid "Kalem"
+msgstr "Line"
+
+#: templates/purchasing/_orders_list.html:29
+msgid "Teslimat gecikti"
+msgstr "Delivery is overdue"
+
+#: templates/purchasing/_orders_list.html:32
+msgid "Belirtilmedi"
+msgstr "Not set"
+
+#: templates/purchasing/_orders_list.html:39
+msgid "Gösterilecek satın alma siparişi yok"
+msgstr "No purchase orders to show"
+
+#: templates/purchasing/_orders_list.html:40
+msgid "Filtreleri temizleyin ya da ilk siparişinizi oluşturun."
+msgstr "Clear the filters or create your first order."
+
+#: templates/purchasing/_orders_list.html:41
+#: templates/sales/_orders_list.html:26
+msgid "İlk siparişi oluştur"
+msgstr "Create the first order"
+
+#: templates/purchasing/list.html:19
+msgid "Sipariş no, tedarikçi veya not ara"
+msgstr "Search order no, supplier or note"
+
+#: templates/purchasing/list.html:28
+msgid "Geciken teslimat"
+msgstr "Overdue deliveries"
+
+#: templates/purchasing/order_create_form.html:2
+msgid "Yeni Satın Alma Siparişi"
+msgstr "New Purchase Order"
+
+#: templates/purchasing/order_create_form.html:5
+#: templates/sales/order_form.html:3
+msgid "Yeni sipariş"
+msgstr "New order"
+
+#: templates/purchasing/order_create_form.html:22
+#: templates/purchasing/order_form.html:34
+msgid "Yeni satın alma siparişi"
+msgstr "New purchase order"
+
+#: templates/purchasing/order_create_form.html:23
+msgid "Tedarikçiyi seçin, ardından sipariş kalemlerini ekleyin."
+msgstr "Pick a supplier, then add the order lines."
+
+#: templates/purchasing/order_create_form.html:25
+#: templates/purchasing/order_detail.html:71
+#: templates/purchasing/order_form.html:42 templates/sales/order_detail.html:52
+#: templates/sales/order_form.html:21
+msgid "Sipariş bilgileri"
+msgstr "Order details"
+
+#: templates/purchasing/order_create_form.html:32
+msgid "Tedarikçi seçin"
+msgstr "Select a supplier"
+
+#: templates/purchasing/order_create_form.html:39
+msgid "Listede yalnızca aktif tedarikçiler görünür."
+msgstr "Only active suppliers are listed."
+
+#: templates/purchasing/order_create_form.html:40
+msgid "Yeni tedarikçi ekle"
+msgstr "Add a new supplier"
+
+#: templates/purchasing/order_create_form.html:47
+msgid "Hemen tedarikçiye gönder"
+msgstr "Send to supplier immediately"
+
+#: templates/purchasing/order_create_form.html:49
+msgid "Seçilmezse sipariş taslak olarak oluşturulur."
+msgstr "If unchecked the order is created as a draft."
+
+#: templates/purchasing/order_create_form.html:53
+#: templates/sales/order_form.html:43
+msgid "Sipariş kalemleri"
+msgstr "Order lines"
+
+#: templates/purchasing/order_create_form.html:63
+#: templates/purchasing/order_create_form.html:91
+msgid "Önce tedarikçi seçin"
+msgstr "Select a supplier first"
+
+#: templates/purchasing/order_create_form.html:78
+#: templates/purchasing/order_create_form.html:106
+#: templates/sales/order_form.html:75 templates/sales/order_form.html:109
+msgid "Kalemi sil"
+msgstr "Remove line"
+
+#: templates/purchasing/order_create_form.html:113
+#: templates/purchasing/order_item_form.html:7
+#: templates/sales/order_form.html:116
+msgid "Kalem ekle"
+msgstr "Add a line"
+
+#: templates/purchasing/order_create_form.html:119
+msgid ""
+"Lot ve teslim alınan miktar, sipariş gönderildikten sonra teslim alma "
+"adımında kaydedilir."
+msgstr ""
+"Lot and received quantity are recorded at the receipt step after the order "
+"is sent."
+
+#: templates/purchasing/order_detail.html:17
+msgid "Tedarikçiye Gönder"
+msgstr "Send to Supplier"
+
+#: templates/purchasing/order_detail.html:19
+msgid "Teyit Edildi"
+msgstr "Mark Confirmed"
+
+#: templates/purchasing/order_detail.html:27
+#: templates/purchasing/order_item_form.html:2
+msgid "Kalem Ekle"
+msgstr "Add Line"
+
+#: templates/purchasing/order_detail.html:37
+msgid "Bu siparişi iptal etmek istiyor musunuz?"
+msgstr "Do you want to cancel this order?"
+
+#: templates/purchasing/order_detail.html:44
+msgid "Taslak siparişi silmek istediğinize emin misiniz?"
+msgstr "Are you sure you want to delete this draft order?"
+
+#: templates/purchasing/order_detail.html:66
+msgid "Teslim alma"
+msgstr "Receipts"
+
+#: templates/purchasing/order_detail.html:67
+#: templates/purchasing/supplier_detail.html:52
+msgid "Sipariş toplamı"
+msgstr "Order total"
+
+#: templates/purchasing/order_detail.html:84
+msgid "Sipariş notu"
+msgstr "Order note"
+
+#: templates/purchasing/order_detail.html:90
+#: templates/sales/order_detail.html:62
+msgid "Kalemler"
+msgstr "Lines"
+
+#: templates/purchasing/order_detail.html:99
+msgid "Teslim alınan"
+msgstr "Received"
+
+#: templates/purchasing/order_detail.html:103
+msgid "İlerleme"
+msgstr "Progress"
+
+#: templates/purchasing/order_detail.html:132
+msgid "Bu sipariş kalemini silmek istiyor musunuz?"
+msgstr "Do you want to delete this order line?"
+
+#: templates/purchasing/order_detail.html:153
+msgid "Teslim al"
+msgstr "Receive"
+
+#: templates/purchasing/order_detail.html:162
+msgid "Henüz sipariş kalemi eklenmedi"
+msgstr "No order lines added yet"
+
+#: templates/purchasing/order_detail.html:163
+msgid "İlk kalemi ekle"
+msgstr "Add the first line"
+
+#: templates/purchasing/order_detail.html:186
+msgid "Teslim Almalar"
+msgstr "Receipts"
+
+#: templates/purchasing/order_detail.html:198
+msgid "Teslim alma zamanı"
+msgstr "Received at"
+
+#: templates/purchasing/order_detail.html:212
+msgid "Henüz teslim alma kaydı yok"
+msgstr "No receipts recorded yet"
+
+#: templates/purchasing/order_form.html:2
+#: templates/purchasing/supplier_detail.html:9
+#: templates/sales/order_form.html:2
+msgid "Yeni Sipariş"
+msgstr "New Order"
+
+#: templates/purchasing/order_form.html:34
+msgid "Taslak siparişi düzenle"
+msgstr "Edit the draft order"
+
+#: templates/purchasing/order_form.html:39
+msgid ""
+"Sipariş taslak olarak oluşturulur. Kalemleri ekledikten sonra tedarikçiye "
+"gönderirsiniz."
+msgstr ""
+"The order is created as a draft. Send it to the supplier once the lines are "
+"added."
+
+#: templates/purchasing/order_item_form.html:2
+msgid "Kalem Düzenle"
+msgstr "Edit Line"
+
+#: templates/purchasing/order_item_form.html:7
+msgid "Kalem düzenle"
+msgstr "Edit line"
+
+#: templates/purchasing/order_item_form.html:26
+msgid "Sipariş kalemini düzenle"
+msgstr "Edit the order line"
+
+#: templates/purchasing/order_item_form.html:26
+msgid "Sipariş kalemi ekle"
+msgstr "Add an order line"
+
+#: templates/purchasing/order_item_form.html:36
+msgid "Bu tedarikçiye ait ürün kataloğu boş. Önce bir ürün ekleyin."
+msgstr "This supplier has no product catalogue yet. Add a product first."
+
+#: templates/purchasing/order_item_form.html:38
+msgid "Tedarikçi ürünü ekle"
+msgstr "Add a supplier product"
+
+#: templates/purchasing/order_item_form.html:45
+msgid "Kalem bilgileri"
+msgstr "Line details"
+
+#: templates/purchasing/supplier_detail.html:16
+msgid "Ürün Ekle"
+msgstr "Add Product"
+
+#: templates/purchasing/supplier_detail.html:29
+#, python-format
+msgid "%(name)s tedarikçisini silmek istediğinize emin misiniz?"
+msgstr "Are you sure you want to delete the supplier %(name)s?"
+
+#: templates/purchasing/supplier_detail.html:43
+#, python-format
+msgid "%(date)s tarihinde kaydedildi"
+msgstr "Registered on %(date)s"
+
+#: templates/purchasing/supplier_detail.html:49
+msgid "Toplam sipariş"
+msgstr "Total orders"
+
+#: templates/purchasing/supplier_detail.html:51
+msgid "Katalog ürünü"
+msgstr "Catalogue products"
+
+#: templates/purchasing/supplier_detail.html:88
+msgid "Bu tedarikçiye ait sipariş yok"
+msgstr "No orders for this supplier"
+
+#: templates/purchasing/supplier_detail.html:96
+msgid "Ürün Kataloğu"
+msgstr "Product Catalogue"
+
+#: templates/purchasing/supplier_detail.html:104
+msgid "Birim"
+msgstr "Unit"
+
+#: templates/purchasing/supplier_detail.html:120
+#, python-format
+msgid "%(name)s ürününü silmek istiyor musunuz?"
+msgstr "Do you want to delete the product %(name)s?"
+
+#: templates/purchasing/supplier_detail.html:126
+msgid "Katalog boş"
+msgstr "The catalogue is empty"
+
+#: templates/purchasing/supplier_detail.html:127
+msgid "Sipariş kalemi ekleyebilmek için önce ürün tanımlayın."
+msgstr "Define a product before adding order lines."
+
+#: templates/purchasing/supplier_detail.html:128
+#: templates/purchasing/supplier_product_form.html:6
+msgid "Ürün ekle"
+msgstr "Add a product"
+
+#: templates/purchasing/supplier_form.html:2
+msgid "Yeni Tedarikçi"
+msgstr "New Supplier"
+
+#: templates/purchasing/supplier_form.html:34
+msgid "Yeni tedarikçi"
+msgstr "New supplier"
+
+#: templates/purchasing/supplier_form.html:36
+msgid "Kayıttan sonra ürün kataloğunu ve siparişleri yönetebilirsiniz."
+msgstr "Once saved you can manage the product catalogue and orders."
+
+#: templates/purchasing/supplier_list.html:18
+msgid "Tedarikçi, e-posta veya telefon ara"
+msgstr "Search supplier, email or phone"
+
+#: templates/purchasing/supplier_list.html:25
+msgid "Toplam tedarikçi"
+msgstr "Total suppliers"
+
+#: templates/purchasing/supplier_list.html:26
+msgid "Aktif tedarikçi"
+msgstr "Active suppliers"
+
+#: templates/purchasing/supplier_list.html:61
+msgid "Gösterilecek tedarikçi yok"
+msgstr "No suppliers to show"
+
+#: templates/purchasing/supplier_list.html:62
+msgid "İlk tedarikçiyi ekle"
+msgstr "Add the first supplier"
+
+#: templates/purchasing/supplier_product_form.html:2
+msgid "Yeni Ürün"
+msgstr "New Product"
+
+#: templates/purchasing/supplier_product_form.html:6
+msgid "Ürünü düzenle"
+msgstr "Edit product"
+
+#: templates/purchasing/supplier_product_form.html:26
+msgid "Katalog ürününü düzenle"
+msgstr "Edit catalogue product"
+
+#: templates/purchasing/supplier_product_form.html:26
+msgid "Kataloğa ürün ekle"
+msgstr "Add a product to the catalogue"
+
+#: templates/purchasing/supplier_product_form.html:30
+msgid "Ürün bilgileri"
+msgstr "Product details"
+
+#: templates/registration/login.html:2
+msgid "Giriş"
+msgstr "Sign in"
+
+#: templates/registration/login.html:13
+msgid ""
+"Tedarik, kavurma, satış ve finansı aynı kayıt defterinde birleştirin; "
+"kararları AI ile destekleyin."
+msgstr ""
+"Bring sourcing, roasting, sales and finance onto one ledger, and back your "
+"decisions with AI."
+
+#: templates/registration/login.html:19
+msgid "Lot bazlı tazelik takibi"
+msgstr "Lot-level freshness tracking"
+
+#: templates/registration/login.html:20
+msgid "Kavurma sonrası tazelik penceresini kaçırmayın."
+msgstr "Never miss the post-roast freshness window."
+
+#: templates/registration/login.html:26
+msgid "Reçete tabanlı üretim"
+msgstr "Recipe-driven production"
+
+#: templates/registration/login.html:27
+msgid "Harman oranları stok hareketlerine otomatik yansır."
+msgstr "Blend ratios flow straight into stock movements."
+
+#: templates/registration/login.html:33
+msgid "Gerçek kârlılık"
+msgstr "Real profitability"
+
+#: templates/registration/login.html:34
+msgid "Lot maliyetinden sipariş kârına kadar izlenebilir."
+msgstr "Traceable from lot cost to order margin."
+
+#: templates/registration/login.html:40
+msgid "AI karar desteği"
+msgstr "AI decision support"
+
+#: templates/registration/login.html:41
+msgid "Verilerinize doğal dille soru sorun."
+msgstr "Ask your data questions in plain language."
+
+#: templates/registration/login.html:64
+msgid "Giriş yapın"
+msgstr "Sign in"
+
+#: templates/registration/login.html:65
+msgid "Hesabınızla devam edin."
+msgstr "Continue with your account."
+
+#: templates/registration/login.html:70
+msgid "Kullanıcı adı veya şifre hatalı."
+msgstr "Incorrect username or password."
+
+#: templates/registration/login.html:79
+msgid "Kullanıcı adı"
+msgstr "Username"
+
+#: templates/registration/login.html:88
+msgid "Şifre"
+msgstr "Password"
+
+#: templates/registration/login.html:94
+msgid "Şifreyi göster"
+msgstr "Show password"
+
+#: templates/registration/login.html:106
+msgid "Demo hesapları"
+msgstr "Demo accounts"
+
+#: templates/registration/login.html:108
+msgid "Satın alma"
+msgstr "Purchasing"
+
+#: templates/registration/login.html:109
+msgid "Satış &amp; CRM"
+msgstr "Sales &amp; CRM"
+
+#: templates/registration/login.html:110
+msgid "Üretim &amp; stok"
+msgstr "Production &amp; stock"
+
+#: templates/registration/login.html:111
+msgid "İK"
+msgstr "HR"
+
+#: templates/registration/login.html:112
+msgid "Rol şifresi"
+msgstr "Role password"
+
+#: templates/registration/login.html:116
+msgid "Tanıtım sayfasına dön"
+msgstr "Back to the landing page"
+
+#: templates/sales/_orders_list.html:25
+msgid "Gösterilecek sipariş yok"
+msgstr "No orders to show"
+
+#: templates/sales/customer_detail.html:7
+msgid "CRM Kartı"
+msgstr "CRM Card"
+
+#: templates/sales/customer_list.html:16
+msgid "Toptan müşteri"
+msgstr "Wholesale customers"
+
+#: templates/sales/forecast.html:7
+msgid "Tahmin edilen ürün"
+msgstr "Forecasted products"
+
+#: templates/sales/forecast.html:8
+msgid "Stok yetersiz"
+msgstr "Stock insufficient"
+
+#: templates/sales/forecast.html:12
+msgid "Tahmini talep ve mevcut stok"
+msgstr "Forecasted demand vs current stock"
+
+#: templates/sales/forecast.html:20
+msgid "Geçmiş satış"
+msgstr "Past sales"
+
+#: templates/sales/forecast.html:21
+msgid "Günlük ortalama"
+msgstr "Daily average"
+
+#: templates/sales/forecast.html:37
+msgid "Yeterli"
+msgstr "Sufficient"
+
+#: templates/sales/forecast.html:39
+msgid "Yetersiz"
+msgstr "Insufficient"
+
+#: templates/sales/forecast.html:44
+msgid "Tahmin için yeterli satış geçmişi yok"
+msgstr "Not enough sales history to forecast"
+
+#: templates/sales/forecast.html:45
+msgid "Karşılanmış siparişler oluştukça tahmin üretilir."
+msgstr "Forecasts appear as orders get fulfilled."
+
+#: templates/sales/list.html:19
+msgid "Sipariş no veya müşteri ara"
+msgstr "Search order no or customer"
+
+#: templates/sales/order_detail.html:12
+msgid "Faturayı Görüntüle"
+msgstr "View Invoice"
+
+#: templates/sales/order_detail.html:18
+msgid "Fatura Oluştur"
+msgstr "Create Invoice"
+
+#: templates/sales/order_detail.html:58
+msgid "Karşılanma"
+msgstr "Fulfilled at"
+
+#: templates/sales/order_detail.html:73 templates/sales/order_detail.html:96
+msgid "İade"
+msgstr "Return"
+
+#: templates/sales/order_detail.html:87
+msgid "İade sebebi"
+msgstr "Return reason"
+
+#: templates/sales/order_detail.html:94
+msgid "İade miktarı"
+msgstr "Return quantity"
+
+#: templates/sales/order_detail.html:102
+msgid "Bu siparişte kalem yok"
+msgstr "No lines on this order"
+
+#: templates/sales/order_form.html:18
+msgid "Yeni satış siparişi"
+msgstr "New sales order"
+
+#: templates/sales/order_form.html:19
+msgid "Müşteriyi seçin, ardından satılacak lotları ekleyin."
+msgstr "Pick a customer, then add the lots to sell."
+
+#: templates/sales/order_form.html:28
+msgid "Müşteri seçin"
+msgstr "Select a customer"
+
+#: templates/sales/order_form.html:37
+msgid "Hemen karşıla"
+msgstr "Fulfil immediately"
+
+#: templates/sales/order_form.html:39
+msgid "Seçilirse stok hareketleri anında oluşur."
+msgstr "If checked, stock movements are created immediately."
+
+#: templates/sales/order_form.html:60 templates/sales/order_form.html:94
+msgid "Lot seçin"
+msgstr "Select a lot"
+
+#: templates/sales/return_list.html:13
+msgid "İade ara"
+msgstr "Search returns"
+
+#: templates/sales/return_list.html:20
+msgid "Bekleyen iade"
+msgstr "Pending returns"
+
+#: templates/sales/return_list.html:31
+msgid "Sebep"
+msgstr "Reason"
+
+#: templates/sales/return_list.html:33
+msgid "Talep"
+msgstr "Requested"
+
+#: templates/sales/return_list.html:57
+msgid "Bu iade talebini reddetmek istiyor musunuz?"
+msgstr "Do you want to reject this return request?"
+
+#: templates/sales/return_list.html:64
+msgid "İade talebi yok"
+msgstr "No return requests"
+
+#: templates/ui/_chatter.html:2
+msgid "Kayıt Geçmişi"
+msgstr "Record History"
+
+#: templates/ui/_chatter.html:20
+msgid "Bu kayıt için henüz bir işlem geçmişi yok."
+msgstr "No activity has been logged for this record yet."
+
+#: templates/ui/_searchbar.html:12
+msgid "Filtreyi kaldır"
+msgstr "Remove filter"
+
+#: templates/ui/_searchbar.html:23
+msgid "Filtre ve gruplama"
+msgstr "Filters and grouping"
+
+#: templates/ui/_searchbar.html:29
+msgid "Filtreler"
+msgstr "Filters"
+
+#: templates/ui/_searchbar.html:32
+msgid "Tümü"
+msgstr "All"
+
+#: templates/ui/_searchbar.html:48
+msgid "Gruplama yok"
+msgstr "No grouping"
+
+#: templates/ui/_searchbar.html:59
+msgid "Yakında"
+msgstr "Coming soon"
+
+#: templates/ui/_searchbar.html:60
+msgid "Favoriler"
+msgstr "Favorites"
+
+#: templates/ui/_searchbar.html:61
+msgid "Kayıtlı arama yakında"
+msgstr "Saved searches coming soon"
+
+#: templates/ui/shell/_appbar.html:4
+msgid "Uygulamalar"
+msgstr "Apps"
+
+#: templates/ui/shell/_appbar.html:17
+msgid "Modül menüsü"
+msgstr "Module menu"
+
+#: templates/ui/shell/_appbar.html:24
+msgid "Diğer menüler"
+msgstr "More menus"
+
+#: templates/ui/shell/_appbar.html:35
+msgid "Dil"
+msgstr "Language"
+
+#: templates/ui/shell/_appbar.html:41
+msgid "Tema"
+msgstr "Theme"
+
+#: templates/ui/shell/_appbar.html:74
+msgid "Çıkış Yap"
+msgstr "Log out"
+
+#: templates/ui/shell/_apps_overlay.html:5
+msgid "Uygulama ara…"
+msgstr "Search apps…"
+
+#: templates/ui/shell/_apps_overlay.html:5
+msgid "Uygulama ara"
+msgstr "Search apps"

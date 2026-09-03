@@ -17,4 +17,6 @@ urlpatterns = [
     path('sales/<int:pk>/advance/', views.opportunity_advance_view, name='opportunity-advance'),
     path('sales/<int:pk>/lose/', views.opportunity_lose_view, name='opportunity-lose'),
     path('sales/<int:pk>/activity/', views.sale_activity, name='crm-sale-activity'),
+    path('sales/<int:pk>/set-stage/', views.opportunity_set_stage_view,
+         name='opportunity-set-stage'),
 ]

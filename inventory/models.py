@@ -3,6 +3,7 @@ from decimal import Decimal
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 class Warehouse(models.Model):
     name = models.CharField(max_length=255)
@@ -16,9 +17,9 @@ class Warehouse(models.Model):
         return self.name
 class Business(models.Model):
     class BusinessType(models.TextChoices):
-        SUPPLIER = 'supplier', 'Tedarikçi'
-        WHOLESALE_CUSTOMER = 'wholesale_customer', 'Toptan müşteri (kafe)'
-        INTERNAL = 'internal', 'İç işletme'
+        SUPPLIER = 'supplier', _('Tedarikçi')
+        WHOLESALE_CUSTOMER = 'wholesale_customer', _('Toptan müşteri (kafe)')
+        INTERNAL = 'internal', _('İç işletme')
 
     name = models.CharField(max_length=255)
     business_type = models.CharField(max_length=30, choices=BusinessType.choices)
@@ -38,9 +39,9 @@ class Business(models.Model):
 
 class Product(models.Model):
     class Unit(models.TextChoices):
-        PIECE = 'piece', 'Adet'
-        KILOGRAM = 'kg', 'Kg'
-        LITER = 'liter', 'Litre'
+        PIECE = 'piece', _('Adet')
+        KILOGRAM = 'kg', _('Kg')
+        LITER = 'liter', _('Litre')
 
     name = models.CharField(max_length=255)
     category = models.CharField(max_length=100)
@@ -111,10 +112,10 @@ class Lot(models.Model):
 
 # NOT: Bilerek MODUL seviyesinde (nested class scoping sorununu hatirla).
 class MovementType(models.TextChoices):
-    IN = 'IN', 'Stock in'
-    OUT_PRODUCTION = 'OUT_PRODUCTION', 'Used in production'
-    OUT_SALE = 'OUT_SALE', 'Sale out'
-    WASTE = 'WASTE', 'Waste'
+    IN = 'IN', _('Stok girişi')
+    OUT_PRODUCTION = 'OUT_PRODUCTION', _('Üretimde kullanıldı')
+    OUT_SALE = 'OUT_SALE', _('Satış sevkiyatı')
+    WASTE = 'WASTE', _('İmha / zayi')
 
 
 class StockMovement(models.Model):

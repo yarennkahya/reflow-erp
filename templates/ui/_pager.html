@@ -1,0 +1,13 @@
+{% if page_obj and page_obj.paginator.num_pages > 1 %}
+<div class="o-pager">
+  <span class="o-pager-value">{{ page_obj.start_index }}-{{ page_obj.end_index }}</span>
+  <span class="o-pager-sep">/</span>
+  <span class="o-pager-total">{{ page_obj.paginator.count }}</span>
+  <a class="o-pager-btn{% if not page_obj.has_previous %} o-disabled{% endif %}"
+     {% if page_obj.has_previous %}href="?{{ base_qs }}{% if base_qs %}&{% endif %}page={{ page_obj.previous_page_number }}"{% endif %}
+     aria-label="Önceki"><i class="bi bi-chevron-left"></i></a>
+  <a class="o-pager-btn{% if not page_obj.has_next %} o-disabled{% endif %}"
+     {% if page_obj.has_next %}href="?{{ base_qs }}{% if base_qs %}&{% endif %}page={{ page_obj.next_page_number }}"{% endif %}
+     aria-label="Sonraki"><i class="bi bi-chevron-right"></i></a>
+</div>
+{% endif %}

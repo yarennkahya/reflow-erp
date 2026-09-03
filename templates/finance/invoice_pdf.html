@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<style>
+  @page {
+    size: A4;
+    margin: 18mm 18mm 22mm 18mm;
+    @bottom-center {
+      content: "{{ invoice.invoice_number }} · Sayfa " counter(page) " / " counter(pages);
+      font-family: Liberation Sans, Arial, sans-serif;
+      font-size: 8pt;
+      color: #999;
+    }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: Liberation Sans, Arial, sans-serif;
+    font-size: 9pt;
+    color: #1a1209;
+    background: #fff;
+    line-height: 1.45;
+  }
+
+  /* ── HEADER ── */
+  .inv-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 10mm;
+    border-bottom: 2px solid #6B4632;
+    margin-bottom: 8mm;
+  }
+  .inv-brand { color: #6B4632; }
+  .inv-brand-name { font-size: 18pt; font-weight: 700; letter-spacing: -0.5px; }
+  .inv-brand-sub  { font-size: 8pt; color: #8a6a56; margin-top: 2px; }
+
+  .inv-meta { text-align: right; }
+  .inv-label { font-size: 7pt; text-transform: uppercase; letter-spacing: 0.8px; color: #8a6a56; }
+  .inv-number { font-size: 16pt; font-weight: 700; color: #3A2A20; font-family: monospace; }
+  .inv-date   { font-size: 8.5pt; color: #555; margin-top: 3px; }
+
+  /* ── PARTIES ── */
+  .inv-parties {
+    display: flex;
+    gap: 12mm;
+    margin-bottom: 8mm;
+  }
+  .inv-party { flex: 1; }
+  .inv-party-title {
+    font-size: 7pt;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #8a6a56;
+    border-bottom: 1px solid #e3ddd6;
+    padding-bottom: 2px;
+    margin-bottom: 4px;
+  }
+  .inv-party-name { font-size: 11pt; font-weight: 700; color: #1a1209; }
+  .inv-party-detail { font-size: 8.5pt; color: #666; margin-top: 2px; }
+
+  /* ── STATUS PILL ── */
+  .inv-status {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 7.5pt;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .inv-status--unpaid         { background: #fff3cd; color: #856404; }
+  .inv-status--partially_paid { background: #cff4fc; color: #055160; }
+  .inv-status--paid           { background: #d1e7dd; color: #0a3622; }
+
+  /* ── TABLE ── */
+  .inv-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 6mm;
+  }
+  .inv-table thead tr {
+    background: #3A2A20;
+    color: #f5ece5;
+  }
+  .inv-table thead th {
+    padding: 4px 8px;
+    font-size: 8pt;
+    font-weight: 600;
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .inv-table thead th.r { text-align: right; }
+  .inv-table tbody tr { border-bottom: 1px solid #ede8e2; }
+  .inv-table tbody tr:last-child { border-bottom: none; }
+  .inv-table tbody td {
+    padding: 5px 8px;
+    font-size: 9pt;
+  }
+  .inv-table tbody td.r { text-align: right; }
+  .inv-table tbody td.bold { font-weight: 700; }
+  .inv-table tfoot tr { border-top: 2px solid #6B4632; background: #faf7f4; }
+  .inv-table tfoot td {
+    padding: 5px 8px;
+    font-size: 9pt;
+    font-weight: 700;
+    text-align: right;
+  }
+
+  /* ── TOTALS ── */
+  .inv-totals {
+    width: 72mm;
+    margin-left: auto;
+    margin-bottom: 8mm;
+  }
+  .inv-totals table { width: 100%; border-collapse: collapse; }
+  .inv-totals td { padding: 3px 6px; font-size: 9pt; }
+  .inv-totals td:last-child { text-align: right; font-weight: 600; }
+  .inv-total-row { border-top: 2px solid #6B4632; background: #faf7f4; }
+  .inv-total-row td { font-size: 10.5pt; font-weight: 700; padding: 5px 6px; }
+  .inv-paid-row td  { color: #0a6640; }
+  .inv-due-row  { background: #fff8f4; }
+  .inv-due-row td   { color: #6B4632; font-size: 10pt; font-weight: 700; }
+
+  /* ── PAYMENTS ── */
+  .inv-payments-title {
+    font-size: 7pt;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #8a6a56;
+    border-bottom: 1px solid #e3ddd6;
+    padding-bottom: 2px;
+    margin-bottom: 4px;
+    margin-top: 6mm;
+  }
+  .inv-payments table { width: 100%; border-collapse: collapse; font-size: 8.5pt; }
+  .inv-payments th { text-align: left; color: #8a6a56; font-size: 7.5pt; padding: 2px 6px; }
+  .inv-payments td { padding: 3px 6px; border-bottom: 1px solid #f0ebe4; }
+  .inv-payments td.r { text-align: right; }
+
+  /* ── FOOTER ── */
+  .inv-footer {
+    margin-top: 10mm;
+    padding-top: 4mm;
+    border-top: 1px solid #e3ddd6;
+    font-size: 7.5pt;
+    color: #999;
+    display: flex;
+    justify-content: space-between;
+  }
+  .inv-footer a { color: #C87941; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="inv-header">
+  <div class="inv-brand">
+    <div class="inv-brand-name">Reflow Coffee</div>
+    <div class="inv-brand-sub">Kahve Kavurma &amp; Dağıtım</div>
+  </div>
+  <div class="inv-meta">
+    <div class="inv-label">Fatura No</div>
+    <div class="inv-number">{{ invoice.invoice_number }}</div>
+    <div class="inv-date">
+      Düzenlenme: {{ invoice.issued_at|date:"d M Y" }}<br>
+      {% if invoice.due_date %}Vade: {{ invoice.due_date|date:"d M Y" }}{% endif %}
+    </div>
+    <div style="margin-top:4px">
+      {% if invoice.status == 'paid' %}
+        <span class="inv-status inv-status--paid">Ödendi</span>
+      {% elif invoice.status == 'partially_paid' %}
+        <span class="inv-status inv-status--partially_paid">Kısmen Ödendi</span>
+      {% else %}
+        <span class="inv-status inv-status--unpaid">Ödenmedi</span>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- PARTIES -->
+<div class="inv-parties">
+  <div class="inv-party">
+    <div class="inv-party-title">Gönderen</div>
+    <div class="inv-party-name">Reflow Coffee</div>
+    <div class="inv-party-detail">Kahve Kavurma &amp; Dağıtım</div>
+  </div>
+  <div class="inv-party">
+    <div class="inv-party-title">Alıcı</div>
+    <div class="inv-party-name">{{ invoice.order.customer.name }}</div>
+    {% if invoice.order.customer.contact_email %}
+      <div class="inv-party-detail">{{ invoice.order.customer.contact_email }}</div>
+    {% endif %}
+    {% if invoice.order.customer.contact_phone %}
+      <div class="inv-party-detail">{{ invoice.order.customer.contact_phone }}</div>
+    {% endif %}
+    <div class="inv-party-detail" style="margin-top:3px;color:#8a6a56;">
+      Sipariş #{{ invoice.order_id }}
+    </div>
+  </div>
+</div>
+
+<!-- LINE ITEMS -->
+<table class="inv-table">
+  <thead>
+    <tr>
+      <th style="width:45%">Ürün</th>
+      <th class="r" style="width:18%">Miktar</th>
+      <th class="r" style="width:18%">Birim Fiyat</th>
+      <th class="r" style="width:19%">Tutar</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in invoice.order.items.all %}
+    <tr>
+      <td class="bold">{{ item.product.name }}</td>
+      <td class="r">{{ item.quantity }} {{ item.product.get_unit_display }}</td>
+      <td class="r">₺{{ item.unit_price }}</td>
+      <td class="r bold">₺{{ item.line_total }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- TOTALS -->
+<div class="inv-totals">
+  <table>
+    <tr>
+      <td>Ara Toplam</td>
+      <td>₺{{ invoice.total_amount }}</td>
+    </tr>
+    {% if invoice.total_paid %}
+    <tr class="inv-paid-row">
+      <td>Ödenen</td>
+      <td>₺{{ invoice.total_paid }}</td>
+    </tr>
+    {% endif %}
+    <tr class="inv-due-row">
+      <td>Kalan Bakiye</td>
+      <td>₺{{ invoice.balance_due }}</td>
+    </tr>
+    <tr class="inv-total-row">
+      <td>TOPLAM</td>
+      <td>₺{{ invoice.total_amount }}</td>
+    </tr>
+  </table>
+</div>
+
+<!-- PAYMENT HISTORY -->
+{% if invoice.payments.all %}
+<div class="inv-payments">
+  <div class="inv-payments-title">Ödeme Geçmişi</div>
+  <table>
+    <thead>
+      <tr>
+        <th>Yöntem</th>
+        <th>Tarih</th>
+        <th class="r">Tutar</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in invoice.payments.all %}
+      <tr>
+        <td>{{ p.get_method_display }}</td>
+        <td>{{ p.paid_at|date:"d M Y, H:i" }}</td>
+        <td class="r">₺{{ p.amount }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<!-- FOOTER -->
+<div class="inv-footer">
+  <span>Bu belge elektronik olarak oluşturulmuştur.</span>
+  <span>{{ invoice.invoice_number }} · {{ invoice.issued_at|date:"d M Y" }}</span>
+</div>
+
+</body>
+</html>

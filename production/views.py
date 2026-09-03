@@ -4,21 +4,49 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils.translation import gettext_lazy as _
 from django.utils.dateparse import parse_date
 
+from dashboard.grouping import group_by_choice
+from dashboard.views_helpers import paginate, pick_view
 from inventory.models import Lot, Product
 
 from .forms import QualityCheckForm, RecipeForm
-from .models import Recipe, RecipeComponent, RoastBatch
+from .models import QualityCheck, Recipe, RecipeComponent, RoastBatch
 from .services import create_roast_batch, perform_quality_check
 
 
 @login_required
 def batch_list(request):
-    batches = RoastBatch.objects.select_related(
-        'recipe', 'output_lot__product', 'output_lot__warehouse'
-    ).order_by('-roasted_at')
-    return render(request, 'production/list.html', {'batches': batches})
+    batches = list(
+        RoastBatch.objects.select_related(
+            'recipe', 'output_lot__product', 'output_lot__warehouse', 'quality_check',
+        ).order_by('-roasted_at')
+    )
+
+    view = pick_view(request, ('list', 'kanban'))
+    page_obj = paginate(request, batches) if view == 'list' else None
+
+    # Kalite kontrolü henüz yapılmamış partiler için sentetik bir kolon.
+    qc_choices = list(QualityCheck.Result.choices) + [('pending', _('Kalite kontrolü bekliyor'))]
+
+    def qc_key(batch):
+        check = getattr(batch, 'quality_check', None)
+        return check.result if check else 'pending'
+
+    return render(request, 'production/list.html', {
+        'view': view,
+        'view_template': f'production/_batches_{view}.html',
+        'page_obj': page_obj,
+        'batches': list(page_obj) if page_obj is not None else batches,
+        'columns': (
+            group_by_choice(batches, 'quality', qc_choices, key=qc_key)
+            if view == 'kanban' else None
+        ),
+        'batch_count': len(batches),
+        'pending_qc': sum(1 for b in batches if qc_key(b) == 'pending'),
+        'recipe_count': Recipe.objects.count(),
+    })
 
 
 @login_required
@@ -26,7 +54,12 @@ def recipe_list_view(request):
     recipes = Recipe.objects.prefetch_related(
         'components__input_product'
     ).select_related('output_product').order_by('name')
-    return render(request, 'production/recipe_list.html', {'recipes': recipes})
+    page_obj = paginate(request, list(recipes))
+    return render(request, 'production/recipe_list.html', {
+        'page_obj': page_obj,
+        'recipes': page_obj,
+        'recipe_count': Recipe.objects.count(),
+    })
 
 
 @login_required
@@ -69,6 +102,9 @@ def batch_detail_view(request, pk):
     return render(request, 'production/batch_detail.html', {
         'batch': batch,
         'quality_check': quality_check,
+        # AuditLog kaydı partiye değil QualityCheck'e bağlı; chatter'ın
+        # bulabilmesi için ilişkili nesneyi ayrıca veriyoruz.
+        'quality_check_list': [quality_check] if quality_check else [],
         'quality_check_form': quality_check_form,
     })
 

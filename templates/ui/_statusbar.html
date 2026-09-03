@@ -1,0 +1,10 @@
+{% if steps %}
+<ol class="o-statusbar" aria-label="Durum">
+  {% for step in steps %}
+    <li class="o-statusbar-step{% if step.is_current %} o-current{% elif step.is_done %} o-done{% endif %}"
+        {% if step.is_current %}aria-current="step"{% endif %}>
+      <span class="o-statusbar-label">{{ step.label }}</span>
+    </li>
+  {% endfor %}
+</ol>
+{% endif %}

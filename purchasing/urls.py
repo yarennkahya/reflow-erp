@@ -22,4 +22,6 @@ urlpatterns = [
     path('suppliers/<int:pk>/products/new/', views.supplier_product_create, name='supplier-product-create'),
     path('suppliers/<int:pk>/products/<int:product_pk>/edit/', views.supplier_product_edit, name='supplier-product-edit'),
     path('suppliers/<int:pk>/products/<int:product_pk>/delete/', views.supplier_product_delete, name='supplier-product-delete'),
+    path('orders/<int:pk>/set-status/', views.purchase_order_set_status_view,
+         name='purchase-order-set-status'),
 ]

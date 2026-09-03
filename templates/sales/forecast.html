@@ -1,74 +1,59 @@
 {% extends 'base.html' %}
-{% block title %}Talep Tahmini — Reflow Coffee ERP{% endblock %}
-{% block nav_sales %}active{% endblock %}
-{% block nav_sales_forecast %}active{% endblock %}
-{% block page_title %}Satış{% endblock %}
-
-{% block extra_head %}
-<style>
-  .data-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:10px; overflow:hidden; }
-  .data-card .table { margin-bottom:0; font-size:13.5px; }
-  .data-card .table thead th { background:var(--g-n-50); color:var(--g-text-2); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.7px; border-bottom:1px solid var(--g-border); padding:10px 16px; white-space:nowrap; }
-  .data-card .table tbody td { padding:11px 16px; vertical-align:middle; color:var(--g-text); border-color:var(--g-border-sub); }
-  .data-card .table tbody tr:last-child td { border-bottom:none; }
-  .data-card .table tbody tr:hover { background:var(--g-n-50); }
-  .empty-state { padding:48px 24px; text-align:center; color:var(--g-text-3); }
-  .empty-state i { font-size:36px; display:block; margin-bottom:8px; }
-</style>
-{% endblock %}
+{% block title %}{% translate "Talep Tahmini" %}{% endblock %}
+{% block cp_views %}{% ui_view_switcher "list,graph" current=view %}{% endblock %}
 
 {% block content %}
-<div class="mb-4">
-  <div class="btn-group btn-group-sm" role="group">
-    <a href="/sales/" class="btn btn-outline-primary">Siparişler</a>
-    <a href="/sales/customers/" class="btn btn-outline-primary">Müşteriler</a>
-    <a href="/sales/forecast/" class="btn btn-primary">Talep Tahmini</a>
-    <a href="/sales/returns/" class="btn btn-outline-primary">İadeler</a>
+  <div class="o-button-box o-po-kpis">
+    {% translate "Tahmin edilen ürün" as l1 %}{% ui_stat value=forecasts|length label=l1 icon="bi-graph-up-arrow" %}
+    {% translate "Stok yetersiz" as l2 %}{% ui_stat value=insufficient label=l2 icon="bi-exclamation-triangle" variant="danger" %}
   </div>
-</div>
 
-<div class="d-flex align-items-baseline gap-3 mb-4">
-  <h4 class="fw-bold mb-0 text-dark"><i class="bi bi-graph-up me-2" style="color:#6366f1;"></i>Talep Tahmini</h4>
-  <span class="text-muted" style="font-size:13px;">Son 90 günlük satış hızına göre 30 günlük projeksiyon</span>
-</div>
+  {% if view == 'graph' and chart %}
+    {% translate "Tahmini talep ve mevcut stok" as gt %}
+    {% ui_graph "sales-forecast" chart type="bar" height=340 title=gt %}
+  {% else %}
+    <div class="o-list"><div class="o-list-scroll">
+      <table class="o-table">
+        <thead>
+          <tr>
+            <th>{% translate "Ürün" %}</th>
+            <th class="o-num">{% translate "Geçmiş satış" %}</th>
+            <th class="o-num">{% translate "Günlük ortalama" %}</th>
+            <th class="o-num">{% translate "Tahmini talep" %}</th>
+            <th class="o-num">{% translate "Mevcut stok" %}</th>
+            <th>{% translate "Durum" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for f in forecasts %}
+            <tr>
+              <td class="o-strong">{{ f.product }}</td>
+              <td class="o-num">{{ f.total_sold_in_lookback|qty }}</td>
+              <td class="o-num">{{ f.daily_average_sales|floatformat:2 }}</td>
+              <td class="o-num o-strong">{{ f.forecasted_demand|qty }}</td>
+              <td class="o-num">{{ f.current_stock|qty }}</td>
+              <td>
+                {% if f.stock_sufficient %}
+                  <span class="o-badge o-badge--success">{% translate "Yeterli" %}</span>
+                {% else %}
+                  <span class="o-badge o-badge--danger">{% translate "Yetersiz" %}</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% empty %}
+            {% translate "Tahmin için yeterli satış geçmişi yok" as t %}
+            {% translate "Karşılanmış siparişler oluştukça tahmin üretilir." as d %}
+            {% ui_empty icon="bi-graph-up" title=t text=d colspan=6 %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div></div>
+  {% endif %}
+{% endblock %}
 
-<div class="data-card">
-  <table class="table table-borderless">
-    <thead>
-      <tr>
-        <th>Ürün</th>
-        <th class="text-end">Günlük Ort. Satış</th>
-        <th class="text-end">30 Günlük Tahmini Talep</th>
-        <th class="text-end">Mevcut Stok</th>
-        <th class="text-center">Durum</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for f in forecasts %}
-      {% if not f.error %}
-      <tr>
-        <td class="fw-medium">{{ f.product }}</td>
-        <td class="text-end">{{ f.daily_average_sales|floatformat:3 }}</td>
-        <td class="text-end">{{ f.forecasted_demand|floatformat:2 }}</td>
-        <td class="text-end">{{ f.current_stock|floatformat:3 }}</td>
-        <td class="text-center">
-          {% if f.stock_sufficient %}
-            <span class="badge" style="background:#dcfce7; color:#16a34a;">Yeterli</span>
-          {% else %}
-            <span class="badge" style="background:#fee2e2; color:#dc2626;"><i class="bi bi-exclamation-triangle-fill me-1"></i>Riskli</span>
-          {% endif %}
-        </td>
-      </tr>
-      {% endif %}
-      {% empty %}
-      <tr>
-        <td colspan="5" class="empty-state">
-          <i class="bi bi-inbox"></i>
-          Tamamlanmış sipariş bulunamadı.
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
+{% block scripts %}
+  {% if view == 'graph' %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="{% static 'js/o-charts.js' %}?v={{ asset_version }}"></script>
+  {% endif %}
 {% endblock %}

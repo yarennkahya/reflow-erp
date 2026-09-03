@@ -1,60 +1,45 @@
 {% extends 'base.html' %}
-{% block title %}Denetim Kaydı — Reflow Coffee ERP{% endblock %}
-{% block nav_audit %}active{% endblock %}
-{% block page_title %}Sistem / Denetim Kaydı{% endblock %}
-
-{% block extra_head %}
-<style>
-  .data-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:12px; overflow:hidden; }
-  .data-card .table { margin:0; font-size:13px; }
-  .data-card .table thead th { background:var(--g-n-50); border-bottom:1px solid var(--g-border); color:var(--g-text-2); font-size:11px; font-weight:700; letter-spacing:.65px; padding:11px 16px; text-transform:uppercase; white-space:nowrap; }
-  .data-card .table tbody td { border-color:var(--g-border-sub); color:var(--g-text); padding:13px 16px; vertical-align:middle; }
-  .data-card .table tbody tr:hover { background:var(--g-n-50); }
-  .user-avatar { align-items:center; background:#eff6ff; border-radius:9px; color:#2563eb; display:inline-flex; font-size:12px; font-weight:700; height:32px; justify-content:center; width:32px; }
-  .action-pill { background:var(--g-n-50); border:1px solid var(--g-border); border-radius:20px; color:var(--g-text); display:inline-block; font-size:11.5px; font-weight:600; padding:4px 9px; }
-  .target-value { color:var(--g-text); font-weight:600; }
-  .target-type { color:var(--g-text-2); font-size:11.5px; margin-top:2px; }
-  .empty-state { color:var(--g-text-3); padding:52px 24px; text-align:center; }
-  .empty-state i { display:block; font-size:34px; margin-bottom:8px; }
-</style>
-{% endblock %}
+{% block title %}{% translate "Denetim Kaydı" %}{% endblock %}
+{% block cp_pager %}{% ui_pager page_obj %}{% endblock %}
 
 {% block content %}
-<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
-  <div>
-    <h4 class="fw-bold mb-1 text-dark"><i class="bi bi-clock-history me-2" style="color:#2563eb;"></i>Denetim Kaydı</h4>
-    <p class="mb-0 text-muted" style="font-size:13px;">Önemli operasyonlarda kimin, ne zaman ve hangi kayıtta işlem yaptığını takip edin.</p>
+  <div class="o-button-box o-po-kpis">
+    {% translate "Toplam kayıt" as l1 %}{% ui_stat value=total_logs label=l1 icon="bi-clock-history" %}
   </div>
-  <span class="badge bg-primary-subtle text-primary-emphasis fw-medium">{{ audit_logs|length }} kayıt</span>
-</div>
 
-<div class="data-card">
-  <div class="table-responsive">
-    <table class="table table-borderless align-middle">
+  <div class="o-list"><div class="o-list-scroll">
+    <table class="o-table">
       <thead>
-        <tr><th>Kullanıcı</th><th>İşlem</th><th>Hedef</th><th>Tarih</th></tr>
+        <tr>
+          <th>{% translate "Kullanıcı" %}</th>
+          <th>{% translate "İşlem" %}</th>
+          <th>{% translate "Kayıt türü" %}</th>
+          <th>{% translate "Kayıt" %}</th>
+          <th>{% translate "Detay" %}</th>
+          <th>{% translate "Zaman" %}</th>
+        </tr>
       </thead>
       <tbody>
         {% for log in audit_logs %}
-        <tr>
-          <td>
-            <div class="d-flex align-items-center gap-2">
-              <span class="user-avatar">{% if log.user %}{{ log.user.username|first|upper }}{% else %}<i class="bi bi-gear-fill"></i>{% endif %}</span>
-              <span class="fw-medium">{% if log.user %}{{ log.user.username }}{% else %}Sistem{% endif %}</span>
-            </div>
-          </td>
-          <td><span class="action-pill">{{ log.action }}</span></td>
-          <td>
-            <div class="target-value">{{ log.target|default:"Silinmiş kayıt" }}</div>
-            <div class="target-type">{{ log.content_type.name|capfirst }} · #{{ log.object_id }}</div>
-          </td>
-          <td class="text-muted" style="font-size:12px;">{{ log.created_at|date:"d M Y, H:i" }}</td>
-        </tr>
+          <tr>
+            <td>
+              <div class="o-row">
+                {% ui_avatar log.user.username|default:"Sistem" size="sm" %}
+                <span class="o-strong">{{ log.user.username|default:"Sistem" }}</span>
+              </div>
+            </td>
+            <td>{{ log.action }}</td>
+            <td class="o-muted">{{ log.content_type.model|default:"—" }}</td>
+            <td class="o-mono o-muted">#{{ log.object_id|default:"—" }}</td>
+            <td class="o-muted o-sm">{{ log.details|default:"—"|truncatechars:60 }}</td>
+            <td class="o-nowrap o-muted o-sm">{{ log.created_at|date:"d M Y, H:i" }}</td>
+          </tr>
         {% empty %}
-        <tr><td colspan="4" class="empty-state"><i class="bi bi-clock"></i><div class="fw-medium">Henüz denetim kaydı yok.</div><div class="mt-1">Ödeme, teslim alma, kalite kontrolü ve satış işlemleri burada görünecek.</div></td></tr>
+          {% translate "Denetim kaydı yok" as t %}
+          {% translate "Sipariş karşılama, teslim alma, ödeme ve kalite kontrolü işlemleri burada listelenir." as d %}
+          {% ui_empty icon="bi-clock-history" title=t text=d colspan=6 %}
         {% endfor %}
       </tbody>
     </table>
-  </div>
-</div>
+  </div></div>
 {% endblock %}

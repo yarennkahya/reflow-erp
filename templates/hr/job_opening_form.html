@@ -1,55 +1,34 @@
 {% extends 'base.html' %}
-{% block title %}Yeni Pozisyon — Reflow Coffee ERP{% endblock %}
-{% block nav_hr %}active{% endblock %}
-{% block nav_hr_recruitment %}active{% endblock %}
-{% block page_title %}İnsan Kaynakları{% endblock %}
+{% load static %}
+{% block title %}{% translate "Yeni Pozisyon" %}{% endblock %}
+{% block cp_breadcrumb %}{% translate "Yeni pozisyon" as rec %}{% ui_breadcrumb record=rec %}{% endblock %}
+
+{% block cp_buttons %}
+  <button type="submit" form="o-form" class="o-btn o-btn--primary">
+    <i class="bi bi-check-lg" aria-hidden="true"></i> {% translate "Kaydet" %}
+  </button>
+  <a class="o-btn" href="{% url 'hr-recruitment' %}">{% translate "Vazgeç" %}</a>
+{% endblock %}
+
+{% block content_class %} o-content--sheet{% endblock %}
+
+{% block scripts %}<script src="{% static 'js/o-dept-select.js' %}?v={{ asset_version }}"></script>{% endblock %}
+{% block inline_data %}<script type="application/json" id="o-dept-positions">{{ positions_json|safe }}</script>{% endblock %}
 
 {% block content %}
-<div class="d-flex align-items-center justify-content-between gap-3 mb-4">
-  <div>
-    <h4 class="fw-bold mb-1 text-dark"><i class="bi bi-briefcase-fill me-2" style="color:#9333ea;"></i>Yeni Pozisyon</h4>
-    <p class="mb-0 text-muted" style="font-size:13px;">Pozisyon açık durumda oluşturulur ve başvuru almaya hazır olur.</p>
-  </div>
-  <a href="{% url 'hr-recruitment' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>İşe Alıma Dön</a>
-</div>
-
-<div class="card border-0 shadow-sm" style="max-width:760px;">
-  <div class="card-body p-4">
-    <form method="post" novalidate>
-      {% csrf_token %}
-      {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
-      <div class="row g-3">
-        <div class="col-12">
-          <label for="{{ form.title.id_for_label }}" class="form-label fw-medium">{{ form.title.label }}</label>
-          {{ form.title }}
-          {% for error in form.title.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
-        </div>
-        <div class="col-md-6">
-          <label for="{{ form.department.id_for_label }}" class="form-label fw-medium">{{ form.department.label }}</label>
-          {{ form.department }}
-          {% for error in form.department.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
-        </div>
-        <div class="col-md-6">
-          <label for="{{ form.position.id_for_label }}" class="form-label fw-medium">{{ form.position.label }}</label>
-          {{ form.position }}
-          {% for error in form.position.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
-        </div>
-        <div class="col-md-6">
-          <label for="{{ form.headcount.id_for_label }}" class="form-label fw-medium">{{ form.headcount.label }}</label>
-          {{ form.headcount }}
-          {% for error in form.headcount.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
-        </div>
-        <div class="col-md-6">
-          <label for="{{ form.closing_date.id_for_label }}" class="form-label fw-medium">{{ form.closing_date.label }}</label>
-          {{ form.closing_date }}
-          {% for error in form.closing_date.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
-        </div>
-      </div>
-      <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
-        <a href="{% url 'hr-recruitment' %}" class="btn btn-outline-secondary">İptal</a>
-        <button type="submit" class="btn btn-primary" style="background:#9333ea; border-color:#9333ea;"><i class="bi bi-plus-lg me-1"></i>Pozisyonu Aç</button>
-      </div>
-    </form>
-  </div>
-</div>
+{% ui_sheet %}
+  <form method="post" id="o-form">
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+    <h1 class="o-form-title">{% translate "Yeni pozisyon" %}</h1>
+    {% translate "Pozisyon bilgileri" as g %}
+    {% ui_group g %}
+      {% ui_field form.title cols=12 %}
+      {% ui_field form.department cols=6 %}
+      {% ui_field form.position cols=6 %}
+      {% ui_field form.headcount cols=6 %}
+      {% ui_field form.closing_date cols=6 %}
+    {% endui_group %}
+  </form>
+{% endui_sheet %}
 {% endblock %}

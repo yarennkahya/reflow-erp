@@ -1,114 +1,106 @@
 {% extends 'base.html' %}
-{% block title %}Yeni Üretim Emri — Reflow Coffee ERP{% endblock %}
-{% block nav_production %}active{% endblock %}
-{% block nav_production_batches %}active{% endblock %}
-{% block page_title %}Üretim{% endblock %}
+{% block title %}{% translate "Yeni Üretim Emri" %}{% endblock %}
+{% block cp_breadcrumb %}{% translate "Yeni üretim emri" as rec %}{% ui_breadcrumb record=rec %}{% endblock %}
 
-{% block extra_head %}
-<style>
-  .prod-subnav { display:flex; gap:4px; margin-bottom:20px; border-bottom:1px solid var(--g-border); padding-bottom:0; }
-  .prod-subnav a { padding:8px 14px; font-size:13px; font-weight:500; color:var(--g-text-2); text-decoration:none; border-bottom:2px solid transparent; margin-bottom:-1px; white-space:nowrap; }
-  .prod-subnav a:hover { color:var(--g-text); }
-  .prod-subnav a.active { color:#ca8a04; border-bottom-color:#ca8a04; font-weight:600; }
-  .form-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:10px; padding:24px; margin-bottom:20px; }
-  .section-title { font-size:13px; font-weight:700; color:var(--g-text-2); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:14px; }
-  .lot-badge { font-size:11.5px; color:var(--g-text-2); font-family:monospace; }
-</style>
+{% block cp_buttons %}
+  {% if selected_recipe %}
+    <button type="submit" form="o-form" class="o-btn o-btn--primary">
+      <i class="bi bi-thermometer-high" aria-hidden="true"></i> {% translate "Üretimi Başlat" %}
+    </button>
+  {% endif %}
+  <a class="o-btn" href="{% url 'production-list' %}">{% translate "Vazgeç" %}</a>
 {% endblock %}
 
+{% block content_class %} o-content--sheet{% endblock %}
+
 {% block content %}
-<div class="prod-subnav">
-  <a href="{% url 'production-list' %}" data-i18n="production-orders">Üretim Emirleri</a>
-  <a href="{% url 'production-recipes' %}" data-i18n="recipes-bom">Reçeteler (BOM)</a>
-</div>
+{% ui_sheet %}
+  <h1 class="o-form-title">{% translate "Yeni üretim emri" %}</h1>
+  <p class="o-form-subtitle">
+    {% translate "Reçeteyi seçin, tüketilecek yeşil kahve lotlarını belirleyin ve çıktı lotunu tanımlayın." %}
+  </p>
 
-<div class="d-flex align-items-center gap-3 mb-4">
-  <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-fire me-2" style="color:#ca8a04;"></i><span data-i18n="new-production-order">Yeni Üretim Emri</span></h5>
-  <a href="{% url 'production-list' %}" class="btn btn-sm btn-outline-secondary ms-auto" data-i18n="cancel">Vazgeç</a>
-</div>
+  {% translate "1. Reçete seçimi" as g1 %}
+  {% ui_group g1 %}
+    <div class="o-col-12">
+      <form method="get" class="o-row">
+        <div class="o-field o-grow">
+          <label class="o-label" for="recipe">{% translate "Reçete" %}</label>
+          <select id="recipe" name="recipe" class="o-select" onchange="this.form.submit()">
+            <option value="">{% translate "Reçete seçin…" %}</option>
+            {% for r in recipes %}
+              <option value="{{ r.pk }}" {% if selected_recipe and selected_recipe.pk == r.pk %}selected{% endif %}>
+                {{ r.name }} → {{ r.output_product.name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="o-field">
+          <span class="o-label">&nbsp;</span>
+          <button type="submit" class="o-btn">{% translate "Reçeteyi Yükle" %}</button>
+        </div>
+      </form>
+    </div>
+  {% endui_group %}
 
-{% if messages %}
-{% for msg in messages %}
-<div class="alert alert-{{ msg.tags|default:'info' }} alert-dismissible" role="alert">
-  {{ msg }} <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-</div>
-{% endfor %}
-{% endif %}
+  {% if selected_recipe %}
+    <form method="post" id="o-form">
+      {% csrf_token %}
+      <input type="hidden" name="recipe" value="{{ selected_recipe.pk }}">
 
-<!-- Adım 1: Reçete seç -->
-<div class="form-card">
-  <div class="section-title" data-i18n="step-recipe-selection">1. Reçete Seçimi</div>
-  <form method="get" class="d-flex gap-3 align-items-end flex-wrap">
-    <div style="flex:1; min-width:220px;">
-      <label class="form-label fw-medium" style="font-size:13px;">Reçete</label>
-      <select name="recipe" class="form-select" onchange="this.form.submit()">
-        <option value="">Reçete seçin...</option>
-        {% for r in recipes %}
-        <option value="{{ r.pk }}" {% if selected_recipe and selected_recipe.pk == r.pk %}selected{% endif %}>
-          {{ r.name }} → {{ r.output_product.name }}
-        </option>
+      {% blocktranslate asvar g2 with name=selected_recipe.name %}2. Girdi lotları — {{ name }}{% endblocktranslate %}
+      {% ui_group g2 %}
+        {% for cd in component_data %}
+          <div class="o-field o-col-6">
+            <label class="o-label" for="lot_{{ cd.component.input_product.pk }}">
+              {{ cd.component.input_product.name }}
+              <span class="o-faint">(%{{ cd.component.ratio_percent|floatformat:"-2" }})</span>
+            </label>
+            {% if cd.lots %}
+              <select id="lot_{{ cd.component.input_product.pk }}"
+                      name="lot_{{ cd.component.input_product.pk }}" class="o-select" required>
+                <option value="">{% translate "Lot seçin…" %}</option>
+                {% for lot in cd.lots %}
+                  <option value="{{ lot.pk }}">
+                    {{ lot.lot_code }} · {% translate "Kalan" %}: {{ lot.remaining_quantity|qty }} · {% translate "SKT" %}: {{ lot.expiry_date|date:"d M Y" }}
+                  </option>
+                {% endfor %}
+              </select>
+            {% else %}
+              <p class="o-field-error">
+                <i class="bi bi-exclamation-triangle" aria-hidden="true"></i>
+                {% blocktranslate with name=cd.component.input_product.name %}{{ name }} için stokta lot yok.{% endblocktranslate %}
+              </p>
+            {% endif %}
+          </div>
         {% endfor %}
-      </select>
-    </div>
-    <button type="submit" class="btn" style="background:#ca8a04; color:#fff;" data-i18n="load-recipe">Reçeteyi Yükle</button>
-  </form>
-</div>
+      {% endui_group %}
 
-{% if selected_recipe %}
-<!-- Adım 2: Üretim detayları -->
-<form method="post">
-{% csrf_token %}
-<input type="hidden" name="recipe" value="{{ selected_recipe.pk }}">
-
-<div class="form-card">
-  <div class="section-title">2. Girdi Lotları — {{ selected_recipe.name }}</div>
-  {% for cd in component_data %}
-  <div class="mb-3">
-    <label class="form-label fw-medium" style="font-size:13px;">
-      {{ cd.component.input_product.name }}
-      <span class="text-muted fw-normal">(%{{ cd.component.ratio_percent|floatformat:1 }})</span>
-    </label>
-    {% if cd.lots %}
-    <select name="lot_{{ cd.component.input_product.pk }}" class="form-select" required>
-      <option value="">Lot seçin...</option>
-      {% for lot in cd.lots %}
-      <option value="{{ lot.pk }}">
-        {{ lot.lot_code }} · Kalan: {{ lot.remaining_quantity|floatformat:3 }} · Son kullanma: {{ lot.expiry_date }}
-      </option>
-      {% endfor %}
-    </select>
-    {% else %}
-    <div class="alert alert-warning py-2 mb-0" style="font-size:13px;">
-      <i class="bi bi-exclamation-triangle me-1"></i>
-      {{ cd.component.input_product.name }} için stokta lot yok.
-    </div>
-    {% endif %}
-  </div>
-  {% endfor %}
-</div>
-
-<div class="form-card">
-  <div class="section-title" data-i18n="step-output-info">3. Çıktı Bilgileri</div>
-  <div class="row g-3">
-    <div class="col-md-3">
-      <label class="form-label fw-medium" style="font-size:13px;">Çıktı Miktarı ({{ selected_recipe.output_product.unit }})</label>
-      <input type="number" name="output_quantity" class="form-control" step="0.001" min="0.001" required placeholder="ör. 50.000">
-    </div>
-    <div class="col-md-4">
-      <label class="form-label fw-medium" style="font-size:13px;">Çıktı Lot Kodu</label>
-      <input type="text" name="output_lot_code" class="form-control" required placeholder="ör. LOT-2026-001">
-    </div>
-    <div class="col-md-3">
-      <label class="form-label fw-medium" style="font-size:13px;">Son Kullanma Tarihi</label>
-      <input type="date" name="output_expiry_date" class="form-control" required>
-    </div>
-  </div>
-</div>
-
-<div class="d-flex gap-2">
-  <button type="submit" class="btn" style="background:#ca8a04; color:#fff;" data-i18n="create-production-order">Üretim Emrini Oluştur</button>
-  <a href="{% url 'production-list' %}" class="btn btn-outline-secondary" data-i18n="cancel-alt">İptal</a>
-</div>
-</form>
-{% endif %}
+      {% translate "3. Çıktı bilgileri" as g3 %}
+      {% ui_group g3 %}
+        <div class="o-field o-col-4">
+          <label class="o-label" for="output_quantity">
+            {% translate "Çıktı miktarı" %} ({{ selected_recipe.output_product.get_unit_display }})
+            <span class="o-required" aria-hidden="true">*</span>
+          </label>
+          <input type="number" id="output_quantity" name="output_quantity" class="o-input"
+                 step="0.001" min="0.001" required placeholder="50.000">
+        </div>
+        <div class="o-field o-col-4">
+          <label class="o-label" for="output_lot_code">
+            {% translate "Çıktı lot kodu" %}<span class="o-required" aria-hidden="true">*</span>
+          </label>
+          <input type="text" id="output_lot_code" name="output_lot_code" class="o-input"
+                 required placeholder="LOT-2026-001">
+        </div>
+        <div class="o-field o-col-4">
+          <label class="o-label" for="output_expiry_date">
+            {% translate "Son kullanma tarihi" %}<span class="o-required" aria-hidden="true">*</span>
+          </label>
+          <input type="date" id="output_expiry_date" name="output_expiry_date" class="o-input" required>
+        </div>
+      {% endui_group %}
+    </form>
+  {% endif %}
+{% endui_sheet %}
 {% endblock %}

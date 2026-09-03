@@ -1,0 +1,11 @@
+{% if messages %}
+<div class="o-toasts" id="o-toasts" aria-live="polite" aria-atomic="true">
+  {% for message in messages %}
+    <div class="o-toast o-toast--{{ message.tags|default:'info' }}"
+         role="{% if message.tags == 'error' %}alert{% else %}status{% endif %}">
+      <div class="o-toast-body">{{ message }}</div>
+      <button type="button" class="o-toast-close" aria-label="{% translate 'Kapat' %}">&times;</button>
+    </div>
+  {% endfor %}
+</div>
+{% endif %}

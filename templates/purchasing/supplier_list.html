@@ -1,21 +1,70 @@
 {% extends 'base.html' %}
-{% block title %}Tedarikçiler — Reflow Coffee ERP{% endblock %}
-{% block nav_purchasing %}active{% endblock %}
-{% block nav_purchasing_suppliers %}active{% endblock %}
-{% block page_title %}Satın Alma / Tedarikçiler{% endblock %}
+{% block title %}{% translate "Tedarikçiler" %}{% endblock %}
+{% block region_attr %} data-ajax-region{% endblock %}
 
-{% block extra_head %}
-<style>
-  .purchase-stat, .data-card { background: var(--g-surface); border:1px solid var(--g-border); border-radius:12px; }.purchase-stat { height:100%; padding:16px; display:flex; align-items:center; gap:12px; }.purchase-stat-icon { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; }.purchase-stat-value { color:var(--g-text); font-size:22px; font-weight:700; line-height:1.1; }.purchase-stat-label { color:var(--g-text-2); font-size:11px; font-weight:600; letter-spacing:.6px; margin-top:3px; text-transform:uppercase; }
-  .data-card { overflow:hidden; }.data-card .table { margin:0; font-size:13px; }.data-card .table thead th { background:var(--g-n-50); border-bottom:1px solid var(--g-border); color:var(--g-text-2); font-size:11px; font-weight:700; letter-spacing:.65px; padding:11px 16px; text-transform:uppercase; white-space:nowrap; }.data-card .table tbody td { border-color:var(--g-border-sub); color:var(--g-text); padding:13px 16px; vertical-align:middle; }.data-card .table tbody tr:hover { background:var(--g-n-50); }
-  .supplier-avatar { width:36px; height:36px; border-radius:10px; background:#fff7ed; color:#c2410c; display:inline-flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; flex:0 0 auto; }.supplier-link { color:var(--g-text); font-weight:600; text-decoration:none; }.supplier-link:hover { color:#ea580c; }.supplier-contact { color:var(--g-text-2); font-size:12px; margin-top:2px; }.status-dot { width:7px; height:7px; display:inline-block; border-radius:50%; margin-right:5px; }.empty-state { color:var(--g-text-3); padding:52px 24px; text-align:center; }.empty-state i { display:block; font-size:34px; margin-bottom:8px; }
-</style>
+{% block cp_buttons %}
+  <a href="{% url 'supplier-create' %}" class="o-btn o-btn--primary">
+    <i class="bi bi-plus-lg" aria-hidden="true"></i> {% translate "Yeni" %}
+  </a>
+  <a href="{% url 'purchasing-list' %}" class="o-btn">
+    <i class="bi bi-basket3" aria-hidden="true"></i> {% translate "Siparişler" %}
+  </a>
+{% endblock %}
+
+{% block cp_pager %}{% ui_pager page_obj %}{% endblock %}
+
+{% block cp_search %}
+  <div class="o-cp-search-row">
+    {% translate "Tedarikçi, e-posta veya telefon ara" as ph %}
+    {% ui_search target="#o-view" placeholder=ph filters=status_options filter_param="status" selected=selected_status %}
+  </div>
 {% endblock %}
 
 {% block content %}
-<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4"><div><h4 class="fw-bold mb-1 text-dark"><i class="bi bi-truck me-2" style="color:#ea580c;"></i>Tedarikçi Yönetimi</h4><p class="mb-0 text-muted" style="font-size:13px;">Tedarikçi bilgilerini, kataloglarını ve satın alma geçmişlerini yönetin.</p></div><div class="d-flex gap-2"><a href="{% url 'purchasing-list' %}" class="btn btn-outline-primary"><i class="bi bi-basket3 me-1"></i>Siparişler</a><a href="{% url 'supplier-create' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Yeni Tedarikçi</a></div></div>
+  <div class="o-button-box o-po-kpis">
+    {% translate "Toplam tedarikçi" as l1 %}{% ui_stat value=supplier_count label=l1 icon="bi-truck" %}
+    {% translate "Aktif tedarikçi" as l2 %}{% ui_stat value=active_supplier_count label=l2 icon="bi-patch-check" variant="success" %}
+  </div>
 
-<div class="row g-3 mb-4"><div class="col-md-6"><div class="purchase-stat"><div class="purchase-stat-icon" style="background:#fff7ed;color:#ea580c;"><i class="bi bi-truck"></i></div><div><div class="purchase-stat-value">{{ supplier_count }}</div><div class="purchase-stat-label">Toplam Tedarikçi</div></div></div></div><div class="col-md-6"><div class="purchase-stat"><div class="purchase-stat-icon" style="background:#f0fdf4;color:#16a34a;"><i class="bi bi-patch-check"></i></div><div><div class="purchase-stat-value">{{ active_supplier_count }}</div><div class="purchase-stat-label">Aktif Tedarikçi</div></div></div></div></div>
-
-{% include 'purchasing/partials/supplier_list_region.html' %}
+  <div class="o-list">
+    <div class="o-list-scroll">
+      <table class="o-table">
+        <thead>
+          <tr>
+            <th>{% translate "Tedarikçi" %}</th>
+            <th>{% translate "İletişim" %}</th>
+            <th>{% translate "Kayıt tarihi" %}</th>
+            <th class="o-num">{% translate "Sipariş" %}</th>
+            <th class="o-num">{% translate "Açık" %}</th>
+            <th>{% translate "Durum" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for supplier in suppliers %}
+            <tr>
+              <td>
+                <div class="o-row">
+                  {% ui_avatar supplier.name size="sm" %}
+                  <a class="o-table-link" href="{% url 'supplier-detail' supplier.pk %}">{{ supplier.name }}</a>
+                </div>
+              </td>
+              <td class="o-sm o-muted">
+                {{ supplier.contact_email|default:"—" }}
+                {% if supplier.contact_phone %}<span class="o-table-sub">{{ supplier.contact_phone }}</span>{% endif %}
+              </td>
+              <td class="o-nowrap o-muted o-sm">{{ supplier.created_at|date:"d M Y" }}</td>
+              <td class="o-num">{{ supplier.order_count }}</td>
+              <td class="o-num">{{ supplier.open_order_count }}</td>
+              <td>{% ui_badge supplier "is_active" %}</td>
+            </tr>
+          {% empty %}
+            {% translate "Gösterilecek tedarikçi yok" as t %}
+            {% translate "İlk tedarikçiyi ekle" as cta %}
+            {% url 'supplier-create' as create_url %}
+            {% ui_empty icon="bi-truck-flatbed" title=t action_url=create_url action_label=cta colspan=6 %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 {% endblock %}

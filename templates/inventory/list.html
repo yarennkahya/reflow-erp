@@ -1,19 +1,35 @@
 {% extends 'base.html' %}
-{% block title %}Stoklar — Reflow Coffee ERP{% endblock %}
-{% block nav_inventory %}active{% endblock %}
-{% block nav_inventory_lots %}active{% endblock %}
-{% block page_title %}Stok / Lotlar{% endblock %}
+{% block title %}{% translate "Stoklar" %}{% endblock %}
+{% block region_attr %} data-ajax-region{% endblock %}
 
-{% block extra_head %}
-<style>
-  .stock-stat, .data-card, .stock-note { background: var(--g-surface); border:1px solid var(--g-border); border-radius:12px; }.stock-stat { height:100%; padding:16px; display:flex; align-items:center; gap:12px; }.stock-stat-icon { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; flex:0 0 auto; }.stock-stat-value { color:var(--g-text); font-size:22px; font-weight:700; line-height:1.1; }.stock-stat-label { color:var(--g-text-2); font-size:11px; font-weight:600; letter-spacing:.6px; margin-top:3px; text-transform:uppercase; }.stock-note { color:var(--g-text-2); font-size:12.5px; padding:12px 14px; }.data-card { overflow:hidden; }.data-card .table { margin:0; font-size:13px; }.data-card .table thead th { background:var(--g-n-50); border-bottom:1px solid var(--g-border); color:var(--g-text-2); font-size:11px; font-weight:700; letter-spacing:.65px; padding:11px 16px; text-transform:uppercase; white-space:nowrap; }.data-card .table tbody td { border-color:var(--g-border-sub); color:var(--g-text); padding:13px 16px; vertical-align:middle; }.data-card .table tbody tr:hover { background:var(--g-n-50); }.product-link { color:var(--g-text); font-weight:600; text-decoration:none; }.product-link:hover { color:#2563eb; }.product-sub { color:var(--g-text-2); font-size:11.5px; margin-top:2px; }.lot-code { background:var(--g-n-50); border-radius:5px; color:var(--g-text-2); font-family:monospace; font-size:12px; padding:3px 6px; }.freshness-pill { border-radius:20px; display:inline-block; font-size:11.5px; font-weight:600; padding:4px 8px; white-space:nowrap; }.freshness-normal { background:#f0fdf4; color:#15803d; }.freshness-priority_sale { background:#fff7ed; color:#c2410c; }.freshness-waste { background:#fef2f2; color:#b91c1c; }.stock-empty { background:var(--g-border-sub); color:var(--g-text-2); }.empty-state { color:var(--g-text-3); padding:52px 24px; text-align:center; }.empty-state i { display:block; font-size:34px; margin-bottom:8px; }
-</style>
+{% block cp_buttons %}
+  <a href="{% url 'warehouse-list' %}" class="o-btn">
+    <i class="bi bi-buildings" aria-hidden="true"></i> {% translate "Depolar" %}
+  </a>
+{% endblock %}
+
+{% block cp_pager %}{% ui_pager page_obj %}{% endblock %}
+{% block cp_views %}{% ui_view_switcher "list,kanban,calendar" current=view %}{% endblock %}
+
+{% block cp_search %}
+  <div class="o-cp-search-row">
+    {% translate "Ürün, kategori veya lot kodu ara" as ph %}
+    {% ui_search target="#o-view" placeholder=ph filters=freshness_choices filter_param="freshness" selected=selected_freshness %}
+  </div>
 {% endblock %}
 
 {% block content %}
-<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4"><div><h4 class="fw-bold mb-1 text-dark"><i class="bi bi-boxes me-2" style="color:#2563eb;"></i><span data-i18n="stock-status">Stok Durumu</span></h4><p class="mb-0 text-muted" style="font-size:13px;" data-i18n="stock-status-desc">Lot bazında kalan miktarı, depo yerleşimini ve son kullanma takibini görün.</p></div><a href="{% url 'warehouse-list' %}" class="btn btn-outline-primary" data-i18n="manage-warehouses"><i class="bi bi-buildings me-1"></i>Depoları Yönet</a></div>
+  <div class="o-button-box o-po-kpis">
+    {% translate "Gösterilen lot" as l1 %}{% ui_stat value=total_lots label=l1 icon="bi-box-seam" %}
+    {% translate "Stokta olan" as l2 %}{% ui_stat value=available_lots label=l2 icon="bi-check2-circle" variant="success" %}
+    {% translate "Deposu atanmamış" as l3 %}{% ui_stat value=unassigned_lots label=l3 icon="bi-geo-alt" %}
+    {% translate "Dikkat gerektiren" as l4 %}{% ui_stat value=attention_lots label=l4 icon="bi-exclamation-triangle" variant="warning" %}
+  </div>
 
-<div class="stock-note mb-4"><i class="bi bi-info-circle-fill text-primary me-1"></i>Stok girişi, satın alma siparişinin <a href="{% url 'purchasing-list' %}">teslim alma</a> adımında otomatik oluşur. Böylece maliyet ve lot geçmişi korunur.</div>
+  <p class="o-note">
+    <i class="bi bi-info-circle" aria-hidden="true"></i>
+    {% blocktranslate %}Stok girişi, satın alma siparişinin teslim alma adımında otomatik oluşur; böylece maliyet ve lot geçmişi korunur.{% endblocktranslate %}
+  </p>
 
-{% include 'inventory/partials/lot_results.html' %}
+  {% include view_template %}
 {% endblock %}

@@ -1,0 +1,33 @@
+<div class="o-list">
+  <div class="o-list-scroll">
+    <table class="o-table">
+      <thead>
+        <tr>
+          <th>{% translate "Fırsat" %}</th>
+          <th>{% translate "Müşteri" %}</th>
+          <th>{% translate "Aşama" %}</th>
+          <th>{% translate "Durum" %}</th>
+          <th class="o-num">{% translate "Tahmini tutar" %}</th>
+          <th>{% translate "Güncelleme" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for sale in sales %}
+          <tr>
+            <td><a href="{% url 'crm-sale-edit' sale.pk %}" class="o-table-link">{{ sale.title }}</a></td>
+            <td><a href="{% url 'crm-customer-detail' sale.customer_id %}" class="o-table-link">{{ sale.customer.name }}</a></td>
+            <td>{% ui_badge sale "stage" %}</td>
+            <td>{% ui_badge sale "status" %}</td>
+            <td class="o-num o-strong">{{ sale.estimated_value|money }}</td>
+            <td class="o-nowrap o-muted o-sm">{{ sale.updated_at|date:"d M Y" }}</td>
+          </tr>
+        {% empty %}
+          {% translate "Gösterilecek fırsat yok" as t %}
+          {% translate "İlk fırsatı oluştur" as cta %}
+          {% url 'opportunity-create' as create_url %}
+          {% ui_empty icon="bi-graph-up" title=t action_url=create_url action_label=cta colspan=6 %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
