@@ -6,6 +6,11 @@
   <a class="o-btn o-btn--sm" data-ajax-link data-ajax-target="#o-view"
      href="?view=calendar&year={{ next_year }}&month={{ next_month }}"
      aria-label="{% translate 'Sonraki ay' %}"><i class="bi bi-chevron-right" aria-hidden="true"></i></a>
+  <form class="o-cal-picker" data-ajax-filter data-ajax-autosubmit data-ajax-target="#o-view">
+    <input type="hidden" name="view" value="calendar">
+    <input type="month" name="period" value="{{ period_value }}"
+           class="o-input" aria-label="{% translate 'Ay seç' %}">
+  </form>
   <span class="o-muted o-sm">{% translate "İzin aralıkları" %}</span>
 </div>
 

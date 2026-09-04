@@ -18,7 +18,10 @@ from .tasks import send_meeting_invites_task
 @login_required
 def calendar_view(request):
     """Ay ızgarası artık dashboard/calendars.py'deki ortak kurucudan geliyor."""
-    year, month = normalize_period(request.GET.get('year'), request.GET.get('month'))
+    year, month = normalize_period(
+        request.GET.get('year'), request.GET.get('month'),
+        period=request.GET.get('period'),
+    )
 
     meetings = Meeting.objects.filter(
         start_time__year=year, start_time__month=month

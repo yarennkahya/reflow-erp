@@ -153,7 +153,10 @@ def leave_list_view(request):
 
     calendar_ctx = {}
     if view == 'calendar':
-        year, month = normalize_period(request.GET.get('year'), request.GET.get('month'))
+        year, month = normalize_period(
+            request.GET.get('year'), request.GET.get('month'),
+            period=request.GET.get('period'),
+        )
         calendar_ctx = period_nav(year, month)
         # İzinler tek gün değil ARALIK; bu yüzden span-duyarlı ızgara.
         calendar_ctx['weeks'] = month_grid_spans(

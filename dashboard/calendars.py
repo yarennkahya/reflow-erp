@@ -22,9 +22,19 @@ WEEKDAY_NAMES = [
 ]
 
 
-def normalize_period(year, month, today=None):
-    """?year=&month= parametrelerini güvenli bir (year, month) çiftine indirger."""
+def normalize_period(year, month, today=None, period=None):
+    """
+    ?year=&month= parametrelerini güvenli bir (year, month) çiftine indirger.
+
+    Alternatif olarak <input type="month"> tarayıcı seçicisinden gelen
+    ``period=YYYY-MM`` biçimini de kabul eder; year/month verilmemişse buradan
+    ayrıştırır. Böylece manuel ay seçimi tek bir alanla çalışabilir.
+    """
     today = today or timezone.localdate()
+    if (year is None or month is None) and period:
+        parts = str(period).split('-')
+        if len(parts) == 2:
+            year, month = parts[0], parts[1]
     try:
         year, month = int(year), int(month)
     except (TypeError, ValueError):
@@ -42,6 +52,8 @@ def period_nav(year, month):
         'month_label': f'{MONTH_NAMES[month]} {year}',
         'prev_year': prev_year, 'prev_month': prev_month,
         'next_year': next_year, 'next_month': next_month,
+        # <input type="month"> value biçimi (YYYY-MM); manuel seçici için.
+        'period_value': f'{year:04d}-{month:02d}',
         'weekday_names': WEEKDAY_NAMES,
     }
 

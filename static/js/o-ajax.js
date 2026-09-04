@@ -157,7 +157,7 @@
     var input = event.target;
     if (!input || !input.closest) return;
     var form = input.closest('form[data-ajax-filter][data-ajax-autosubmit]');
-    if (!form || !input.matches('select, input[type="checkbox"], input[type="radio"]')) return;
+    if (!form || !input.matches('select, input[type="checkbox"], input[type="radio"], input[type="month"], input[type="date"]')) return;
     form.requestSubmit();
   });
 

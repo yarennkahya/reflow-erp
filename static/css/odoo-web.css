@@ -1419,6 +1419,9 @@ a.o-stat:hover { border-color: var(--o-primary); background: var(--o-primary-sub
   margin-bottom: var(--o-sp-3);
 }
 .o-cal-label { font-size: var(--o-font-size-lg); font-weight: 600; min-width: 9ch; }
+/* Takvim toolbar'ında manuel ay seçici: yerleşik <input type="month"> */
+.o-cal-picker { margin: 0; margin-inline-start: var(--o-sp-2); }
+.o-cal-picker .o-input { height: 26px; padding: 0 6px; width: auto; }
 
 /* Satır içi iade formu */
 .o-return-form { display: flex; gap: 4px; margin: 0; align-items: center; }

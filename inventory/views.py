@@ -100,7 +100,10 @@ def lot_list(request):
 
     calendar_ctx = {}
     if view == 'calendar':
-        year, month = normalize_period(request.GET.get('year'), request.GET.get('month'))
+        year, month = normalize_period(
+            request.GET.get('year'), request.GET.get('month'),
+            period=request.GET.get('period'),
+        )
         calendar_ctx = period_nav(year, month)
         calendar_ctx['weeks'] = month_grid(
             year, month, rows, date_of=lambda row: row['lot'].expiry_date,
